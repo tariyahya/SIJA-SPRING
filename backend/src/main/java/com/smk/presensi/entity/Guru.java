@@ -64,6 +64,24 @@ public class Guru {
     private String faceId;
 
     /**
+     * USER - Relasi ke User (akun login)
+     * 
+     * Tidak semua guru punya akun login.
+     * Hanya guru yang perlu akses sistem yang diberi akun.
+     * 
+     * Relasi: OneToOne (1 guru max 1 user, 1 user max 1 guru)
+     * 
+     * @OneToOne: Relasi one-to-one dengan User
+     * @JoinColumn: Foreign key di tabel guru
+     *   - name = "user_id": Nama kolom FK di tabel guru
+     *   - nullable = true: Boleh null (guru tidak wajib punya user)
+     *   - unique = true: Satu user hanya boleh link ke 1 guru
+     */
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = true, unique = true)
+    private User user;  // Akun login guru (opsional)
+
+    /**
      * Constructor kosong - WAJIB untuk JPA
      * Jangan dihapus!
      */
@@ -130,5 +148,13 @@ public class Guru {
     }
     public void setFaceId(String faceId) { 
         this.faceId = faceId; 
+    }
+
+    // Getter & Setter untuk USER
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
     }
 }

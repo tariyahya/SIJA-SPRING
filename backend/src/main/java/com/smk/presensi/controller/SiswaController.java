@@ -6,6 +6,7 @@ import com.smk.presensi.service.SiswaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -122,6 +123,7 @@ public class SiswaController {
      * @return List semua siswa dalam bentuk DTO (JSON array)
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU')")
     public List<SiswaResponse> getAll() {
         return siswaService.findAll();
     }
@@ -179,6 +181,7 @@ public class SiswaController {
      * @throws RuntimeException jika siswa tidak ditemukan (di-handle di service layer)
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU')")
     public SiswaResponse getById(@PathVariable Long id) {
         return siswaService.findById(id);
     }
@@ -272,6 +275,7 @@ public class SiswaController {
      * @return ResponseEntity berisi SiswaResponse dengan status 201 CREATED
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SiswaResponse> create(@RequestBody @Valid SiswaRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(siswaService.create(request));
@@ -359,6 +363,7 @@ public class SiswaController {
      * @throws RuntimeException jika siswa dengan id tersebut tidak ditemukan
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public SiswaResponse update(@PathVariable Long id, @RequestBody @Valid SiswaRequest request) {
         return siswaService.update(id, request);
     }
@@ -451,6 +456,7 @@ public class SiswaController {
      * @throws RuntimeException jika siswa dengan id tersebut tidak ditemukan
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         siswaService.delete(id);
         return ResponseEntity.noContent().build();
@@ -549,6 +555,7 @@ public class SiswaController {
      * @return List siswa dengan kelas tersebut (bisa kosong jika tidak ada)
      */
     @GetMapping("/kelas/{namaKelas}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU')")
     public List<SiswaResponse> getByKelas(@PathVariable String namaKelas) {
         return siswaService.findByKelas(namaKelas);
     }

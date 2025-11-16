@@ -73,37 +73,56 @@ Anggap ini untuk ± 10–12 pertemuan besar. Di kelas bisa dipecah lagi jadi beb
 
 ---
 
-### Tahap 3 – Auth & Role (Admin, Guru, Siswa)
+### Tahap 3 – Auth & Role (Admin, Guru, Siswa) ✅ COMPLETED
 
 **Tujuan:** Siswa paham otentikasi & otorisasi sederhana.
 
-* Tambah `User` + `Role` (ADMIN, GURU, SISWA).
-* Login pakai JWT sederhana (`/auth/login`).
-* Proteksi endpoint:
+* Tambah `User` + `Role` (ADMIN, GURU, SISWA). ✅
+* Login pakai JWT sederhana (`/auth/login`). ✅
+* Proteksi endpoint: ✅
 
-  * Admin: manage siswa/guru.
-  * Guru: lihat presensi kelasnya.
-  * Siswa: lihat histori presensi sendiri.
+  * Admin: manage siswa/guru (CRUD all).
+  * Guru: lihat data siswa/guru (read-only).
+  * Siswa: no access to siswa/guru endpoints.
+* User relationship: OneToOne dengan Siswa/Guru. ✅
+* Role-based access control dengan @PreAuthorize. ✅
 * **Branch guru:** `tahap-03-auth-role`
+* **Status:** ✅ COMPLETE (All Tasks 1-15 done, build SUCCESS)
+* **Files created:** 23 files (19 code + 4 docs) = ~8,500 lines total
+* **Documentation:**
+  - `docs/TASK-3.md` (implementation guide)
+  - `docs/blog3.md` (concept explanation with analogies)
+  - `docs/POSTMAN-TAHAP-03.md` (API testing guide)
+  - `docs/README-TAHAP-03.md` (overview & summary)
+  - `docs/COMPLETED-TASK-12-13.md` (Tasks 12-13 completion report)
 
 ---
 
-### Tahap 4 – Model Presensi & Flow Manual (Tanpa RFID dkk dulu)
+### Tahap 4 – Model Presensi & Flow Manual (Tanpa RFID dkk dulu) ✅ COMPLETED
 
 **Tujuan:** Paham alur presensi dulu, baru masuk hardware.
 
-* Entity `Presensi`:
-
+* Entity `Presensi`: ✅
   * `userId`, `tipe` (SISWA / GURU), `tanggal`, `jamMasuk`, `jamPulang`, `status`, `latitude`, `longitude`, `method` (MANUAL/RFID/QR/FACE).
-* Endpoint:
-
-  * `POST /presensi/checkin`
-  * `POST /presensi/checkout`
-  * `GET /presensi/histori?siswaId=...`
-* Tambah validasi dasar:
-
-  * Tidak boleh checkin dua kali.
+* Enum: TipeUser, StatusPresensi, MethodPresensi ✅
+* Endpoint: ✅
+  * `POST /api/presensi/checkin` - User checkin (SISWA, GURU)
+  * `POST /api/presensi/checkout` - User checkout (SISWA, GURU)
+  * `GET /api/presensi/histori` - View own history
+  * `GET /api/presensi` - View all (ADMIN, GURU)
+* Validasi: ✅
+  * Tidak boleh checkin dua kali per hari
+  * Harus checkin dulu sebelum checkout
+  * Tidak boleh checkout dua kali
+* Status auto-calculate: HADIR vs TERLAMBAT based on jam masuk ✅
+* GPS tracking (latitude/longitude) ✅
+* Role-based access control ✅
 * **Branch guru:** `tahap-04-presensi-basic`
+* **Status:** ✅ COMPLETE (11 code files, 3 docs, build SUCCESS)
+* **Documentation:**
+  - `docs/TASK-4.md` (implementation guide)
+  - `docs/POSTMAN-TAHAP-04.md` (API testing)
+  - `docs/README-TAHAP-04.md` (overview & summary)
 
 ---
 

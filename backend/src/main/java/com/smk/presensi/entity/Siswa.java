@@ -89,6 +89,28 @@ public class Siswa {
     private String faceId;  // Contoh: "face_vector_12345" (data wajah yang sudah diproses)
 
     /**
+     * USER - Relasi ke User (akun login)
+     * 
+     * Tidak semua siswa punya akun login.
+     * Hanya siswa yang perlu akses sistem yang diberi akun.
+     * 
+     * Relasi: OneToOne (1 siswa max 1 user, 1 user max 1 siswa)
+     * 
+     * @OneToOne: Relasi one-to-one dengan User
+     * @JoinColumn: Foreign key di tabel siswa
+     *   - name = "user_id": Nama kolom FK di tabel siswa
+     *   - nullable = true: Boleh null (siswa tidak wajib punya user)
+     *   - unique = true: Satu user hanya boleh link ke 1 siswa
+     * 
+     * Contoh:
+     * Siswa A punya user → bisa login ke sistem
+     * Siswa B tidak punya user → tidak bisa login (data master saja)
+     */
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = true, unique = true)
+    private User user;  // Akun login siswa (opsional)
+
+    /**
      * CONSTRUCTOR KOSONG (No-args constructor)
      * 
      * JPA WAJIB butuh constructor tanpa parameter.
@@ -182,5 +204,13 @@ public class Siswa {
     }
     public void setFaceId(String faceId) { 
         this.faceId = faceId; 
+    }
+
+    // Getter & Setter untuk USER
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
     }
 }
