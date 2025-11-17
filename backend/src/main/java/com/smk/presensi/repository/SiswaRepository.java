@@ -100,6 +100,21 @@ public interface SiswaRepository extends JpaRepository<Siswa, Long> {
      */
     Optional<Siswa> findByRfidCardId(String rfidCardId);
     
+    /**
+     * FIND BY BARCODE ID - Cari siswa berdasarkan Barcode ID.
+     * 
+     * Generated SQL:
+     * SELECT * FROM siswa WHERE barcode_id = ?
+     * 
+     * Use case:
+     * - Barcode checkin: cari siswa yang punya barcode ini
+     * - Validasi barcode: apakah barcode ini terdaftar?
+     * 
+     * @param barcodeId ID barcode yang dicari
+     * @return Optional<Siswa> (ada jika terdaftar, empty jika tidak)
+     */
+    Optional<Siswa> findByBarcodeId(String barcodeId);
+    
     // CATATAN PENTING:
     // Method di atas TIDAK PERLU implementasi!
     // Spring Data JPA otomatis bikin SQL dan implementasinya.

@@ -151,6 +151,10 @@ public class SecurityConfig {
                         // Hardware tidak bisa login, jadi endpoint harus public
                         .requestMatchers("/api/presensi/rfid/**").permitAll()
                         
+                        // Barcode endpoints (untuk barcode reader/smartphone scanner)
+                        // Hardware tidak bisa login, jadi endpoint harus public
+                        .requestMatchers("/api/presensi/barcode/**").permitAll()
+                        
                         // Semua endpoint lain PERLU authentication
                         .anyRequest().authenticated()
                 )

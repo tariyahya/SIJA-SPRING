@@ -1,5 +1,6 @@
 package com.smk.presensi.service;
 
+import com.smk.presensi.dto.presensi.BarcodeCheckinRequest;
 import com.smk.presensi.dto.presensi.CheckinRequest;
 import com.smk.presensi.dto.presensi.CheckoutRequest;
 import com.smk.presensi.dto.presensi.PresensiResponse;
@@ -268,6 +269,93 @@ public class PresensiService {
         
         // Keterangan otomatis
         presensi.setKeterangan("Checkin via RFID: " + rfidCardId);
+        
+        // 6. Save
+        Presensi saved = presensiRepository.save(presensi);
+        
+        // 7. Convert ke DTO
+        return toResponse(saved);
+    }
+
+    /**
+     * CHECKIN VIA BARCODE - untuk barcode reader/smartphone scanner.
+     * 
+     * Flow:
+     * 1. Terima barcodeId dari scanner
+     * 2. Cari user berdasarkan barcodeId (cek Siswa dulu, lalu Guru)
+     * 3. Auto-detect tipe user (SISWA/GURU)
+     * 4. Validasi duplikasi (sudah checkin hari ini?)
+     * 5. Buat record presensi dengan method = BARCODE
+     * 6. Hitung status (HADIR/TERLAMBAT)
+     * 7. Return response
+     * 
+     * Perbedaan dengan checkin() manual:
+     * - Tidak perlu authentication (no JWT)
+     * - Tidak ambil user dari SecurityContext
+     * - Cari user berdasarkan barcodeId
+     * - Auto-detect tipe (SISWA/GURU) dari tabel yang ditemukan
+     * 
+     * Perbedaan dengan checkinRfid():
+     * - Cari by barcodeId (bukan rfidCardId)
+     * - Method = BARCODE (bukan RFID)
+     * - Keterangan include barcodeId (bukan rfidCardId)
+     */
+    @Transactional
+    public PresensiResponse checkinBarcode(BarcodeCheckinRequest request) {
+        String barcodeId = request.barcodeId();
+        
+        // 1. Cari user berdasarkan barcodeId
+        User user = null;
+        TipeUser tipe = null;
+        
+        // Cari di tabel Siswa dulu
+        Optional<Siswa> siswaOpt = siswaRepository.findByBarcodeId(barcodeId);
+        if (siswaOpt.isPresent()) {
+            Siswa siswa = siswaOpt.get();
+            user = siswa.getUser(); // Ambil User dari relasi OneToOne
+            tipe = TipeUser.SISWA;
+        } else {
+            // Jika tidak ada di Siswa, cari di tabel Guru
+            Optional<Guru> guruOpt = guruRepository.findByBarcodeId(barcodeId);
+            if (guruOpt.isPresent()) {
+                Guru guru = guruOpt.get();
+                user = guru.getUser(); // Ambil User dari relasi OneToOne
+                tipe = TipeUser.GURU;
+            }
+        }
+        
+        // Jika tidak ketemu di Siswa maupun Guru
+        if (user == null) {
+            throw new RuntimeException("Barcode tidak terdaftar: " + barcodeId);
+        }
+        
+        // 2. Validasi duplikasi
+        LocalDate today = LocalDate.now();
+        if (presensiRepository.existsByUserAndTanggal(user, today)) {
+            throw new RuntimeException("User dengan barcode " + barcodeId + " sudah checkin hari ini");
+        }
+        
+        // 3. Buat record presensi baru
+        Presensi presensi = new Presensi();
+        presensi.setUser(user);
+        presensi.setTipe(tipe); // SISWA atau GURU (auto-detect)
+        presensi.setTanggal(today);
+        
+        LocalTime now = LocalTime.now();
+        presensi.setJamMasuk(now);
+        
+        // 4. Hitung status (HADIR/TERLAMBAT)
+        presensi.setStatus(hitungStatus(now));
+        
+        // 5. Set method = BARCODE (bukan MANUAL/RFID)
+        presensi.setMethod(MethodPresensi.BARCODE);
+        
+        // GPS tidak ada (Barcode reader fixed location)
+        presensi.setLatitude(null);
+        presensi.setLongitude(null);
+        
+        // Keterangan otomatis
+        presensi.setKeterangan("Checkin via Barcode: " + barcodeId);
         
         // 6. Save
         Presensi saved = presensiRepository.save(presensi);
