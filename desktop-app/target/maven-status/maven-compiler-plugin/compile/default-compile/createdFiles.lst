@@ -1,0 +1,12 @@
+com\smk\presensi\desktop\controller\DashboardController.class
+com\smk\presensi\desktop\viewmodel\DashboardViewModel.class
+com\smk\presensi\desktop\model\DashboardStats.class
+com\smk\presensi\desktop\service\PresensiService.class
+com\smk\presensi\desktop\service\PresensiService$1.class
+com\smk\presensi\desktop\DesktopApp.class
+com\smk\presensi\desktop\service\PresensiService$2.class
+com\smk\presensi\desktop\controller\DashboardController$1.class
+com\smk\presensi\desktop\model\User.class
+com\smk\presensi\desktop\service\ApiClient$LoginResponse.class
+com\smk\presensi\desktop\model\Presensi.class
+com\smk\presensi\desktop\service\ApiClient.class
