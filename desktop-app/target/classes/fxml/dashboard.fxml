@@ -26,9 +26,13 @@
             
             <Region HBox.hgrow="ALWAYS"/>
             
+            <Label fx:id="userLabel" text="👤 User" styleClass="user-label"/>
+            
             <CheckBox fx:id="mockDataCheckbox" text="Mock Data" selected="true"/>
             
             <Button fx:id="refreshButton" text="⟳ Refresh" styleClass="btn-primary"/>
+            
+            <Button fx:id="logoutButton" text="🚪 Logout" styleClass="btn-danger"/>
             
             <ProgressIndicator fx:id="loadingIndicator" prefWidth="30" prefHeight="30" visible="false"/>
         </HBox>

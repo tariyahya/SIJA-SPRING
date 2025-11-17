@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<StackPane xmlns="http://javafx.com/javafx/21" 
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.smk.presensi.desktop.controller.LoginController"
+           stylesheets="@../css/login.css"
+           styleClass="root">
+
+    <!-- Background -->
+    <VBox styleClass="background-gradient" StackPane.alignment="CENTER"/>
+
+    <!-- Login Card -->
+    <VBox styleClass="login-card" spacing="20" alignment="CENTER" maxWidth="400">
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+
+        <!-- Logo / Title -->
+        <VBox alignment="CENTER" spacing="10">
+            <Label text="SIJA PRESENSI" styleClass="app-title">
+                <font>
+                    <Font name="System Bold" size="28"/>
+                </font>
+            </Label>
+            <Label text="Dashboard Admin/TU" styleClass="app-subtitle">
+                <font>
+                    <Font size="14"/>
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Separator -->
+        <Separator prefWidth="300"/>
+
+        <!-- Error Label -->
+        <Label fx:id="errorLabel" styleClass="error-label" visible="false" wrapText="true" maxWidth="320"/>
+
+        <!-- Form Fields -->
+        <VBox spacing="15" VBox.vgrow="ALWAYS">
+            <!-- Username -->
+            <VBox spacing="5">
+                <Label text="Username" styleClass="field-label">
+                    <font>
+                        <Font size="12"/>
+                    </font>
+                </Label>
+                <TextField fx:id="usernameField" 
+                          promptText="Masukkan username Anda" 
+                          styleClass="input-field"
+                          prefHeight="40"/>
+            </VBox>
+
+            <!-- Password -->
+            <VBox spacing="5">
+                <Label text="Password" styleClass="field-label">
+                    <font>
+                        <Font size="12"/>
+                    </font>
+                </Label>
+                <PasswordField fx:id="passwordField" 
+                              promptText="Masukkan password Anda"
+                              styleClass="input-field"
+                              prefHeight="40"/>
+            </VBox>
+
+            <!-- Remember Me -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <CheckBox fx:id="rememberMeCheckbox" text="Remember Me" styleClass="remember-checkbox"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Hyperlink text="Lupa Password?" styleClass="forgot-link"/>
+            </HBox>
+        </VBox>
+
+        <!-- Login Button -->
+        <VBox spacing="15">
+            <Button fx:id="loginButton" 
+                    text="Login" 
+                    styleClass="login-button"
+                    prefWidth="320"
+                    prefHeight="45"
+                    defaultButton="true">
+                <font>
+                    <Font name="System Bold" size="14"/>
+                </font>
+            </Button>
+
+            <!-- Loading Indicator -->
+            <ProgressIndicator fx:id="loadingIndicator" 
+                             prefWidth="40" 
+                             prefHeight="40" 
+                             visible="false"/>
+        </VBox>
+
+        <!-- Footer -->
+        <VBox alignment="CENTER" spacing="5">
+            <Separator prefWidth="300"/>
+            <Label text="SIJA Presensi Desktop v1.0.0" styleClass="footer-text">
+                <font>
+                    <Font size="11"/>
+                </font>
+            </Label>
+            <Label text="© 2025 SMK Negeri 1" styleClass="footer-text">
+                <font>
+                    <Font size="10"/>
+                </font>
+            </Label>
+        </VBox>
+    </VBox>
+
+</StackPane>

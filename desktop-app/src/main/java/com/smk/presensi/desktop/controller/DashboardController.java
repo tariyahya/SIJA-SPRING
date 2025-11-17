@@ -2,13 +2,23 @@ package com.smk.presensi.desktop.controller;
 
 import com.smk.presensi.desktop.model.Presensi;
 import com.smk.presensi.desktop.service.ApiClient;
+import com.smk.presensi.desktop.service.SessionManager;
 import com.smk.presensi.desktop.viewmodel.DashboardViewModel;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -44,16 +54,29 @@ public class DashboardController implements Initializable {
 
     // Controls
     @FXML private Button refreshButton;
+    @FXML private Button logoutButton;
+    @FXML private Label userLabel;
     @FXML private ProgressIndicator loadingIndicator;
     @FXML private Label errorLabel;
     @FXML private CheckBox mockDataCheckbox;
 
     private DashboardViewModel viewModel;
+    private SessionManager sessionManager;
+    private Timeline autoRefreshTimer;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialize ViewModel
+        // Will be set by LoginController
+        if (sessionManager == null) {
+            sessionManager = new SessionManager();
+        }
+
+        // Initialize ApiClient with saved token
         ApiClient apiClient = new ApiClient();
+        if (sessionManager.isLoggedIn()) {
+            apiClient.setJwtToken(sessionManager.getJwtToken());
+        }
+        
         viewModel = new DashboardViewModel(apiClient);
 
         // Setup table columns
@@ -67,6 +90,12 @@ public class DashboardController implements Initializable {
 
         // Setup event handlers
         setupEventHandlers();
+        
+        // Display user info
+        updateUserInfo();
+        
+        // Setup auto-refresh (every 30 seconds)
+        setupAutoRefresh();
     }
 
     private void setupTableColumns() {
@@ -146,6 +175,11 @@ public class DashboardController implements Initializable {
         // Refresh button
         refreshButton.setOnAction(event -> viewModel.refreshData());
 
+        // Logout button
+        if (logoutButton != null) {
+            logoutButton.setOnAction(event -> handleLogout());
+        }
+
         // RFID Checkin button
         checkinButton.setOnAction(event -> handleRfidCheckin());
 
@@ -186,5 +220,80 @@ public class DashboardController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    /**
+     * Set SessionManager (called by LoginController)
+     */
+    public void setSessionManager(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+        updateUserInfo();
+    }
+
+    /**
+     * Update user info label
+     */
+    private void updateUserInfo() {
+        if (userLabel != null && sessionManager != null && sessionManager.isLoggedIn()) {
+            String username = sessionManager.getUsername();
+            String role = sessionManager.getRole();
+            userLabel.setText("👤 " + username + " (" + role + ")");
+        }
+    }
+
+    /**
+     * Setup auto-refresh timer (every 30 seconds)
+     */
+    private void setupAutoRefresh() {
+        autoRefreshTimer = new Timeline(
+            new KeyFrame(Duration.seconds(30), event -> {
+                System.out.println("Auto-refresh triggered at " + java.time.LocalTime.now());
+                viewModel.refreshData();
+            })
+        );
+        autoRefreshTimer.setCycleCount(Animation.INDEFINITE);
+        autoRefreshTimer.play();
+    }
+
+    /**
+     * Handle logout
+     */
+    @FXML
+    private void handleLogout() {
+        // Confirm logout
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout");
+        alert.setHeaderText("Konfirmasi Logout");
+        alert.setContentText("Apakah Anda yakin ingin logout?");
+        
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                // Stop auto-refresh
+                if (autoRefreshTimer != null) {
+                    autoRefreshTimer.stop();
+                }
+
+                // Clear session
+                sessionManager.logout();
+
+                // Navigate back to login
+                try {
+                    FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource("/fxml/login.fxml")
+                    );
+                    Parent root = loader.load();
+
+                    Stage stage = (Stage) logoutButton.getScene().getWindow();
+                    Scene scene = new Scene(root, 500, 650);
+                    stage.setScene(scene);
+                    stage.setTitle("SIJA Presensi - Login");
+                    stage.setResizable(false);
+
+                } catch (IOException e) {
+                    showError("Error loading login screen: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

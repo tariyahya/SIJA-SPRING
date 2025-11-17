@@ -44,6 +44,24 @@
     -fx-background-color: #229954;
 }
 
+.btn-danger {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* User Label */
+.user-label {
+    -fx-text-fill: white;
+    -fx-font-size: 14;
+    -fx-padding: 5 10 5 10;
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-radius: 5;
+}
+
 /* CheckBox */
 .check-box {
     -fx-text-fill: white;

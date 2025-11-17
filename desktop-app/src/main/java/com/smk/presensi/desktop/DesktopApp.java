@@ -21,20 +21,21 @@ public class DesktopApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Load FXML
+            // Load Login Screen first
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/fxml/dashboard.fxml")
+                getClass().getResource("/fxml/login.fxml")
             );
             Parent root = loader.load();
 
             // Create Scene
-            Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+            Scene scene = new Scene(root, 500, 650);
 
             // Configure Stage
-            primaryStage.setTitle(APP_TITLE);
+            primaryStage.setTitle("SIJA Presensi - Login");
             primaryStage.setScene(scene);
-            primaryStage.setMinWidth(800);
-            primaryStage.setMinHeight(600);
+            primaryStage.setMinWidth(500);
+            primaryStage.setMinHeight(650);
+            primaryStage.setResizable(false); // Fixed size untuk login screen
             
             // Show window
             primaryStage.show();
