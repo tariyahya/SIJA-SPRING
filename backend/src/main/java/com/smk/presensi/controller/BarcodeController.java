@@ -54,4 +54,24 @@ public class BarcodeController {
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("Barcode endpoint is working!");
     }
+
+    /**
+     * ENDPOINT: POST /api/presensi/barcode/checkout
+     * 
+     * Checkout via scan barcode/QR code.
+     * 
+     * Access: PUBLIC (no JWT required)
+     * 
+     * Request body:
+     * {
+     *   "barcodeId": "BC001234"
+     * }
+     * 
+     * Response: PresensiResponse dengan jamPulang terisi
+     */
+    @PostMapping("/checkout")
+    public ResponseEntity<PresensiResponse> checkoutBarcode(@Valid @RequestBody BarcodeCheckinRequest request) {
+        PresensiResponse response = presensiService.checkoutBarcode(request.barcodeId());
+        return ResponseEntity.ok(response);
+    }
 }

@@ -118,4 +118,45 @@ public class RfidController {
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("RFID endpoint is working!");
     }
+
+    /**
+     * ENDPOINT: POST /api/presensi/rfid/checkout
+     * 
+     * Checkout via tap kartu RFID.
+     * 
+     * Access: PUBLIC (no JWT required)
+     * 
+     * Request body:
+     * {
+     *   "rfidCardId": "RF001234"
+     * }
+     * 
+     * Response: PresensiResponse dengan jamPulang terisi
+     * 
+     * Success response (200 OK):
+     * {
+     *   "id": 1,
+     *   "userId": 5,
+     *   "username": "budi",
+     *   "tipe": "SISWA",
+     *   "tanggal": "2024-01-15",
+     *   "jamMasuk": "07:05:30",
+     *   "jamPulang": "15:00:00",
+     *   "status": "HADIR",
+     *   "method": "RFID",
+     *   "latitude": null,
+     *   "longitude": null,
+     *   "keterangan": "Checkin via RFID: RF001234 | Checkout via RFID: RF001234"
+     * }
+     * 
+     * Error responses:
+     * - "User dengan kartu RF001234 belum checkin hari ini"
+     * - "User dengan kartu RF001234 sudah checkout hari ini"
+     * - "Kartu RFID tidak terdaftar: RF001234"
+     */
+    @PostMapping("/checkout")
+    public ResponseEntity<PresensiResponse> checkoutRfid(@Valid @RequestBody RfidCheckinRequest request) {
+        PresensiResponse response = presensiService.checkoutRfid(request.rfidCardId());
+        return ResponseEntity.ok(response);
+    }
 }

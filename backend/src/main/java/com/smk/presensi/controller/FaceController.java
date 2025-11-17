@@ -223,4 +223,61 @@ public class FaceController {
             return ResponseEntity.badRequest().body("Checkin gagal: " + e.getMessage());
         }
     }
+
+    /**
+     * CHECKOUT VIA FACE RECOGNITION.
+     * 
+     * POST /api/presensi/face/checkout
+     * Body: { "imageBase64": "data:image/jpeg;base64,..." }
+     * 
+     * Flow sama dengan checkin, tapi panggil checkoutFace() instead of checkinFace().
+     * 
+     * @param request FaceCheckinRequest (imageBase64)
+     * @return PresensiResponse dengan jamPulang terisi atau error message
+     */
+    @PostMapping("/checkout")
+    public ResponseEntity<?> checkout(@Valid @RequestBody FaceCheckinRequest request) {
+        try {
+            String imageBase64 = request.imageBase64();
+
+            // 1. Generate encoding dari input image
+            String inputEncoding = faceRecognitionService.generateFaceEncoding(imageBase64);
+
+            // 2. Cari match di semua siswa yang sudah enroll face
+            for (Siswa siswa : siswaRepository.findByFaceEncodingIsNotNull()) {
+                double similarity = faceRecognitionService.calculateSimilarity(
+                        inputEncoding,
+                        siswa.getFaceEncoding()
+                );
+
+                if (faceRecognitionService.isMatch(similarity)) {
+                    // MATCH! Checkout via PresensiService
+                    PresensiResponse response = presensiService.checkoutFace(siswa);
+                    return ResponseEntity.ok(response);
+                }
+            }
+
+            // 3. Jika tidak match di siswa, cari di guru
+            for (Guru guru : guruRepository.findByFaceEncodingIsNotNull()) {
+                double similarity = faceRecognitionService.calculateSimilarity(
+                        inputEncoding,
+                        guru.getFaceEncoding()
+                );
+
+                if (faceRecognitionService.isMatch(similarity)) {
+                    // MATCH! Checkout via PresensiService
+                    PresensiResponse response = presensiService.checkoutFace(guru);
+                    return ResponseEntity.ok(response);
+                }
+            }
+
+            // 4. Jika tidak ada yang match
+            return ResponseEntity.status(404).body(
+                    "Face tidak dikenali. Pastikan sudah enrollment dan foto clear."
+            );
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Checkout gagal: " + e.getMessage());
+        }
+    }
 }

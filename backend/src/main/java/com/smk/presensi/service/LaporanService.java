@@ -260,12 +260,99 @@ public class LaporanService {
                 presensi.getTipe(),
                 presensi.getTanggal(),
                 presensi.getJamMasuk(),
-                null,  // jamPulang (checkout not implemented yet)
+                presensi.getJamPulang(),  // UPDATED: Now includes jamPulang (Tahap 10)
                 presensi.getStatus(),
                 presensi.getMethod(),
                 presensi.getLatitude(),
                 presensi.getLongitude(),
                 presensi.getKeterangan()
         );
+    }
+
+    // ===== TAHAP 10: WORK HOURS ANALYTICS =====
+
+    /**
+     * Get average work hours for a period.
+     * 
+     * Logic:
+     * 1. Get all presensi with jamPulang (completed checkouts)
+     * 2. Calculate work duration for each
+     * 3. Return average
+     * 
+     * @param startDate Start date
+     * @param endDate End date
+     * @return Average work hours in decimal (e.g., 8.5 = 8 jam 30 menit)
+     */
+    public double getAverageWorkHours(LocalDate startDate, LocalDate endDate) {
+        List<Presensi> presensiList = presensiRepository.findByTanggalBetween(startDate, endDate);
+        
+        // Filter only completed (has jamPulang)
+        List<Presensi> completed = presensiList.stream()
+                .filter(p -> p.getJamPulang() != null)
+                .toList();
+        
+        if (completed.isEmpty()) {
+            return 0.0;
+        }
+        
+        // Calculate total minutes
+        long totalMinutes = completed.stream()
+                .mapToLong(p -> {
+                    java.time.Duration duration = java.time.Duration.between(
+                        p.getJamMasuk(), 
+                        p.getJamPulang()
+                    );
+                    return duration.toMinutes();
+                })
+                .sum();
+        
+        // Average minutes
+        double avgMinutes = (double) totalMinutes / completed.size();
+        
+        // Convert to hours (decimal)
+        return Math.round((avgMinutes / 60.0) * 100.0) / 100.0;
+    }
+
+    /**
+     * Count overtime instances (work > 8 hours).
+     * 
+     * @param startDate Start date
+     * @param endDate End date
+     * @return Number of overtime instances
+     */
+    public long countOvertime(LocalDate startDate, LocalDate endDate) {
+        List<Presensi> presensiList = presensiRepository.findByTanggalBetween(startDate, endDate);
+        
+        return presensiList.stream()
+                .filter(p -> p.getJamPulang() != null)
+                .filter(p -> {
+                    java.time.Duration duration = java.time.Duration.between(
+                        p.getJamMasuk(), 
+                        p.getJamPulang()
+                    );
+                    return duration.toMinutes() > 480; // > 8 hours
+                })
+                .count();
+    }
+
+    /**
+     * Get percentage of users who completed checkout.
+     * 
+     * @param tanggal Date to check
+     * @return Percentage (0-100)
+     */
+    public double getCheckoutCompletionRate(LocalDate tanggal) {
+        List<Presensi> presensiList = presensiRepository.findByTanggal(tanggal);
+        
+        if (presensiList.isEmpty()) {
+            return 0.0;
+        }
+        
+        long completed = presensiList.stream()
+                .filter(p -> p.getJamPulang() != null)
+                .count();
+        
+        double rate = (completed * 100.0) / presensiList.size();
+        return Math.round(rate * 100.0) / 100.0;
     }
 }

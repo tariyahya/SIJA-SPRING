@@ -86,4 +86,22 @@ public class PresensiController {
     ) {
         return presensiService.getAllPresensi(tanggal);
     }
+
+    /**
+     * GET WORK HOURS - Hitung jam kerja dari presensi ID.
+     * 
+     * Access: ADMIN, GURU, SISWA (owner only via service)
+     * URL: GET /api/presensi/{id}/work-hours
+     */
+    @GetMapping("/{id}/work-hours")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU', 'SISWA')")
+    public ResponseEntity<?> getWorkHours(@PathVariable Long id) {
+        try {
+            var presensi = presensiService.getPresensiById(id);
+            var workHours = presensiService.calculateWorkHours(presensi);
+            return ResponseEntity.ok(workHours);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

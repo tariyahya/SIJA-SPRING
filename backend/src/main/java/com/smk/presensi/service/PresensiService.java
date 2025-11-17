@@ -485,4 +485,196 @@ public class PresensiService {
         // 7. Convert ke DTO
         return toResponse(saved);
     }
+
+    // ===== TAHAP 10: CHECKOUT METHODS =====
+
+    /**
+     * CHECKOUT VIA RFID - User checkout menggunakan tap kartu RFID.
+     * 
+     * Flow:
+     * 1. Cari user berdasarkan rfidCardId
+     * 2. Cari presensi hari ini
+     * 3. Validasi: sudah checkin? belum checkout?
+     * 4. Update jam pulang
+     * 5. Return response dengan work hours
+     */
+    @Transactional
+    public PresensiResponse checkoutRfid(String rfidCardId) {
+        // 1. Cari user berdasarkan rfidCardId
+        User user = null;
+        Optional<Siswa> siswaOpt = siswaRepository.findByRfidCardId(rfidCardId);
+        if (siswaOpt.isPresent()) {
+            user = siswaOpt.get().getUser();
+        } else {
+            Optional<Guru> guruOpt = guruRepository.findByRfidCardId(rfidCardId);
+            if (guruOpt.isPresent()) {
+                user = guruOpt.get().getUser();
+            }
+        }
+        
+        if (user == null) {
+            throw new RuntimeException("Kartu RFID tidak terdaftar: " + rfidCardId);
+        }
+        
+        // 2. Cari presensi hari ini
+        LocalDate today = LocalDate.now();
+        Presensi presensi = presensiRepository.findByUserAndTanggal(user, today)
+                .orElseThrow(() -> new RuntimeException("User dengan kartu " + rfidCardId + " belum checkin hari ini"));
+        
+        // 3. Validasi: sudah checkout?
+        if (presensi.getJamPulang() != null) {
+            throw new RuntimeException("User dengan kartu " + rfidCardId + " sudah checkout hari ini");
+        }
+        
+        // 4. Update jam pulang
+        presensi.setJamPulang(LocalTime.now());
+        String existingKeterangan = presensi.getKeterangan();
+        presensi.setKeterangan(existingKeterangan + " | Checkout via RFID: " + rfidCardId);
+        
+        // 5. Save dan return
+        Presensi updated = presensiRepository.save(presensi);
+        return toResponse(updated);
+    }
+
+    /**
+     * CHECKOUT VIA BARCODE - User checkout menggunakan scan barcode.
+     */
+    @Transactional
+    public PresensiResponse checkoutBarcode(String barcodeId) {
+        // 1. Cari user berdasarkan barcodeId
+        User user = null;
+        Optional<Siswa> siswaOpt = siswaRepository.findByBarcodeId(barcodeId);
+        if (siswaOpt.isPresent()) {
+            user = siswaOpt.get().getUser();
+        } else {
+            Optional<Guru> guruOpt = guruRepository.findByBarcodeId(barcodeId);
+            if (guruOpt.isPresent()) {
+                user = guruOpt.get().getUser();
+            }
+        }
+        
+        if (user == null) {
+            throw new RuntimeException("Barcode tidak terdaftar: " + barcodeId);
+        }
+        
+        // 2. Cari presensi hari ini
+        LocalDate today = LocalDate.now();
+        Presensi presensi = presensiRepository.findByUserAndTanggal(user, today)
+                .orElseThrow(() -> new RuntimeException("User dengan barcode " + barcodeId + " belum checkin hari ini"));
+        
+        // 3. Validasi: sudah checkout?
+        if (presensi.getJamPulang() != null) {
+            throw new RuntimeException("User dengan barcode " + barcodeId + " sudah checkout hari ini");
+        }
+        
+        // 4. Update jam pulang
+        presensi.setJamPulang(LocalTime.now());
+        String existingKeterangan = presensi.getKeterangan();
+        presensi.setKeterangan(existingKeterangan + " | Checkout via Barcode: " + barcodeId);
+        
+        // 5. Save dan return
+        Presensi updated = presensiRepository.save(presensi);
+        return toResponse(updated);
+    }
+
+    /**
+     * CHECKOUT VIA FACE RECOGNITION - User checkout menggunakan face recognition.
+     */
+    @Transactional
+    public PresensiResponse checkoutFace(Siswa siswa) {
+        User user = siswa.getUser();
+        
+        // Cari presensi hari ini
+        LocalDate today = LocalDate.now();
+        Presensi presensi = presensiRepository.findByUserAndTanggal(user, today)
+                .orElseThrow(() -> new RuntimeException("Siswa " + user.getUsername() + " belum checkin hari ini"));
+        
+        // Validasi: sudah checkout?
+        if (presensi.getJamPulang() != null) {
+            throw new RuntimeException("Siswa " + user.getUsername() + " sudah checkout hari ini");
+        }
+        
+        // Update jam pulang
+        presensi.setJamPulang(LocalTime.now());
+        String existingKeterangan = presensi.getKeterangan();
+        presensi.setKeterangan(existingKeterangan + " | Checkout via Face Recognition: " + user.getUsername());
+        
+        // Save dan return
+        Presensi updated = presensiRepository.save(presensi);
+        return toResponse(updated);
+    }
+
+    /**
+     * CHECKOUT VIA FACE RECOGNITION - overload untuk Guru.
+     */
+    @Transactional
+    public PresensiResponse checkoutFace(Guru guru) {
+        User user = guru.getUser();
+        
+        // Cari presensi hari ini
+        LocalDate today = LocalDate.now();
+        Presensi presensi = presensiRepository.findByUserAndTanggal(user, today)
+                .orElseThrow(() -> new RuntimeException("Guru " + user.getUsername() + " belum checkin hari ini"));
+        
+        // Validasi: sudah checkout?
+        if (presensi.getJamPulang() != null) {
+            throw new RuntimeException("Guru " + user.getUsername() + " sudah checkout hari ini");
+        }
+        
+        // Update jam pulang
+        presensi.setJamPulang(LocalTime.now());
+        String existingKeterangan = presensi.getKeterangan();
+        presensi.setKeterangan(existingKeterangan + " | Checkout via Face Recognition: " + user.getUsername());
+        
+        // Save dan return
+        Presensi updated = presensiRepository.save(presensi);
+        return toResponse(updated);
+    }
+
+    /**
+     * GET PRESENSI BY ID - Untuk mendapatkan presensi berdasarkan ID.
+     */
+    public Presensi getPresensiById(Long id) {
+        return presensiRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Presensi dengan ID " + id + " tidak ditemukan"));
+    }
+
+    /**
+     * CALCULATE WORK HOURS - Hitung total jam kerja dari checkin ke checkout.
+     * 
+     * @param presensi Presensi yang sudah ada jamMasuk dan jamPulang
+     * @return WorkHoursResponse dengan detail jam kerja
+     */
+    public com.smk.presensi.dto.WorkHoursResponse calculateWorkHours(Presensi presensi) {
+        if (presensi.getJamMasuk() == null || presensi.getJamPulang() == null) {
+            throw new RuntimeException("Data jam masuk atau jam pulang belum lengkap");
+        }
+        
+        // Hitung durasi
+        java.time.Duration duration = java.time.Duration.between(
+            presensi.getJamMasuk(), 
+            presensi.getJamPulang()
+        );
+        
+        long totalMinutes = duration.toMinutes();
+        long hours = totalMinutes / 60;
+        long minutes = totalMinutes % 60;
+        
+        // Check overtime (lebih dari 8 jam = 480 menit)
+        boolean isOvertime = totalMinutes > 480;
+        
+        return new com.smk.presensi.dto.WorkHoursResponse(
+            presensi.getId(),
+            presensi.getUser().getUsername(),
+            presensi.getTipe().name(),
+            presensi.getTanggal().toString(),
+            presensi.getJamMasuk().toString(),
+            presensi.getJamPulang().toString(),
+            totalMinutes,
+            hours,
+            minutes,
+            isOvertime,
+            presensi.getStatus().name()
+        );
+    }
 }
