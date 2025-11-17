@@ -33,6 +33,7 @@ public class PresensiService {
     private final UserRepository userRepository;
     private final SiswaRepository siswaRepository;
     private final GuruRepository guruRepository;
+    private final GeolocationService geolocationService;
 
     // Inject config dari application.properties
     @Value("${presensi.jam-masuk:07:00:00}")
@@ -45,12 +46,14 @@ public class PresensiService {
             PresensiRepository presensiRepository,
             UserRepository userRepository,
             SiswaRepository siswaRepository,
-            GuruRepository guruRepository
+            GuruRepository guruRepository,
+            GeolocationService geolocationService
     ) {
         this.presensiRepository = presensiRepository;
         this.userRepository = userRepository;
         this.siswaRepository = siswaRepository;
         this.guruRepository = guruRepository;
+        this.geolocationService = geolocationService;
     }
 
     /**
@@ -63,13 +66,18 @@ public class PresensiService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
 
-        // 2. Validasi: cek apakah sudah checkin hari ini
+        // 2. Validasi GPS (jika koordinat dikirim)
+        if (request.latitude() != null && request.longitude() != null) {
+            geolocationService.validateLocation(request.latitude(), request.longitude());
+        }
+
+        // 3. Validasi: cek apakah sudah checkin hari ini
         LocalDate today = LocalDate.now();
         if (presensiRepository.existsByUserAndTanggal(user, today)) {
             throw new RuntimeException("Anda sudah checkin hari ini");
         }
 
-        // 3. Buat record presensi baru
+        // 4. Buat record presensi baru
         Presensi presensi = new Presensi();
         presensi.setUser(user);
         presensi.setTipe(request.tipe());
@@ -80,13 +88,13 @@ public class PresensiService {
         presensi.setLongitude(request.longitude());
         presensi.setKeterangan(request.keterangan());
 
-        // 4. Hitung status: HADIR atau TERLAMBAT
+        // 5. Hitung status: HADIR atau TERLAMBAT
         presensi.setStatus(hitungStatus(presensi.getJamMasuk()));
 
-        // 5. Save ke database
+        // 6. Save ke database
         Presensi saved = presensiRepository.save(presensi);
 
-        // 6. Convert Entity → DTO
+        // 7. Convert Entity → DTO
         return toResponse(saved);
     }
 
