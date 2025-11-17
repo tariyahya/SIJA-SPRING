@@ -64,6 +64,21 @@ public interface GuruRepository extends JpaRepository<Guru, Long> {
      */
     Optional<Guru> findByNip(String nip);
     
+    /**
+     * FIND BY RFID CARD ID - Cari guru berdasarkan RFID Card ID.
+     * 
+     * Generated SQL:
+     * SELECT * FROM guru WHERE rfid_card_id = ?
+     * 
+     * Use case:
+     * - RFID checkin: cari guru yang punya kartu ini
+     * - Validasi kartu: apakah kartu ini terdaftar?
+     * 
+     * @param rfidCardId ID kartu RFID yang dicari
+     * @return Optional<Guru> (ada jika terdaftar, empty jika tidak)
+     */
+    Optional<Guru> findByRfidCardId(String rfidCardId);
+    
     // Query method lain yang bisa ditambahkan (belum kita pakai):
     // Optional<Guru> findByNama(String nama); → cari guru berdasarkan nama
     // List<Guru> findByMapel(String mapel); → cari semua guru yang mengajar mata pelajaran tertentu

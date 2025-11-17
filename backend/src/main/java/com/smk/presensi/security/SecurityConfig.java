@@ -147,6 +147,10 @@ public class SecurityConfig {
                         // Hello endpoint (untuk testing)
                         .requestMatchers("/api/hello").permitAll()
                         
+                        // RFID endpoints (untuk hardware RFID reader)
+                        // Hardware tidak bisa login, jadi endpoint harus public
+                        .requestMatchers("/api/presensi/rfid/**").permitAll()
+                        
                         // Semua endpoint lain PERLU authentication
                         .anyRequest().authenticated()
                 )

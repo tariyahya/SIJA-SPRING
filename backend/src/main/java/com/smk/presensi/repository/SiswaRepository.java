@@ -85,6 +85,21 @@ public interface SiswaRepository extends JpaRepository<Siswa, Long> {
      */
     List<Siswa> findByKelas(String kelas);
     
+    /**
+     * FIND BY RFID CARD ID - Cari siswa berdasarkan RFID Card ID.
+     * 
+     * Generated SQL:
+     * SELECT * FROM siswa WHERE rfid_card_id = ?
+     * 
+     * Use case:
+     * - RFID checkin: cari siswa yang punya kartu ini
+     * - Validasi kartu: apakah kartu ini terdaftar?
+     * 
+     * @param rfidCardId ID kartu RFID yang dicari
+     * @return Optional<Siswa> (ada jika terdaftar, empty jika tidak)
+     */
+    Optional<Siswa> findByRfidCardId(String rfidCardId);
+    
     // CATATAN PENTING:
     // Method di atas TIDAK PERLU implementasi!
     // Spring Data JPA otomatis bikin SQL dan implementasinya.

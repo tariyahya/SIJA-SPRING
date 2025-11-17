@@ -132,19 +132,24 @@ Anggap ini untuk ± 10–12 pertemuan besar. Di kelas bisa dipecah lagi jadi beb
 
 **Backend:**
 
-* Tambah field `rfidCardId` di `Siswa` dan `Guru`.
-* Endpoint:
-
-  * `POST /presensi/rfid/checkin` dengan body `{ "rfidCardId": "xxxx" }`.
-  * Backend mencari data siswa/guru berdasarkan `rfidCardId`.
+* ✅ Field `rfidCardId` sudah ada di `Siswa` dan `Guru` (dari Tahap 2).
+* ✅ Endpoint: `POST /api/presensi/rfid/checkin` dengan body `{ "rfidCardId": "xxxx" }`.
+* ✅ Backend mencari data siswa/guru berdasarkan `rfidCardId`.
+* ✅ Auto-detect tipe (SISWA/GURU) dari tabel yang ditemukan.
+* ✅ Public endpoint (no JWT) - whitelist di SecurityConfig.
+* ✅ Method = RFID untuk tracking.
 
 **Simulasi di kelas (tanpa alat dulu):**
 
-* Frontend desktop/mobile kirim `rfidCardId` manual via form.
+* ✅ Input `rfidCardId` manual via Postman/form (simulasi).
+* ✅ Nanti bisa diganti dengan input dari hardware RFID reader.
 
-* Nanti bisa diganti dengan input dari serial/USB/alat.
-
-* **Branch guru:** `tahap-05-rfid-basic`
+**Branch:** `tahap-05-rfid-basic`
+**Status:** ✅ COMPLETE (6 changes, 2 new files, 4 updates, build SUCCESS)
+**Documentation:**
+- `docs/TASK-5.md` (implementation guide)
+- `docs/POSTMAN-TAHAP-05.md` (API testing)
+- `docs/README-TAHAP-05.md` (overview & summary)
 
 ---
 
