@@ -610,4 +610,782 @@ public interface PresensiRepository extends JpaRepository<Presensi, Long> {
 }
 ```
 
-Saya lanjutkan dengan file-file berikutnya. Apakah Anda ingin saya terus menulis dokumentasi lengkap seperti ini, atau lebih ringkas saja? Dokumentasi ini sudah ~600 baris dan baru sampai Step 3. 😅
+---
+
+### STEP 4: Buat DTO (Data Transfer Object)
+
+DTO digunakan untuk transfer data antara client dan server, terpisah dari Entity.
+
+#### 4.1 CheckinRequest DTO
+
+**File:** `backend/src/main/java/com/smk/presensi/dto/presensi/CheckinRequest.java`
+
+```java
+package com.smk.presensi.dto.presensi;
+
+import com.smk.presensi.enums.TipeUser;
+import jakarta.validation.constraints.NotNull;
+
+/**
+ * DTO untuk request checkin.
+ * 
+ * Kenapa pakai DTO, tidak langsung Entity?
+ * - Entity = struktur database (punya semua field)
+ * - DTO = data yang dikirim client (hanya field yang diperlukan)
+ * - Client tidak perlu tahu struktur lengkap database
+ * 
+ * Field yang dikirim client saat checkin:
+ * - tipe: SISWA atau GURU (wajib)
+ * - latitude, longitude: GPS location (opsional)
+ * - keterangan: Catatan tambahan (opsional)
+ * 
+ * Field yang TIDAK dikirim (auto-generate di server):
+ * - id: Auto-increment
+ * - user: Ambil dari SecurityContext (yang login)
+ * - tanggal: LocalDate.now()
+ * - jamMasuk: LocalTime.now()
+ * - status: Auto-calculate (HADIR/TERLAMBAT)
+ * - method: Set MANUAL
+ */
+public record CheckinRequest(
+    /**
+     * Tipe user yang checkin (SISWA/GURU).
+     * @NotNull: Wajib diisi, tidak boleh null
+     */
+    @NotNull(message = "Tipe user harus diisi")
+    TipeUser tipe,
+    
+    /**
+     * GPS latitude (opsional).
+     * Contoh: -6.200000
+     */
+    Double latitude,
+    
+    /**
+     * GPS longitude (opsional).
+     * Contoh: 106.816666
+     */
+    Double longitude,
+    
+    /**
+     * Keterangan tambahan (opsional).
+     * Contoh: "Datang dari rumah sakit"
+     */
+    String keterangan
+) {}
+```
+
+#### 4.2 CheckoutRequest DTO
+
+**File:** `backend/src/main/java/com/smk/presensi/dto/presensi/CheckoutRequest.java`
+
+```java
+package com.smk.presensi.dto.presensi;
+
+/**
+ * DTO untuk request checkout.
+ * 
+ * Field minimal karena hanya update jamPulang.
+ * - latitude, longitude: GPS location saat checkout (opsional)
+ * - keterangan: Catatan tambahan saat checkout (opsional)
+ */
+public record CheckoutRequest(
+    /**
+     * GPS latitude saat checkout (opsional).
+     */
+    Double latitude,
+    
+    /**
+     * GPS longitude saat checkout (opsional).
+     */
+    Double longitude,
+    
+    /**
+     * Keterangan tambahan saat checkout (opsional).
+     * Contoh: "Pulang ke rumah"
+     */
+    String keterangan
+) {}
+```
+
+#### 4.3 PresensiResponse DTO
+
+**File:** `backend/src/main/java/com/smk/presensi/dto/presensi/PresensiResponse.java`
+
+```java
+package com.smk.presensi.dto.presensi;
+
+import com.smk.presensi.enums.MethodPresensi;
+import com.smk.presensi.enums.StatusPresensi;
+import com.smk.presensi.enums.TipeUser;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+/**
+ * DTO untuk response presensi.
+ * 
+ * Berisi semua informasi yang perlu ditampilkan ke client.
+ * Struktur lebih flat (tidak nested) untuk kemudahan parsing.
+ */
+public record PresensiResponse(
+    Long id,
+    Long userId,
+    String username,
+    TipeUser tipe,
+    LocalDate tanggal,
+    LocalTime jamMasuk,
+    LocalTime jamPulang,
+    StatusPresensi status,
+    MethodPresensi method,
+    Double latitude,
+    Double longitude,
+    String keterangan
+) {}
+```
+
+---
+
+### STEP 5: Buat Service Layer
+
+Service berisi business logic untuk presensi.
+
+**File:** `backend/src/main/java/com/smk/presensi/service/PresensiService.java`
+
+```java
+package com.smk.presensi.service;
+
+import com.smk.presensi.dto.presensi.CheckinRequest;
+import com.smk.presensi.dto.presensi.CheckoutRequest;
+import com.smk.presensi.dto.presensi.PresensiResponse;
+import com.smk.presensi.entity.Presensi;
+import com.smk.presensi.entity.User;
+import com.smk.presensi.enums.MethodPresensi;
+import com.smk.presensi.enums.StatusPresensi;
+import com.smk.presensi.repository.PresensiRepository;
+import com.smk.presensi.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * SERVICE PRESENSI - Business logic untuk presensi.
+ * 
+ * Tanggung jawab:
+ * 1. Validasi business rules
+ * 2. Perhitungan status (HADIR/TERLAMBAT)
+ * 3. Orchestrate repository calls
+ * 4. Convert Entity ↔ DTO
+ */
+@Service
+public class PresensiService {
+
+    private final PresensiRepository presensiRepository;
+    private final UserRepository userRepository;
+
+    /**
+     * JAM MASUK NORMAL - Diambil dari application.properties.
+     * Contoh: 07:00:00
+     */
+    @Value("${presensi.jam-masuk}")
+    private LocalTime jamMasukNormal;
+
+    /**
+     * TOLERANSI KETERLAMBATAN (dalam menit).
+     * Contoh: 15 menit → checkin sampai 07:15 masih HADIR
+     */
+    @Value("${presensi.toleransi-menit}")
+    private int toleransiMenit;
+
+    public PresensiService(PresensiRepository presensiRepository, UserRepository userRepository) {
+        this.presensiRepository = presensiRepository;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * CHECKIN - User melakukan presensi masuk.
+     * 
+     * Alur:
+     * 1. Ambil user yang sedang login (dari SecurityContext)
+     * 2. Validasi: sudah checkin hari ini atau belum?
+     * 3. Jika sudah → throw error
+     * 4. Jika belum → insert record baru:
+     *    - Set tanggal = hari ini
+     *    - Set jamMasuk = sekarang
+     *    - Hitung status (HADIR/TERLAMBAT)
+     *    - Set method = MANUAL
+     * 5. Save ke database
+     * 6. Return response DTO
+     */
+    @Transactional
+    public PresensiResponse checkin(CheckinRequest request) {
+        // 1. Ambil user yang login
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
+
+        // 2. Validasi duplikasi
+        LocalDate today = LocalDate.now();
+        if (presensiRepository.existsByUserAndTanggal(user, today)) {
+            throw new RuntimeException("Anda sudah checkin hari ini");
+        }
+
+        // 3. Buat record presensi baru
+        Presensi presensi = new Presensi();
+        presensi.setUser(user);
+        presensi.setTipe(request.tipe());
+        presensi.setTanggal(today);
+        
+        LocalTime now = LocalTime.now();
+        presensi.setJamMasuk(now);
+        
+        // 4. Hitung status (HADIR/TERLAMBAT)
+        presensi.setStatus(hitungStatus(now));
+        
+        presensi.setMethod(MethodPresensi.MANUAL);
+        presensi.setLatitude(request.latitude());
+        presensi.setLongitude(request.longitude());
+        presensi.setKeterangan(request.keterangan());
+
+        // 5. Save
+        Presensi saved = presensiRepository.save(presensi);
+
+        // 6. Convert ke DTO
+        return toResponse(saved);
+    }
+
+    /**
+     * CHECKOUT - User melakukan presensi pulang.
+     * 
+     * Alur:
+     * 1. Ambil user yang sedang login
+     * 2. Cari presensi hari ini
+     * 3. Validasi: sudah checkin atau belum?
+     * 4. Validasi: sudah checkout atau belum?
+     * 5. Update jamPulang = sekarang
+     * 6. Append keterangan checkout (jika ada)
+     * 7. Save update
+     * 8. Return response DTO
+     */
+    @Transactional
+    public PresensiResponse checkout(CheckoutRequest request) {
+        // 1. Ambil user yang login
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
+
+        // 2. Cari presensi hari ini
+        LocalDate today = LocalDate.now();
+        Presensi presensi = presensiRepository.findByUserAndTanggal(user, today)
+                .orElseThrow(() -> new RuntimeException("Anda belum checkin hari ini"));
+
+        // 3. Validasi: sudah checkout atau belum?
+        if (presensi.getJamPulang() != null) {
+            throw new RuntimeException("Anda sudah checkout hari ini");
+        }
+
+        // 4. Update jamPulang
+        presensi.setJamPulang(LocalTime.now());
+        
+        // Update GPS (jika ada)
+        if (request.latitude() != null) {
+            presensi.setLatitude(request.latitude());
+        }
+        if (request.longitude() != null) {
+            presensi.setLongitude(request.longitude());
+        }
+        
+        // Append keterangan checkout
+        if (request.keterangan() != null && !request.keterangan().isBlank()) {
+            String keteranganBaru = presensi.getKeterangan() == null
+                    ? request.keterangan()
+                    : presensi.getKeterangan() + " | Pulang: " + request.keterangan();
+            presensi.setKeterangan(keteranganBaru);
+        }
+
+        // 5. Save update
+        Presensi updated = presensiRepository.save(presensi);
+
+        // 6. Convert ke DTO
+        return toResponse(updated);
+    }
+
+    /**
+     * GET HISTORI - Ambil history presensi user sendiri.
+     * 
+     * @param startDate Tanggal mulai (opsional, default: 30 hari lalu)
+     * @param endDate Tanggal akhir (opsional, default: hari ini)
+     * @return List presensi dalam range tanggal
+     */
+    public List<PresensiResponse> getHistori(LocalDate startDate, LocalDate endDate) {
+        // Ambil user yang login
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
+
+        // Default: 30 hari terakhir
+        if (startDate == null) {
+            startDate = LocalDate.now().minusDays(30);
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+
+        // Ambil data
+        List<Presensi> list = presensiRepository.findByUserAndTanggalBetweenOrderByTanggalDesc(
+                user, startDate, endDate
+        );
+
+        // Convert ke DTO
+        return list.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * GET ALL PRESENSI - Ambil semua presensi (admin/guru only).
+     * 
+     * @param tanggal Tanggal yang dicari (opsional, default: hari ini)
+     * @return List semua presensi di tanggal tersebut
+     */
+    public List<PresensiResponse> getAllPresensi(LocalDate tanggal) {
+        if (tanggal == null) {
+            tanggal = LocalDate.now();
+        }
+
+        List<Presensi> list = presensiRepository.findByTanggal(tanggal);
+
+        return list.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * HITUNG STATUS - Tentukan HADIR atau TERLAMBAT.
+     * 
+     * Logic:
+     * - Jika jamMasuk <= (jamMasukNormal + toleransi) → HADIR
+     * - Jika jamMasuk > (jamMasukNormal + toleransi) → TERLAMBAT
+     * 
+     * Contoh:
+     * - jamMasukNormal = 07:00
+     * - toleransiMenit = 15
+     * - Batas HADIR = 07:15
+     * 
+     * - Checkin 06:55 → HADIR
+     * - Checkin 07:00 → HADIR
+     * - Checkin 07:10 → HADIR
+     * - Checkin 07:15 → HADIR
+     * - Checkin 07:16 → TERLAMBAT
+     * - Checkin 08:00 → TERLAMBAT
+     */
+    private StatusPresensi hitungStatus(LocalTime jamMasuk) {
+        LocalTime batasHadir = jamMasukNormal.plusMinutes(toleransiMenit);
+        
+        if (jamMasuk.isBefore(batasHadir) || jamMasuk.equals(batasHadir)) {
+            return StatusPresensi.HADIR;
+        } else {
+            return StatusPresensi.TERLAMBAT;
+        }
+    }
+
+    /**
+     * CONVERT ENTITY TO DTO.
+     * 
+     * Mapping field by field dari Entity ke Response DTO.
+     */
+    private PresensiResponse toResponse(Presensi presensi) {
+        return new PresensiResponse(
+                presensi.getId(),
+                presensi.getUser().getId(),
+                presensi.getUser().getUsername(),
+                presensi.getTipe(),
+                presensi.getTanggal(),
+                presensi.getJamMasuk(),
+                presensi.getJamPulang(),
+                presensi.getStatus(),
+                presensi.getMethod(),
+                presensi.getLatitude(),
+                presensi.getLongitude(),
+                presensi.getKeterangan()
+        );
+    }
+}
+```
+
+---
+
+### STEP 6: Buat Controller
+
+**File:** `backend/src/main/java/com/smk/presensi/controller/PresensiController.java`
+
+```java
+package com.smk.presensi.controller;
+
+import com.smk.presensi.dto.presensi.CheckinRequest;
+import com.smk.presensi.dto.presensi.CheckoutRequest;
+import com.smk.presensi.dto.presensi.PresensiResponse;
+import com.smk.presensi.service.PresensiService;
+import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * CONTROLLER PRESENSI - REST API endpoints untuk presensi.
+ * 
+ * Base URL: /api/presensi
+ * 
+ * Endpoints:
+ * 1. POST /checkin - Checkin (SISWA/GURU)
+ * 2. POST /checkout - Checkout (SISWA/GURU)
+ * 3. GET /histori - Lihat histori sendiri (SISWA/GURU)
+ * 4. GET / - Lihat semua presensi (ADMIN/GURU)
+ */
+@RestController
+@RequestMapping("/api/presensi")
+public class PresensiController {
+
+    private final PresensiService presensiService;
+
+    public PresensiController(PresensiService presensiService) {
+        this.presensiService = presensiService;
+    }
+
+    /**
+     * ENDPOINT: POST /api/presensi/checkin
+     * 
+     * Checkin presensi masuk.
+     * 
+     * Access: SISWA, GURU
+     * 
+     * Request body:
+     * {
+     *   "tipe": "SISWA",
+     *   "latitude": -6.200000,
+     *   "longitude": 106.816666,
+     *   "keterangan": "Datang tepat waktu"
+     * }
+     * 
+     * Response: PresensiResponse
+     */
+    @PostMapping("/checkin")
+    @PreAuthorize("hasAnyRole('SISWA', 'GURU')")
+    public ResponseEntity<PresensiResponse> checkin(@Valid @RequestBody CheckinRequest request) {
+        PresensiResponse response = presensiService.checkin(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * ENDPOINT: POST /api/presensi/checkout
+     * 
+     * Checkout presensi pulang.
+     * 
+     * Access: SISWA, GURU
+     * 
+     * Request body:
+     * {
+     *   "latitude": -6.200000,
+     *   "longitude": 106.816666,
+     *   "keterangan": "Pulang ke rumah"
+     * }
+     * 
+     * Response: PresensiResponse
+     */
+    @PostMapping("/checkout")
+    @PreAuthorize("hasAnyRole('SISWA', 'GURU')")
+    public ResponseEntity<PresensiResponse> checkout(@Valid @RequestBody CheckoutRequest request) {
+        PresensiResponse response = presensiService.checkout(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * ENDPOINT: GET /api/presensi/histori
+     * 
+     * Lihat histori presensi sendiri.
+     * 
+     * Access: SISWA, GURU
+     * 
+     * Query params (opsional):
+     * - startDate: Tanggal mulai (format: yyyy-MM-dd)
+     * - endDate: Tanggal akhir (format: yyyy-MM-dd)
+     * 
+     * Contoh:
+     * GET /api/presensi/histori?startDate=2024-01-01&endDate=2024-01-31
+     * 
+     * Response: List<PresensiResponse>
+     */
+    @GetMapping("/histori")
+    @PreAuthorize("hasAnyRole('SISWA', 'GURU')")
+    public ResponseEntity<List<PresensiResponse>> getHistori(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        List<PresensiResponse> list = presensiService.getHistori(startDate, endDate);
+        return ResponseEntity.ok(list);
+    }
+
+    /**
+     * ENDPOINT: GET /api/presensi
+     * 
+     * Lihat semua presensi (admin/guru only).
+     * 
+     * Access: ADMIN, GURU
+     * 
+     * Query params (opsional):
+     * - tanggal: Tanggal yang dicari (format: yyyy-MM-dd, default: hari ini)
+     * 
+     * Contoh:
+     * GET /api/presensi?tanggal=2024-01-15
+     * 
+     * Response: List<PresensiResponse>
+     */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU')")
+    public ResponseEntity<List<PresensiResponse>> getAllPresensi(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tanggal
+    ) {
+        List<PresensiResponse> list = presensiService.getAllPresensi(tanggal);
+        return ResponseEntity.ok(list);
+    }
+}
+```
+
+---
+
+### STEP 7: Update Configuration
+
+**File:** `backend/src/main/resources/application.properties`
+
+Tambahkan konfigurasi jam kerja:
+
+```properties
+# ... (existing configuration)
+
+# ==================== PRESENSI CONFIGURATION ====================
+# Jam masuk normal (format: HH:mm:ss)
+presensi.jam-masuk=07:00:00
+
+# Toleransi keterlambatan (dalam menit)
+# Contoh: 15 menit → checkin sampai 07:15 masih HADIR
+presensi.toleransi-menit=15
+
+# Jam pulang (reference only, tidak di-validate)
+presensi.jam-pulang=15:00:00
+```
+
+---
+
+### STEP 8: Compile & Test
+
+#### 8.1 Compile
+
+```bash
+cd backend
+mvn clean compile
+```
+
+Expected output:
+```
+[INFO] BUILD SUCCESS
+[INFO] Compiling 41 source files
+```
+
+#### 8.2 Run Application
+
+```bash
+mvn spring-boot:run
+```
+
+Expected output:
+```
+Tomcat started on port 8081
+Started PresensiApplication in 7.634 seconds
+DataSeeder: Data seeding completed!
+```
+
+#### 8.3 Test dengan Postman
+
+Ikuti panduan lengkap di **POSTMAN-TAHAP-04.md** untuk test semua skenario:
+
+1. ✅ Checkin normal (HADIR)
+2. ✅ Checkin terlambat (TERLAMBAT)
+3. ✅ Checkin duplikasi (error)
+4. ✅ Checkout tanpa checkin (error)
+5. ✅ Checkout normal
+6. ✅ Checkout duplikasi (error)
+7. ✅ Lihat histori
+8. ✅ SISWA akses GET /presensi (403 forbidden)
+9. ✅ ADMIN akses GET /presensi (200 OK)
+10. ✅ Test dengan GPS coordinates
+11. ✅ Complete flow test
+
+---
+
+## 🎓 PEMBELAJARAN PENTING
+
+### 1. Entity vs DTO
+
+**Entity** (Presensi.java):
+- Representasi tabel database
+- Punya semua field (termasuk yang auto-generate)
+- Punya relasi (@ManyToOne, @OneToMany)
+- Tidak boleh diexpose langsung ke client
+
+**DTO** (CheckinRequest, PresensiResponse):
+- Data transfer object untuk API
+- Hanya field yang diperlukan
+- Flat structure (no nested objects)
+- Aman diexpose ke client
+
+### 2. Business Logic di Service
+
+**Validasi:**
+- ✅ Cek duplikasi checkin
+- ✅ Cek sudah checkout atau belum
+- ✅ Validasi user sudah login
+
+**Perhitungan:**
+- ✅ Status HADIR/TERLAMBAT (based on jam masuk)
+- ✅ Auto-set tanggal & jam dari server (bukan dari client)
+
+**Orchestration:**
+- ✅ Ambil user dari SecurityContext
+- ✅ Call repository untuk save/update
+- ✅ Convert Entity ↔ DTO
+
+### 3. Role-Based Access Control
+
+**@PreAuthorize:**
+- `"hasAnyRole('SISWA', 'GURU')"` → SISWA & GURU bisa akses
+- `"hasAnyRole('ADMIN', 'GURU')"` → hanya ADMIN & GURU
+- `"hasRole('ADMIN')"` → hanya ADMIN
+
+**Access matrix:**
+| Endpoint | SISWA | GURU | ADMIN |
+|----------|-------|------|-------|
+| POST /checkin | ✅ | ✅ | ❌ |
+| POST /checkout | ✅ | ✅ | ❌ |
+| GET /histori | ✅ (own) | ✅ (own) | ❌ |
+| GET /presensi | ❌ | ✅ (all) | ✅ (all) |
+
+### 4. LocalDate vs LocalTime
+
+**LocalDate** (tanggal):
+- Format: `2024-01-15`
+- Untuk: tanggal presensi
+- Method: `.now()`, `.plusDays()`, `.isBefore()`
+
+**LocalTime** (jam):
+- Format: `07:05:30`
+- Untuk: jam masuk/pulang
+- Method: `.now()`, `.plusMinutes()`, `.isBefore()`
+
+### 5. Optional & Exception Handling
+
+**Optional:**
+```java
+Optional<Presensi> opt = repository.findByUserAndTanggal(user, tanggal);
+if (opt.isPresent()) {
+    Presensi p = opt.get();
+} else {
+    throw new RuntimeException("Tidak ditemukan");
+}
+
+// Atau shortcut:
+Presensi p = opt.orElseThrow(() -> new RuntimeException("Tidak ditemukan"));
+```
+
+**Custom Exception (nanti):**
+- ResourceNotFoundException
+- DuplicateCheckinException
+- ValidationException
+
+---
+
+## 📊 STATISTIK TAHAP 4
+
+**Files created:**
+- 3 Enums (TipeUser, StatusPresensi, MethodPresensi)
+- 1 Entity (Presensi)
+- 1 Repository (PresensiRepository)
+- 3 DTOs (CheckinRequest, CheckoutRequest, PresensiResponse)
+- 1 Service (PresensiService)
+- 1 Controller (PresensiController)
+- **Total: 11 files**
+
+**Lines of code:**
+- Enums: ~20 lines
+- Entity: ~150 lines
+- Repository: ~25 lines
+- DTOs: ~40 lines
+- Service: ~160 lines
+- Controller: ~80 lines
+- **Total: ~475 lines** (excluding comments)
+
+**Features implemented:**
+- ✅ Checkin with status auto-calculation
+- ✅ Checkout with validation
+- ✅ History view (own records)
+- ✅ Admin view (all records)
+- ✅ GPS tracking (latitude/longitude)
+- ✅ Duplicate checkin prevention
+- ✅ Sequential checkout validation
+- ✅ Role-based access control
+- ✅ Configurable jam-masuk & toleransi
+
+---
+
+## 🚀 NEXT STEPS
+
+**Tahap 5 - RFID Integration:**
+1. Add RFID checkin endpoint: `POST /api/presensi/rfid/checkin`
+2. Find user by rfidCardId (already exists in Siswa/Guru entity)
+3. Auto-checkin tanpa login (karena identify by RFID)
+4. Simulation mode (manual input), real device later
+
+**Tahap 6 - Barcode/QR Integration:**
+1. Generate unique barcode per user
+2. Scan barcode → checkin
+3. QR code support
+
+**Tahap 7 - Face Recognition:**
+1. Upload foto wajah
+2. Face matching algorithm
+3. Liveness detection
+
+---
+
+## 📚 REFERENSI
+
+- **POSTMAN-TAHAP-04.md** - Testing guide lengkap
+- **README-TAHAP-04.md** - Architecture overview
+- **PLAN.MD** - Overall project plan
+- Spring Boot Docs: https://spring.io/projects/spring-boot
+- Spring Data JPA: https://spring.io/projects/spring-data-jpa
+- Java 8 Date/Time API: https://www.oracle.com/technical-resources/articles/java/jf14-date-time.html
+
+---
+
+## ✅ CHECKLIST COMPLETION
+
+- [x] Step 1: Buat 3 Enums (TipeUser, StatusPresensi, MethodPresensi)
+- [x] Step 2: Buat Entity Presensi
+- [x] Step 3: Buat PresensiRepository
+- [x] Step 4: Buat 3 DTOs (Request & Response)
+- [x] Step 5: Buat PresensiService (business logic)
+- [x] Step 6: Buat PresensiController (REST API)
+- [x] Step 7: Update application.properties (configuration)
+- [x] Step 8: Compile, Run, Test
+
+**Status: ✅ TAHAP 4 COMPLETE!**
