@@ -4,6 +4,7 @@ import com.smk.presensi.entity.Guru;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -93,6 +94,36 @@ public interface GuruRepository extends JpaRepository<Guru, Long> {
      * @return Optional<Guru> (ada jika terdaftar, empty jika tidak)
      */
     Optional<Guru> findByBarcodeId(String barcodeId);
+    
+    /**
+     * FIND ALL GURU WITH ENROLLED FACE.
+     * 
+     * Generated SQL:
+     * SELECT * FROM guru WHERE face_encoding IS NOT NULL
+     * 
+     * Use case:
+     * - Face recognition: cari semua guru yang sudah enroll face
+     * - Loop dan compare encoding dengan input
+     * - Count berapa guru yang sudah enroll
+     * 
+     * @return List<Guru> yang punya face_encoding
+     */
+    List<Guru> findByFaceEncodingIsNotNull();
+    
+    /**
+     * FIND GURU BY USER.
+     * 
+     * Generated SQL:
+     * SELECT * FROM guru WHERE user_id = ?
+     * 
+     * Use case:
+     * - Face enrollment: cari guru berdasarkan user untuk save encoding
+     * - Check apakah user ini siswa atau guru
+     * 
+     * @param user User object
+     * @return Optional<Guru> (ada jika user adalah guru)
+     */
+    Optional<Guru> findByUser(com.smk.presensi.entity.User user);
     
     // Query method lain yang bisa ditambahkan (belum kita pakai):
     // Optional<Guru> findByNama(String nama); → cari guru berdasarkan nama

@@ -155,6 +155,10 @@ public class SecurityConfig {
                         // Hardware tidak bisa login, jadi endpoint harus public
                         .requestMatchers("/api/presensi/barcode/**").permitAll()
                         
+                        // Face Recognition endpoints (untuk camera/face recognition system)
+                        // Hardware tidak bisa login, jadi endpoint harus public
+                        .requestMatchers("/api/presensi/face/**").permitAll()
+                        
                         // Semua endpoint lain PERLU authentication
                         .anyRequest().authenticated()
                 )

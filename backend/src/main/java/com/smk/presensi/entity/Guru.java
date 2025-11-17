@@ -64,6 +64,30 @@ public class Guru {
     private String faceId;
 
     /**
+     * FACE ENCODING - Face recognition encoding (128 characters).
+     * 
+     * Ini adalah "signature" digital dari wajah guru.
+     * Generated dari foto saat enrollment.
+     * 
+     * Format: String 128 characters (hex)
+     * Contoh: "a3f5b2c9d1e4f7a8b2c5d8e1f4a7b0c3..."
+     * 
+     * NULL = belum enroll face
+     * NOT NULL = sudah enroll, bisa pakai face recognition
+     */
+    @Column(name = "face_encoding", length = 500)
+    private String faceEncoding;
+
+    /**
+     * FACE ENROLLED AT - Timestamp saat enroll face.
+     * 
+     * Mencatat kapan guru enroll face.
+     * Berguna untuk audit dan re-enrollment policy.
+     */
+    @Column(name = "face_enrolled_at")
+    private java.time.LocalDateTime faceEnrolledAt;
+
+    /**
      * USER - Relasi ke User (akun login)
      * 
      * Tidak semua guru punya akun login.
@@ -148,6 +172,22 @@ public class Guru {
     }
     public void setFaceId(String faceId) { 
         this.faceId = faceId; 
+    }
+
+    // Getter & Setter untuk FACE ENCODING
+    public String getFaceEncoding() {
+        return faceEncoding;
+    }
+    public void setFaceEncoding(String faceEncoding) {
+        this.faceEncoding = faceEncoding;
+    }
+
+    // Getter & Setter untuk FACE ENROLLED AT
+    public java.time.LocalDateTime getFaceEnrolledAt() {
+        return faceEnrolledAt;
+    }
+    public void setFaceEnrolledAt(java.time.LocalDateTime faceEnrolledAt) {
+        this.faceEnrolledAt = faceEnrolledAt;
     }
 
     // Getter & Setter untuk USER

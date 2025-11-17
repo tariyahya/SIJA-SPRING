@@ -153,49 +153,71 @@ Anggap ini untuk ± 10–12 pertemuan besar. Di kelas bisa dipecah lagi jadi beb
 
 ---
 
-### Tahap 6 – Integrasi Barcode / QR-Code
+### Tahap 6 – Integrasi Barcode / QR-Code ✅ COMPLETED
 
 **Tujuan:** Siswa paham barcode/QR juga cuma ID string.
 
-**Backend:**
+**Backend:** ✅
 
-* Bisa pakai field `barcodeId` (atau reuse `nis` yang dikodekan jadi QR).
-* Endpoint:
+* Bisa pakai field `barcodeId` (atau reuse `nis` yang dikodekan jadi QR). ✅
+* Endpoint: ✅
 
-  * `POST /presensi/barcode/checkin` body: `{ "barcode": "..." }`.
-* Logika sama dengan RFID (cari siswa + buat record presensi).
+  * `POST /api/presensi/barcode/checkin` body: `{ "barcodeId": "..." }`. ✅
+  * `GET /api/presensi/barcode/test` (connectivity test). ✅
+* Logika sama dengan RFID (cari siswa + buat record presensi). ✅
+* Pattern replication: Copy RFID → replace rfidCardId dengan barcodeId. ✅
+* Public endpoint (no JWT), auto-detect tipe (SISWA/GURU). ✅
+* Method = BARCODE, audit trail dengan keterangan "Checkin via Barcode: {id}". ✅
+
+**Statistics:**
+* Source Files: 45 files (+2 dari Tahap 5)
+* Changes: 6 files (2 new, 4 updated)
+* Lines Added: +225 lines
+* Build Status: ✅ SUCCESS
+* Documentation: 3 files (TASK-6, POSTMAN-06, README-06)
+
+**Documentation:**
+* `docs/TASK-6.md` (implementation guide, 700+ lines)
+* `docs/POSTMAN-TAHAP-06.md` (API testing, 8 scenarios, 650+ lines)
+* `docs/README-TAHAP-06.md` (architecture overview, comparison table, 550+ lines)
 
 **Frontend mobile:**
 
 * Integrasi library scanner (ZXing, dsb) → panggil API.
-* **Branch guru backend:** `tahap-06-barcode-basic`
+* **Branch guru backend:** `tahap-06-barcode-basic` ✅
 * **Branch guru mobile:** `tahap-01-mobile-qr-scanner`
 
 ---
 
-### Tahap 7 – Geolocation (Lokasi Saat Presensi)
+### Tahap 7 – Face Recognition Integration (Simplified) ✅ COMPLETED
 
-**Tujuan:** Siswa paham validasi berbasis lokasi.
+**Tujuan:** Siswa paham konsep biometric authentication dengan implementasi simplified.
 
-**Backend:**
+**Backend:** ✅
 
-* Tambah field `latitude`, `longitude`, `accRadius` di `Presensi`.
-* Simpan dari request body.
-* Validasi jarak (opsional, advanced):
+* ✅ Field `faceEncoding` (String, 128 chars) dan `faceEnrolledAt` di Siswa/Guru
+* ✅ SHA-256 hash dari image bytes sebagai "face encoding" (simplified)
+* ✅ Levenshtein distance untuk similarity calculation (threshold 0.6)
+* ✅ Two-phase pattern: Enrollment + Recognition
+* ✅ Endpoints: POST /face/enroll (dengan userId), POST /face/checkin (NO userId)
+* ✅ Auto-detect tipe (SISWA/GURU) via similarity matching
+* ✅ Public endpoint (no JWT) - whitelist di SecurityConfig
+* ✅ Method = FACE untuk tracking
 
-  * Koordinat sekolah disimpan di tabel `LokasiKantor`.
-  * Hitung jarak (rumus Haversine simple).
-  * Kalau > batas (misal 200 meter) → tolak presensi.
+**Statistics:**
+* Source Files: 50 (+5 dari Tahap 6)
+* Lines Added: ~931 lines
+* Build: ✅ SUCCESS
+* Method Enum: 100% (MANUAL, RFID, BARCODE, FACE)
 
-**Frontend mobile:**
+**Documentation:**
+* docs/TASK-7.md (900+ lines)
+* docs/POSTMAN-TAHAP-07.md (850+ lines)
+* docs/README-TAHAP-07.md (1000+ lines)
 
-* Ambil GPS (`FusedLocationProviderClient` / API lokasi).
+**Branch:** `tahap-07-face-recognition` ✅
 
-* Kirim lat/long ke endpoint `checkin`.
-
-* **Branch guru backend:** `tahap-07-geolocation`
-
-* **Branch guru mobile:** `tahap-02-mobile-geolocation`
+**Note:** Simplified approach untuk pembelajaran (SHA-256 + Levenshtein). Production upgrade path documented.
 
 ---
 

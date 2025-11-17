@@ -363,4 +363,118 @@ public class PresensiService {
         // 7. Convert ke DTO
         return toResponse(saved);
     }
+
+    /**
+     * CHECKIN VIA FACE RECOGNITION - untuk face recognition camera.
+     * 
+     * Flow:
+     * 1. Terima Siswa atau Guru object (sudah diidentifikasi di FaceController)
+     * 2. Get User dari Siswa/Guru (OneToOne relation)
+     * 3. Auto-detect tipe (SISWA/GURU)
+     * 4. Validasi duplikasi (sudah checkin hari ini?)
+     * 5. Buat record presensi dengan method = FACE
+     * 6. Hitung status (HADIR/TERLAMBAT)
+     * 7. Return response
+     * 
+     * Perbedaan dengan checkin() manual:
+     * - Tidak perlu authentication (no JWT)
+     * - Tidak ambil user dari SecurityContext
+     * - User sudah diidentifikasi via face matching di controller
+     * - Auto-detect tipe dari object type (Siswa vs Guru)
+     * 
+     * Perbedaan dengan checkinRfid/Barcode:
+     * - Input: Siswa/Guru object (bukan ID string)
+     * - Face matching sudah dilakukan sebelumnya
+     * - Method = FACE (bukan RFID/BARCODE)
+     * 
+     * @param siswa Siswa object jika yang checkin siswa
+     * @return PresensiResponse
+     */
+    @Transactional
+    public PresensiResponse checkinFace(Siswa siswa) {
+        // 1. Get User dan tipe
+        User user = siswa.getUser();
+        TipeUser tipe = TipeUser.SISWA;
+        
+        // 2. Validasi duplikasi
+        LocalDate today = LocalDate.now();
+        if (presensiRepository.existsByUserAndTanggal(user, today)) {
+            throw new RuntimeException("Siswa " + user.getUsername() + " sudah checkin hari ini");
+        }
+        
+        // 3. Buat record presensi baru
+        Presensi presensi = new Presensi();
+        presensi.setUser(user);
+        presensi.setTipe(tipe);
+        presensi.setTanggal(today);
+        
+        LocalTime now = LocalTime.now();
+        presensi.setJamMasuk(now);
+        
+        // 4. Hitung status (HADIR/TERLAMBAT)
+        presensi.setStatus(hitungStatus(now));
+        
+        // 5. Set method = FACE (bukan MANUAL/RFID/BARCODE)
+        presensi.setMethod(MethodPresensi.FACE);
+        
+        // GPS tidak ada (Face camera fixed location)
+        presensi.setLatitude(null);
+        presensi.setLongitude(null);
+        
+        // Keterangan otomatis
+        presensi.setKeterangan("Checkin via Face Recognition: " + user.getUsername());
+        
+        // 6. Save
+        Presensi saved = presensiRepository.save(presensi);
+        
+        // 7. Convert ke DTO
+        return toResponse(saved);
+    }
+
+    /**
+     * CHECKIN VIA FACE RECOGNITION - overload untuk Guru.
+     * 
+     * @param guru Guru object jika yang checkin guru
+     * @return PresensiResponse
+     */
+    @Transactional
+    public PresensiResponse checkinFace(Guru guru) {
+        // 1. Get User dan tipe
+        User user = guru.getUser();
+        TipeUser tipe = TipeUser.GURU;
+        
+        // 2. Validasi duplikasi
+        LocalDate today = LocalDate.now();
+        if (presensiRepository.existsByUserAndTanggal(user, today)) {
+            throw new RuntimeException("Guru " + user.getUsername() + " sudah checkin hari ini");
+        }
+        
+        // 3. Buat record presensi baru
+        Presensi presensi = new Presensi();
+        presensi.setUser(user);
+        presensi.setTipe(tipe);
+        presensi.setTanggal(today);
+        
+        LocalTime now = LocalTime.now();
+        presensi.setJamMasuk(now);
+        
+        // 4. Hitung status (HADIR/TERLAMBAT)
+        presensi.setStatus(hitungStatus(now));
+        
+        // 5. Set method = FACE (bukan MANUAL/RFID/BARCODE)
+        presensi.setMethod(MethodPresensi.FACE);
+        
+        // GPS tidak ada (Face camera fixed location)
+        presensi.setLatitude(null);
+        presensi.setLongitude(null);
+        
+        // Keterangan otomatis
+        presensi.setKeterangan("Checkin via Face Recognition: " + user.getUsername());
+        
+        // 6. Save
+        Presensi saved = presensiRepository.save(presensi);
+        
+        // 7. Convert ke DTO
+        return toResponse(saved);
+    }
 }

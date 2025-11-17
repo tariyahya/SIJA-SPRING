@@ -115,6 +115,36 @@ public interface SiswaRepository extends JpaRepository<Siswa, Long> {
      */
     Optional<Siswa> findByBarcodeId(String barcodeId);
     
+    /**
+     * FIND ALL SISWA WITH ENROLLED FACE.
+     * 
+     * Generated SQL:
+     * SELECT * FROM siswa WHERE face_encoding IS NOT NULL
+     * 
+     * Use case:
+     * - Face recognition: cari semua siswa yang sudah enroll face
+     * - Loop dan compare encoding dengan input
+     * - Count berapa siswa yang sudah enroll
+     * 
+     * @return List<Siswa> yang punya face_encoding
+     */
+    List<Siswa> findByFaceEncodingIsNotNull();
+    
+    /**
+     * FIND SISWA BY USER.
+     * 
+     * Generated SQL:
+     * SELECT * FROM siswa WHERE user_id = ?
+     * 
+     * Use case:
+     * - Face enrollment: cari siswa berdasarkan user untuk save encoding
+     * - Check apakah user ini siswa atau guru
+     * 
+     * @param user User object
+     * @return Optional<Siswa> (ada jika user adalah siswa)
+     */
+    Optional<Siswa> findByUser(com.smk.presensi.entity.User user);
+    
     // CATATAN PENTING:
     // Method di atas TIDAK PERLU implementasi!
     // Spring Data JPA otomatis bikin SQL dan implementasinya.
