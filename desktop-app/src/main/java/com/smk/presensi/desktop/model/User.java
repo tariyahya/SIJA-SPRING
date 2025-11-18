@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class User {
     private Long id;
     private String username;
+    private String password; // Used only for creation, not returned by API
     private String nama;
     private String email;
     private String role; // ADMIN, USER
@@ -43,6 +44,14 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getNama() {

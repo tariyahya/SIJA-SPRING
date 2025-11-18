@@ -150,16 +150,63 @@ public class UserManagementController implements Initializable {
 
     @FXML
     private void handleAddUser() {
-        // TODO: Open Add User dialog - akan dibuat nanti
-        showInfo("Add User", "User form dialog will be implemented next.");
+        UserFormDialog dialog = new UserFormDialog();
+        dialog.showAndWait().ifPresent(newUser -> {
+            updateStatus("Creating user...");
+            
+            // Create via API in background thread
+            new Thread(() -> {
+                try {
+                    User createdUser = userService.createUser(newUser);
+                    
+                    // Update UI on JavaFX Application Thread
+                    javafx.application.Platform.runLater(() -> {
+                        usersList.add(createdUser);
+                        updateTotalUsers();
+                        updateStatus("User created: " + createdUser.getUsername());
+                        showInfo("Success", "User created successfully!");
+                    });
+                } catch (Exception e) {
+                    javafx.application.Platform.runLater(() -> {
+                        updateStatus("Failed to create user");
+                        showError("Error", "Failed to create user: " + e.getMessage());
+                    });
+                }
+            }).start();
+        });
     }
 
     @FXML
     private void handleEditUser() {
         User selectedUser = usersTable.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
-            // TODO: Open Edit User dialog - akan dibuat nanti
-            showInfo("Edit User", "User form dialog will be implemented next for: " + selectedUser.getUsername());
+            UserFormDialog dialog = new UserFormDialog(selectedUser);
+            dialog.showAndWait().ifPresent(updatedUser -> {
+                updateStatus("Updating user...");
+                
+                // Update via API in background thread
+                new Thread(() -> {
+                    try {
+                        User result = userService.updateUser(updatedUser.getId(), updatedUser);
+                        
+                        // Update UI on JavaFX Application Thread
+                        javafx.application.Platform.runLater(() -> {
+                            // Update the user in the list
+                            int index = usersList.indexOf(selectedUser);
+                            if (index >= 0) {
+                                usersList.set(index, result);
+                            }
+                            updateStatus("User updated: " + result.getUsername());
+                            showInfo("Success", "User updated successfully!");
+                        });
+                    } catch (Exception e) {
+                        javafx.application.Platform.runLater(() -> {
+                            updateStatus("Failed to update user");
+                            showError("Error", "Failed to update user: " + e.getMessage());
+                        });
+                    }
+                }).start();
+            });
         }
     }
 
