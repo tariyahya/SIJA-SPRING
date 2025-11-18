@@ -152,9 +152,43 @@ Checkin → Checkout (opsional)
   # Output: openjdk version "17.x.x"
   ```
 
-**2. Build Tool**
-- Tool: **Maven 3.9.x**
-- Included in Spring Boot project (mvnw)
+**2. Build Tool: Apache Maven**
+- Version: **Maven 3.9.x** (atau lebih baru)
+- Download: https://maven.apache.org/download.cgi
+
+**Instalasi Maven:**
+
+1. **Download Maven Binary**
+   - Kunjungi: https://maven.apache.org/download.cgi
+   - Download: `apache-maven-3.9.x-bin.zip`
+
+2. **Extract Maven**
+   - Extract ke: `C:\Program Files\Apache\maven` (atau lokasi pilihan Anda)
+
+3. **Set Environment Variables**
+   ```powershell
+   # Tambahkan MAVEN_HOME
+   setx MAVEN_HOME "C:\Program Files\Apache\maven"
+   
+   # Tambahkan Maven ke PATH
+   setx PATH "%PATH%;%MAVEN_HOME%\bin"
+   ```
+
+4. **Restart Terminal** (agar environment variables aktif)
+
+5. **Verify Installation**
+   ```powershell
+   mvn -version
+   
+   # Expected output:
+   # Apache Maven 3.9.x (xxx)
+   # Maven home: C:\Program Files\Apache\maven
+   # Java version: 17.x.x
+   ```
+
+**Alternative: Maven Wrapper (included in project)**
+- Project ini sudah include Maven Wrapper (`mvnw`, `mvnw.cmd`)
+- Tidak perlu install Maven global jika pakai wrapper
 - Verify:
   ```powershell
   cd backend

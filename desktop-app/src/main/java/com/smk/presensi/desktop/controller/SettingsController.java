@@ -1,5 +1,7 @@
 package com.smk.presensi.desktop.controller;
 
+import com.smk.presensi.desktop.model.AppSettings;
+import com.smk.presensi.desktop.service.SettingsManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -85,42 +87,39 @@ public class SettingsController implements Initializable {
     }
 
     private void loadSettings() {
-        // TODO: Load from properties file or preferences
-        // For now, use default values
+        // Load from SettingsManager (Java Preferences API)
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        AppSettings settings = settingsManager.getSettings();
+        
         if (serverUrlField != null) {
-            serverUrlField.setText("http://localhost:8080");
+            serverUrlField.setText(settings.getServerUrl());
+        }
+        
+        if (refreshIntervalSpinner != null) {
+            refreshIntervalSpinner.getValueFactory().setValue(settings.getAutoRefreshInterval());
         }
         
         if (exportDirField != null) {
-            exportDirField.setText(System.getProperty("user.home") + "/Desktop");
+            exportDirField.setText(settings.getDefaultExportPath());
         }
 
         if (enableWebSocketCheck != null) {
-            enableWebSocketCheck.setSelected(true);
+            enableWebSocketCheck.setSelected(settings.isEnableWebSocket());
         }
 
         if (autoReconnectCheck != null) {
-            autoReconnectCheck.setSelected(true);
+            autoReconnectCheck.setSelected(settings.isAutoReconnect());
         }
 
         if (showNotificationsCheck != null) {
-            showNotificationsCheck.setSelected(true);
+            showNotificationsCheck.setSelected(settings.isShowNotifications());
         }
-
-        if (autoOpenExportCheck != null) {
-            autoOpenExportCheck.setSelected(true);
-        }
-
-        if (compactModeCheck != null) {
-            compactModeCheck.setSelected(false);
-        }
-
-        if (debugModeCheck != null) {
-            debugModeCheck.setSelected(false);
-        }
-
-        if (mockDataCheck != null) {
-            mockDataCheck.setSelected(true);
+        
+        // Set export format radio buttons
+        if ("PDF".equals(settings.getDefaultExportFormat())) {
+            if (pdfFormatRadio != null) pdfFormatRadio.setSelected(true);
+        } else {
+            if (csvFormatRadio != null) csvFormatRadio.setSelected(true);
         }
     }
 
@@ -148,8 +147,22 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void handleSave() {
-        // TODO: Save settings to properties file or preferences
-        // For now, just show confirmation
+        // Build AppSettings from UI fields
+        AppSettings settings = new AppSettings();
+        
+        settings.setServerUrl(serverUrlField.getText());
+        settings.setAutoRefreshInterval(refreshIntervalSpinner.getValue());
+        settings.setEnableWebSocket(enableWebSocketCheck.isSelected());
+        settings.setAutoReconnect(autoReconnectCheck.isSelected());
+        settings.setShowNotifications(showNotificationsCheck.isSelected());
+        settings.setDefaultExportFormat(pdfFormatRadio.isSelected() ? "PDF" : "CSV");
+        settings.setDefaultExportPath(exportDirField.getText());
+        
+        // Save using SettingsManager
+        SettingsManager settingsManager = SettingsManager.getInstance();
+        settingsManager.saveSettings(settings);
+        
+        // Show confirmation
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Settings Saved");
         alert.setHeaderText(null);
@@ -176,6 +189,11 @@ public class SettingsController implements Initializable {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
+                // Reset using SettingsManager
+                SettingsManager settingsManager = SettingsManager.getInstance();
+                settingsManager.resetToDefault();
+                
+                // Reload UI from reset settings
                 loadSettings();
                 
                 Alert info = new Alert(Alert.AlertType.INFORMATION);
