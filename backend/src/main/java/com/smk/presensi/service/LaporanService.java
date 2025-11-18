@@ -248,6 +248,21 @@ public class LaporanService {
                 Math.round(persentaseFace * 100.0) / 100.0
         );
     }
+
+    /**
+     * Get raw presensi list for an arbitrary date range.
+     * Used by desktop analytics view and offline cache.
+     *
+     * @param startDate start date (inclusive)
+     * @param endDate   end date (inclusive)
+     * @return list of PresensiResponse within the period
+     */
+    public List<PresensiResponse> getPresensiPeriode(LocalDate startDate, LocalDate endDate) {
+        List<Presensi> presensiList = presensiRepository.findByTanggalBetween(startDate, endDate);
+        return presensiList.stream()
+                .map(this::toPresensiResponse)
+                .collect(Collectors.toList());
+    }
     
     /**
      * Convert Presensi entity to PresensiResponse DTO.

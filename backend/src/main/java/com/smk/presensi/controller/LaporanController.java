@@ -204,4 +204,52 @@ public class LaporanController {
         
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * GET /api/laporan/periode?startDate=2025-01-01&endDate=2025-01-31
+     * Get raw presensi list for an arbitrary date range.
+     *
+     * Access: ADMIN or GURU
+     *
+     * Response:
+     * {
+     *   "message": "Laporan periode 2025-01-01 hingga 2025-01-31 berhasil diambil",
+     *   "data": {
+     *     "startDate": "2025-01-01",
+     *     "endDate": "2025-01-31",
+     *     "totalPresensi": 123,
+     *     "daftarPresensi": [ ... ]
+     *   }
+     * }
+     */
+    @GetMapping("/periode")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU')")
+    public ResponseEntity<Map<String, Object>> getLaporanPeriode(
+            @RequestParam("startDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+            @RequestParam("endDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        if (startDate.isAfter(endDate)) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", "startDate harus lebih kecil atau sama dengan endDate");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        var daftarPresensi = laporanService.getPresensiPeriode(startDate, endDate);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("startDate", startDate);
+        data.put("endDate", endDate);
+        data.put("totalPresensi", daftarPresensi.size());
+        data.put("daftarPresensi", daftarPresensi);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Laporan periode " + startDate + " hingga " + endDate + " berhasil diambil");
+        response.put("data", data);
+
+        return ResponseEntity.ok(response);
+    }
 }

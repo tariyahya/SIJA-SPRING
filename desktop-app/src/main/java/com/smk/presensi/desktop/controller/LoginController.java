@@ -32,9 +32,9 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialize SessionManager & ViewModel
+        // Initialize SessionManager & ViewModel with singleton ApiClient
         sessionManager = new SessionManager();
-        ApiClient apiClient = new ApiClient();
+        ApiClient apiClient = ApiClient.getInstance();
         viewModel = new LoginViewModel(apiClient, sessionManager);
 
         // Bind UI to ViewModel

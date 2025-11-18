@@ -23,6 +23,7 @@ com\smk\presensi\desktop\service\SiswaService.class
 com\smk\presensi\desktop\util\InAppNotification.class
 com\smk\presensi\desktop\service\PresensiService$3.class
 com\smk\presensi\desktop\controller\SiswaManagementController$1.class
+com\smk\presensi\desktop\service\PresensiService$4.class
 com\smk\presensi\desktop\controller\AnalyticsController$1.class
 com\smk\presensi\desktop\model\Guru.class
 com\smk\presensi\desktop\service\SiswaService$2.class
@@ -34,6 +35,7 @@ com\smk\presensi\desktop\service\ApiClient$LoginResponse.class
 com\smk\presensi\desktop\service\SessionManager.class
 com\smk\presensi\desktop\controller\UserManagementController.class
 com\smk\presensi\desktop\service\ApiClient.class
+com\smk\presensi\desktop\service\PresensiService$AdminPresensiPayload.class
 com\smk\presensi\desktop\service\NotificationService.class
 com\smk\presensi\desktop\service\UserService$1.class
 com\smk\presensi\desktop\controller\GuruManagementController.class

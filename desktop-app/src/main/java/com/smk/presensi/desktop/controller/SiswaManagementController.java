@@ -66,8 +66,8 @@ public class SiswaManagementController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialize service
-        ApiClient apiClient = new ApiClient();
+        // Initialize service with singleton ApiClient (shares JWT token)
+        ApiClient apiClient = ApiClient.getInstance();
         siswaService = new SiswaService(apiClient);
         
         siswaList = FXCollections.observableArrayList();
@@ -132,13 +132,14 @@ public class SiswaManagementController implements Initializable {
     private void setupFilters() {
         // Populate filter dropdowns
         kelasFilter.setItems(FXCollections.observableArrayList(
-            "X RPL 1", "X RPL 2", "XI RPL 1", "XI RPL 2", "XII RPL 1", "XII RPL 2",
-            "X TKJ 1", "X TKJ 2", "XI TKJ 1", "XI TKJ 2", "XII TKJ 1", "XII TKJ 2",
-            "X MM 1", "XI MM 1", "XII MM 1"
+            "X AKL 1", "X AKL 2", "XI AKL 1", "XI AKL 2", "XII AKL 1", "XII AKL 2",
+            "X TKR 1", "X TKR 2", "XI TKR 1", "XI TKR 2", "XII TKR 1", "XII TKR 2",
+            "X TBO 1", "XI TBO 1", "XII TBO 1",
+            "X SIJA 1", "XI SIJA 1", "XII SIJA 1", "XIII SIJA 1"
         ));
         
         jurusanFilter.setItems(FXCollections.observableArrayList(
-            "RPL", "TKJ", "MM", "OTKP", "AKL"
+            "AKL", "TKR", "TBO", "SIJA"
         ));
     }
     
@@ -250,7 +251,7 @@ public class SiswaManagementController implements Initializable {
             TextField barcodeField = (TextField) form.lookup("#barcodeField");
             
             // Populate jurusan ComboBox
-            jurusanCombo.setItems(FXCollections.observableArrayList("RPL", "TKJ", "MM", "OTKP", "AKL"));
+            jurusanCombo.setItems(FXCollections.observableArrayList("AKL", "TKR", "TBO", "SIJA"));
             
             dialog.getDialogPane().setContent(form);
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);

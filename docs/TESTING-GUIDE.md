@@ -79,8 +79,8 @@
 3. Fill form:
    - **NIS**: `12399` (unique number)
    - **Nama**: `Testing User`
-   - **Kelas**: `XII RPL 1`
-   - **Jurusan**: Select `RPL` from dropdown
+   - **Kelas**: `XIII SIJA 1`
+   - **Jurusan**: Select `SIJA` from dropdown
    - **RFID Card ID**: `RFID12399` (optional)
    - **Barcode ID**: `BC12399` (optional)
 4. Click **OK**
@@ -98,8 +98,8 @@
 {
   "nis": "12399",
   "nama": "Testing User",
-  "kelas": "XII RPL 1",
-  "jurusan": "RPL",
+  "kelas": "XIII SIJA 1",
+  "jurusan": "SIJA",
   "rfidCardId": "RFID12399",
   "barcodeId": "BC12399"
 }

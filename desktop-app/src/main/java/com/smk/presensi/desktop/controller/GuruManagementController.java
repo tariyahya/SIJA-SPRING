@@ -59,7 +59,7 @@ public class GuruManagementController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        ApiClient apiClient = new ApiClient();
+        ApiClient apiClient = ApiClient.getInstance();
         guruService = new GuruService(apiClient);
         
         guruList = FXCollections.observableArrayList();
@@ -255,8 +255,74 @@ public class GuruManagementController implements Initializable {
     
     private void handleEdit(Guru guru) {
         if (guru == null) return;
-        InAppNotification.show("Edit Guru - Coming Soon!", guruTable.getParent(), 
-                              InAppNotification.NotificationType.INFO, 3);
+
+        try {
+            Dialog<Guru> dialog = new Dialog<>();
+            dialog.setTitle("Edit Guru");
+            dialog.setHeaderText("Edit data guru: " + guru.getNama());
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/guru-form-dialog.fxml"));
+            GridPane form = loader.load();
+
+            TextField nipField = (TextField) form.lookup("#nipField");
+            TextField namaField = (TextField) form.lookup("#namaField");
+            ComboBox<String> mapelCombo = (ComboBox<String>) form.lookup("#mapelCombo");
+            TextField rfidField = (TextField) form.lookup("#rfidField");
+            TextField barcodeField = (TextField) form.lookup("#barcodeField");
+
+            mapelCombo.setItems(FXCollections.observableArrayList(
+                "Matematika", "Bahasa Indonesia", "Bahasa Inggris",
+                "Pemrograman Web", "Pemrograman Mobile", "Basis Data",
+                "Jaringan Komputer", "Sistem Operasi", "PKN", "Agama", "Olahraga"
+            ));
+
+            nipField.setText(guru.getNip());
+            nipField.setDisable(true);
+            namaField.setText(guru.getNama());
+            mapelCombo.setValue(guru.getMapel());
+            rfidField.setText(guru.getRfidCardId());
+            barcodeField.setText(guru.getBarcodeId());
+
+            dialog.getDialogPane().setContent(form);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+            dialog.setResultConverter(buttonType -> {
+                if (buttonType == ButtonType.OK) {
+                    guru.setNama(namaField.getText());
+                    guru.setMapel(mapelCombo.getValue());
+                    guru.setRfidCardId(rfidField.getText());
+                    guru.setBarcodeId(barcodeField.getText());
+                    return guru;
+                }
+                return null;
+            });
+
+            Optional<Guru> result = dialog.showAndWait();
+            result.ifPresent(updatedGuru -> {
+                setLoading(true);
+                new Thread(() -> {
+                    Guru updated = guruService.updateGuru(updatedGuru.getId(), updatedGuru);
+                    Platform.runLater(() -> {
+                        setLoading(false);
+                        if (updated != null) {
+                            loadData();
+                            InAppNotification.show("Guru berhasil diupdate",
+                                    guruTable.getParent(),
+                                    InAppNotification.NotificationType.SUCCESS, 3);
+                        } else {
+                            InAppNotification.show("Gagal mengupdate guru",
+                                    guruTable.getParent(),
+                                    InAppNotification.NotificationType.ERROR, 5);
+                        }
+                    });
+                }).start();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            InAppNotification.show("Error: " + e.getMessage(),
+                    guruTable.getParent(),
+                    InAppNotification.NotificationType.ERROR, 5);
+        }
     }
     
     private void handleView(Guru guru) {

@@ -88,8 +88,8 @@ Write-Host "Test 4: CREATE Siswa" -ForegroundColor Yellow
 $testSiswa = @{
     nis = "TEST$(Get-Random -Minimum 1000 -Maximum 9999)"
     nama = "Test Siswa $(Get-Date -Format 'HHmmss')"
-    kelas = "XII RPL 1"
-    jurusan = "RPL"
+    kelas = "XIII SIJA 1"
+    jurusan = "SIJA"
 } | ConvertTo-Json
 
 try {
@@ -121,8 +121,8 @@ if ($createdId) {
     $updateSiswa = @{
         nis = "TEST$(Get-Random -Minimum 1000 -Maximum 9999)"
         nama = "Test Siswa UPDATED"
-        kelas = "XII RPL 2"
-        jurusan = "RPL"
+        kelas = "XII AKL 2"
+        jurusan = "AKL"
     } | ConvertTo-Json
     
     try {

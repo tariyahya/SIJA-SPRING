@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,22 @@ public class PresensiService {
     public PresensiService(ApiClient apiClient) {
         this.apiClient = apiClient;
         this.gson = new Gson();
+    }
+
+    /**
+     * DTO untuk admin create/update presensi (desktop).
+     */
+    public static class AdminPresensiPayload {
+        public Long userId;
+        public String tipe;
+        public String tanggal;
+        public String jamMasuk;
+        public String jamPulang;
+        public String status;
+        public String method;
+        public Double latitude;
+        public Double longitude;
+        public String keterangan;
     }
 
     /**
@@ -141,6 +158,84 @@ public class PresensiService {
      */
     public DashboardStats getMockStats() {
         return new DashboardStats(95, 85, 8, 2, 89.47);
+    }
+
+    /**
+     * ADMIN: Create presensi record.
+     */
+    public Presensi createPresensi(Presensi presensi) throws IOException, InterruptedException {
+        AdminPresensiPayload payload = toAdminPayload(presensi);
+        String jsonBody = gson.toJson(payload);
+        HttpResponse<String> response = apiClient.post("/admin/presensi", jsonBody);
+
+        if (response.statusCode() == 201 || response.statusCode() == 200) {
+            return parseSinglePresensi(response.body());
+        }
+        throw new IOException("Failed to create presensi: " + response.statusCode() + " - " + response.body());
+    }
+
+    /**
+     * ADMIN: Update presensi record.
+     */
+    public Presensi updatePresensi(Presensi presensi) throws IOException, InterruptedException {
+        if (presensi.getId() == null) {
+            throw new IllegalArgumentException("Presensi ID is required for update");
+        }
+        AdminPresensiPayload payload = toAdminPayload(presensi);
+        String jsonBody = gson.toJson(payload);
+        HttpResponse<String> response = apiClient.put("/admin/presensi/" + presensi.getId(), jsonBody);
+
+        if (response.statusCode() == 200) {
+            return parseSinglePresensi(response.body());
+        }
+        throw new IOException("Failed to update presensi: " + response.statusCode() + " - " + response.body());
+    }
+
+    /**
+     * ADMIN: Delete presensi record.
+     */
+    public boolean deletePresensi(Long id) throws IOException, InterruptedException {
+        HttpResponse<String> response = apiClient.delete("/admin/presensi/" + id);
+        return response.statusCode() == 200 || response.statusCode() == 204;
+    }
+
+    private AdminPresensiPayload toAdminPayload(Presensi p) {
+        AdminPresensiPayload payload = new AdminPresensiPayload();
+        payload.userId = p.getUserId();
+        payload.tipe = p.getTipe();
+        payload.tanggal = p.getTanggal() != null ? p.getTanggal().toString() : null;
+        payload.jamMasuk = p.getJamMasuk() != null ? p.getJamMasuk().toString() : null;
+        payload.jamPulang = p.getJamPulang() != null ? p.getJamPulang().toString() : null;
+        payload.status = p.getStatus();
+        payload.method = p.getMethod();
+        payload.latitude = null;
+        payload.longitude = null;
+        payload.keterangan = p.getKeterangan();
+        return payload;
+    }
+
+    private Presensi parseSinglePresensi(String json) {
+        Type type = new TypeToken<Map<String, Object>>(){}.getType();
+        Map<String, Object> map = gson.fromJson(json, type);
+
+        Presensi p = new Presensi();
+        p.setId(((Double) map.get("id")).longValue());
+        p.setUserId(((Double) map.get("userId")).longValue());
+        p.setUsername((String) map.get("username"));
+        p.setTipe(map.get("tipe").toString());
+        p.setTanggal(LocalDate.parse((String) map.get("tanggal")));
+        Object jamMasukObj = map.get("jamMasuk");
+        if (jamMasukObj != null) {
+            p.setJamMasuk(LocalTime.parse(jamMasukObj.toString()));
+        }
+        Object jamPulangObj = map.get("jamPulang");
+        if (jamPulangObj != null) {
+            p.setJamPulang(LocalTime.parse(jamPulangObj.toString()));
+        }
+        p.setStatus(map.get("status").toString());
+        p.setMethod(map.get("method").toString());
+        p.setKeterangan((String) map.get("keterangan"));
+        return p;
     }
     
     /**

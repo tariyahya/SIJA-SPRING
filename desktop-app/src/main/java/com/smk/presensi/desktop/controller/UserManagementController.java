@@ -45,9 +45,9 @@ public class UserManagementController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Initialize API client
+        // Initialize API client with singleton (shares JWT token)
         sessionManager = new SessionManager();
-        apiClient = new ApiClient();
+        apiClient = ApiClient.getInstance();
         if (sessionManager.isLoggedIn()) {
             apiClient.setJwtToken(sessionManager.getJwtToken());
         }

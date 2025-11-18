@@ -75,8 +75,8 @@ public class DashboardController implements Initializable {
             sessionManager = new SessionManager();
         }
 
-        // Initialize ApiClient with saved token
-        ApiClient apiClient = new ApiClient();
+        // Initialize ApiClient with saved token (singleton pattern)
+        ApiClient apiClient = ApiClient.getInstance();
         if (sessionManager.isLoggedIn()) {
             apiClient.setJwtToken(sessionManager.getJwtToken());
         }
@@ -319,12 +319,12 @@ public class DashboardController implements Initializable {
             
             java.io.File file = fileChooser.showSaveDialog(presensiTable.getScene().getWindow());
             if (file != null) {
-                updateStatus("Exporting to PDF...");
+                updateStatus("Exporting to CSV...");
                 
                 // Export in background thread
                 new Thread(() -> {
                     try {
-                        ApiClient apiClient = new ApiClient();
+                        ApiClient apiClient = ApiClient.getInstance();
                         PresensiService presensiService = new PresensiService(apiClient);
                         ExportService exportService = new ExportService(presensiService);
                         exportService.exportToPdf(dateRange[0], dateRange[1], file);
@@ -376,7 +376,7 @@ public class DashboardController implements Initializable {
                 // Export in background thread
                 new Thread(() -> {
                     try {
-                        ApiClient apiClient = new ApiClient();
+                        ApiClient apiClient = ApiClient.getInstance();
                         PresensiService presensiService = new PresensiService(apiClient);
                         ExportService exportService = new ExportService(presensiService);
                         exportService.exportToCsv(dateRange[0], dateRange[1], file);

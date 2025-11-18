@@ -17,16 +17,19 @@ import java.time.format.DateTimeFormatter;
 /**
  * HTTP Client untuk komunikasi dengan Backend API
  * Handles authentication (JWT), request/response, error handling
+ * Uses Singleton pattern to share JWT token across the application
  */
 public class ApiClient {
     private static final String BASE_URL = "http://localhost:8081/api";
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
     
+    private static ApiClient instance;
+    
     private final HttpClient httpClient;
     private final Gson gson;
     private String jwtToken;
 
-    public ApiClient() {
+    private ApiClient() {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(TIMEOUT)
                 .build();
@@ -40,6 +43,16 @@ public class ApiClient {
                     (JsonDeserializer<LocalTime>) (json, type, context) -> 
                         LocalTime.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_TIME))
                 .create();
+    }
+    
+    /**
+     * Get singleton instance of ApiClient
+     */
+    public static synchronized ApiClient getInstance() {
+        if (instance == null) {
+            instance = new ApiClient();
+        }
+        return instance;
     }
 
     /**
@@ -170,16 +183,6 @@ public class ApiClient {
         return BASE_URL;
     }
     
-    public static ApiClient getInstance() {
-        // Singleton pattern (untuk simplicity)
-        if (instance == null) {
-            instance = new ApiClient();
-        }
-        return instance;
-    }
-    
-    private static ApiClient instance;
-
     // Inner class untuk parse login response
     private static class LoginResponse {
         String token;
