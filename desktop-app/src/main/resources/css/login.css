@@ -7,7 +7,7 @@
 
 /* Background Gradient */
 .background-gradient {
-    -fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #667eea 0%, #764ba2 100%);
 }
 
 /* Login Card */
