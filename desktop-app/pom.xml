@@ -71,6 +71,13 @@
             <artifactId>commons-csv</artifactId>
             <version>1.10.0</version>
         </dependency>
+
+        <!-- SQLite for Local Cache -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.44.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>

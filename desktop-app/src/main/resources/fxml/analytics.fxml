@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.smk.presensi.desktop.controller.AnalyticsController"
+            stylesheets="@../css/analytics.css">
+
+    <!-- Top: Date Range Filter -->
+    <top>
+        <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: white;">
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="From:" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                <DatePicker fx:id="startDatePicker" prefWidth="150"/>
+                
+                <Label text="To:" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+                <DatePicker fx:id="endDatePicker" prefWidth="150"/>
+                
+                <Button fx:id="refreshButton" text="Refresh Charts" 
+                        onAction="#handleRefresh"
+                        style="-fx-background-color: #2196F3; -fx-text-fill: white; 
+                               -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20;"/>
+                
+                <Button text="Clear Cache" 
+                        onAction="#handleClearCache"
+                        style="-fx-background-color: #f44336; -fx-text-fill: white; 
+                               -fx-cursor: hand; -fx-padding: 8 20;"/>
+                
+                <ProgressIndicator fx:id="progressIndicator" 
+                                   prefWidth="30" prefHeight="30" 
+                                   visible="false"/>
+                
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <Label fx:id="statusLabel" text="Ready" 
+                       style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+            </HBox>
+            
+            <Separator/>
+        </VBox>
+    </top>
+
+    <!-- Center: Charts Grid -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true">
+            <VBox spacing="20" style="-fx-padding: 20;">
+                <!-- Row 1: PieChart and BarChart -->
+                <HBox spacing="20">
+                    <!-- PieChart -->
+                    <VBox spacing="10" HBox.hgrow="ALWAYS" 
+                          style="-fx-background-color: white; -fx-padding: 20; 
+                                 -fx-background-radius: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                        <Label text="Status Distribution" 
+                               style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <PieChart fx:id="statusPieChart" 
+                                  prefWidth="450" prefHeight="400"
+                                  legendVisible="true"/>
+                    </VBox>
+
+                    <!-- BarChart -->
+                    <VBox spacing="10" HBox.hgrow="ALWAYS" 
+                          style="-fx-background-color: white; -fx-padding: 20; 
+                                 -fx-background-radius: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                        <Label text="Daily Attendance" 
+                               style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <BarChart fx:id="dailyBarChart" 
+                                  prefWidth="550" prefHeight="400"
+                                  legendVisible="true">
+                            <xAxis>
+                                <CategoryAxis label="Date"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Count" side="LEFT"/>
+                            </yAxis>
+                        </BarChart>
+                    </VBox>
+                </HBox>
+
+                <!-- Row 2: LineChart (full width) -->
+                <VBox spacing="10" 
+                      style="-fx-background-color: white; -fx-padding: 20; 
+                             -fx-background-radius: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                    <Label text="Weekly Trend" 
+                           style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <LineChart fx:id="trendLineChart" 
+                               prefHeight="400"
+                               legendVisible="true">
+                        <xAxis>
+                            <CategoryAxis label="Week"/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Count" side="LEFT"/>
+                        </yAxis>
+                    </LineChart>
+                </VBox>
+
+                <!-- Info Panel -->
+                <HBox spacing="20" alignment="CENTER" 
+                      style="-fx-background-color: #E3F2FD; -fx-padding: 15; -fx-background-radius: 5;">
+                    <Label text="ℹ" style="-fx-font-size: 24; -fx-text-fill: #2196F3;"/>
+                    <VBox spacing="5">
+                        <Label text="Analytics Tips:" 
+                               style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #1976D2;"/>
+                        <Label text="• Select different date ranges to see trends over time"
+                               style="-fx-font-size: 12; -fx-text-fill: #333;"/>
+                        <Label text="• Charts automatically update with real-time data from WebSocket"
+                               style="-fx-font-size: 12; -fx-text-fill: #333;"/>
+                        <Label text="• Offline mode will use cached data when server is unavailable"
+                               style="-fx-font-size: 12; -fx-text-fill: #333;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
