@@ -461,12 +461,113 @@ public class DashboardController implements Initializable {
         alert.setHeaderText("SIJA Presensi Desktop App");
         alert.setContentText(
             "Version: 1.0.0\n" +
-            "Build: Tahap 03\n\n" +
+            "Build: Tahap 05\n\n" +
             "Desktop application untuk sistem presensi SIJA\n" +
             "dengan integrasi RFID dan real-time monitoring.\n\n" +
-            "© 2024 SIJA"
+            "© 2025 SIJA"
         );
         alert.showAndWait();
+    }
+    
+    /**
+     * Handle Siswa Management dari menu
+     */
+    @FXML
+    private void handleSiswaManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/siswa-management.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manajemen Siswa");
+            stage.setScene(new Scene(root, 1200, 700));
+            stage.showAndWait();
+            
+            // Refresh dashboard setelah window ditutup
+            viewModel.refreshData();
+            
+        } catch (IOException e) {
+            showError("Error loading Siswa Management: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Handle Guru Management dari menu
+     */
+    @FXML
+    private void handleGuruManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/guru-management.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manajemen Guru");
+            stage.setScene(new Scene(root, 1100, 700));
+            stage.showAndWait();
+            
+            // Refresh dashboard setelah window ditutup
+            viewModel.refreshData();
+            
+        } catch (IOException e) {
+            showError("Error loading Guru Management: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Handle Presensi Management dari menu
+     */
+    @FXML
+    private void handlePresensiManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/presensi-management.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manajemen Presensi");
+            stage.setScene(new Scene(root, 1400, 700));
+            stage.showAndWait();
+            
+            // Refresh dashboard setelah window ditutup
+            viewModel.refreshData();
+            
+        } catch (IOException e) {
+            showError("Error loading Presensi Management: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Handle Analytics dari menu
+     */
+    @FXML
+    private void handleAnalytics() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/analytics.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Analytics & Reports");
+            stage.setScene(new Scene(root, 1200, 800));
+            stage.showAndWait();
+            
+        } catch (IOException e) {
+            showError("Error loading Analytics: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**

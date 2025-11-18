@@ -23,7 +23,16 @@
                 </Menu>
                 
                 <Menu text="Manage">
+                    <MenuItem text="Presensi Management" onAction="#handlePresensiManagement"/>
+                    <MenuItem text="Siswa Management" onAction="#handleSiswaManagement"/>
+                    <MenuItem text="Guru Management" onAction="#handleGuruManagement"/>
+                    <SeparatorMenuItem/>
                     <MenuItem text="User Management" onAction="#handleUserManagement"/>
+                </Menu>
+                
+                <Menu text="View">
+                    <MenuItem text="Analytics & Reports" onAction="#handleAnalytics"/>
+                    <MenuItem text="Dashboard" onAction="#handleRefresh"/>
                 </Menu>
                 
                 <Menu text="Settings">
