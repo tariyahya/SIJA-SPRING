@@ -3,6 +3,7 @@ package com.smk.presensi.desktop.controller;
 import com.smk.presensi.desktop.model.User;
 import com.smk.presensi.desktop.service.ApiClient;
 import com.smk.presensi.desktop.service.SessionManager;
+import com.smk.presensi.desktop.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 
@@ -39,6 +41,7 @@ public class UserManagementController implements Initializable {
     private ObservableList<User> usersList;
     private ApiClient apiClient;
     private SessionManager sessionManager;
+    private UserService userService;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -48,6 +51,9 @@ public class UserManagementController implements Initializable {
         if (sessionManager.isLoggedIn()) {
             apiClient.setJwtToken(sessionManager.getJwtToken());
         }
+        
+        // Initialize UserService
+        userService = new UserService(apiClient);
 
         // Setup table columns
         setupTableColumns();
@@ -107,47 +113,28 @@ public class UserManagementController implements Initializable {
     }
 
     private void loadUsers() {
-        // TODO: Load from API
-        // For now, use mock data
         updateStatus("Loading users...");
         
-        usersList.clear();
-        
-        // Mock data
-        User user1 = new User();
-        user1.setId(1L);
-        user1.setUsername("admin");
-        user1.setEmail("admin@sija.com");
-        user1.setRole("ADMIN");
-        user1.setTipe("GURU");
-        user1.setRfidCardId("ADMIN001");
-        user1.setEnabled(true);
-        user1.setCreatedAt(LocalDateTime.now().minusDays(10));
-        
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setUsername("guru01");
-        user2.setEmail("guru01@sija.com");
-        user2.setRole("USER");
-        user2.setTipe("GURU");
-        user2.setRfidCardId("GURU001");
-        user2.setEnabled(true);
-        user2.setCreatedAt(LocalDateTime.now().minusDays(5));
-        
-        User user3 = new User();
-        user3.setId(3L);
-        user3.setUsername("siswa01");
-        user3.setEmail("siswa01@sija.com");
-        user3.setRole("USER");
-        user3.setTipe("SISWA");
-        user3.setRfidCardId("SISWA001");
-        user3.setEnabled(true);
-        user3.setCreatedAt(LocalDateTime.now().minusDays(3));
-        
-        usersList.addAll(user1, user2, user3);
-        
-        updateTotalUsers();
-        updateStatus("Users loaded successfully");
+        // Load from API in background thread
+        new Thread(() -> {
+            try {
+                List<User> users = userService.getAllUsers();
+                
+                // Update UI on JavaFX Application Thread
+                javafx.application.Platform.runLater(() -> {
+                    usersList.clear();
+                    usersList.addAll(users);
+                    updateTotalUsers();
+                    updateStatus("Users loaded successfully");
+                });
+                
+            } catch (Exception e) {
+                javafx.application.Platform.runLater(() -> {
+                    updateStatus("Error loading users: " + e.getMessage());
+                    showError("Failed to load users", e.getMessage());
+                });
+            }
+        }).start();
     }
 
     private void filterUsers(String searchText) {
@@ -163,16 +150,16 @@ public class UserManagementController implements Initializable {
 
     @FXML
     private void handleAddUser() {
-        // TODO: Open Add User dialog
-        showInfo("Add User", "Add User dialog akan diimplementasikan.");
+        // TODO: Open Add User dialog - akan dibuat nanti
+        showInfo("Add User", "User form dialog will be implemented next.");
     }
 
     @FXML
     private void handleEditUser() {
         User selectedUser = usersTable.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
-            // TODO: Open Edit User dialog
-            showInfo("Edit User", "Edit User dialog akan diimplementasikan untuk: " + selectedUser.getUsername());
+            // TODO: Open Edit User dialog - akan dibuat nanti
+            showInfo("Edit User", "User form dialog will be implemented next for: " + selectedUser.getUsername());
         }
     }
 
@@ -188,10 +175,28 @@ public class UserManagementController implements Initializable {
             
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    // TODO: Delete via API
-                    usersList.remove(selectedUser);
-                    updateTotalUsers();
-                    updateStatus("User deleted: " + selectedUser.getUsername());
+                    updateStatus("Deleting user...");
+                    
+                    // Delete via API in background thread
+                    new Thread(() -> {
+                        try {
+                            userService.deleteUser(selectedUser.getId());
+                            
+                            // Update UI on JavaFX Application Thread
+                            javafx.application.Platform.runLater(() -> {
+                                usersList.remove(selectedUser);
+                                updateTotalUsers();
+                                updateStatus("User deleted: " + selectedUser.getUsername());
+                                showInfo("Success", "User deleted successfully!");
+                            });
+                            
+                        } catch (Exception e) {
+                            javafx.application.Platform.runLater(() -> {
+                                updateStatus("Error deleting user");
+                                showError("Delete Failed", "Failed to delete user: " + e.getMessage());
+                            });
+                        }
+                    }).start();
                 }
             });
         }
@@ -216,6 +221,14 @@ public class UserManagementController implements Initializable {
 
     private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
