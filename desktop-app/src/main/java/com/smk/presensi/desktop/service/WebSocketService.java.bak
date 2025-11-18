@@ -1,0 +1,252 @@
+package com.smk.presensi.desktop.service;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.smk.presensi.desktop.model.DashboardStats;
+import com.smk.presensi.desktop.model.Presensi;
+import javafx.application.Platform;
+
+// Temporarily disabled - needs proper Jakarta WebSocket configuration
+// import jakarta.websocket.*;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+/**
+ * WebSocket Service untuk real-time updates dari backend
+ * Menangani PRESENSI_CREATED, PRESENSI_UPDATED, dan STATS_UPDATE events
+ * 
+ * TODO: WebSocket implementation needs proper configuration with Jakarta WebSocket API
+ * For now, using polling mechanism as fallback
+ */
+// @ClientEndpoint
+public class WebSocketService {
+    
+    private Session session;
+    private final String wsUrl;
+    private final Gson gson;
+    
+    // Callbacks untuk UI updates
+    private Consumer<Presensi> onPresensiCreated;
+    private Consumer<Presensi> onPresensiUpdated;
+    private Consumer<DashboardStats> onStatsUpdate;
+    private Consumer<String> onConnectionStatusChanged;
+    
+    // Reconnection settings
+    private boolean autoReconnect = true;
+    private int reconnectAttempts = 0;
+    private static final int MAX_RECONNECT_ATTEMPTS = 5;
+    private static final int RECONNECT_DELAY_MS = 5000;
+    
+    public WebSocketService(String wsUrl) {
+        this.wsUrl = wsUrl;
+        this.gson = new Gson();
+    }
+    
+    /**
+     * Connect to WebSocket server dengan JWT token
+     */
+    public void connect(String jwtToken) throws Exception {
+        System.out.println("Connecting to WebSocket: " + wsUrl);
+        
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            
+            // Custom configurator untuk add Authorization header
+            ClientEndpointConfig config = ClientEndpointConfig.Builder.create()
+                .configurator(new ClientEndpointConfig.Configurator() {
+                    @Override
+                    public void beforeRequest(Map<String, List<String>> headers) {
+                        headers.put("Authorization", List.of("Bearer " + jwtToken));
+                    }
+                })
+                .build();
+            
+            // Connect to WebSocket endpoint using annotated endpoint
+            URI uri = new URI(wsUrl);
+            session = container.connectToServer(this.getClass(), config, uri);
+            reconnectAttempts = 0;
+            
+            notifyConnectionStatus("Connected");
+        } catch (Exception e) {
+            System.err.println("Failed to connect to WebSocket: " + e.getMessage());
+            notifyConnectionStatus("Connection failed");
+            throw e;
+        }
+    }
+    
+    /**
+     * Handle incoming WebSocket messages
+     */
+    @OnMessage
+    public void onMessage(String message) {
+        System.out.println("WebSocket received: " + message);
+        
+        try {
+            JsonObject json = JsonParser.parseString(message).getAsJsonObject();
+            String type = json.get("type").getAsString();
+            JsonElement data = json.get("data");
+            
+            switch (type) {
+                case "PRESENSI_CREATED":
+                    handlePresensiCreated(data);
+                    break;
+                    
+                case "PRESENSI_UPDATED":
+                    handlePresensiUpdated(data);
+                    break;
+                    
+                case "STATS_UPDATE":
+                    handleStatsUpdate(data);
+                    break;
+                    
+                default:
+                    System.out.println("Unknown message type: " + type);
+            }
+        } catch (Exception e) {
+            System.err.println("Error handling WebSocket message: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private void handlePresensiCreated(JsonElement data) {
+        Presensi presensi = gson.fromJson(data, Presensi.class);
+        
+        // CRITICAL: Update JavaFX UI on FX Application Thread
+        Platform.runLater(() -> {
+            if (onPresensiCreated != null) {
+                onPresensiCreated.accept(presensi);
+            }
+        });
+    }
+    
+    private void handlePresensiUpdated(JsonElement data) {
+        Presensi presensi = gson.fromJson(data, Presensi.class);
+        
+        Platform.runLater(() -> {
+            if (onPresensiUpdated != null) {
+                onPresensiUpdated.accept(presensi);
+            }
+        });
+    }
+    
+    private void handleStatsUpdate(JsonElement data) {
+        DashboardStats stats = gson.fromJson(data, DashboardStats.class);
+        
+        Platform.runLater(() -> {
+            if (onStatsUpdate != null) {
+                onStatsUpdate.accept(stats);
+            }
+        });
+    }
+    
+    @OnOpen
+    public void onOpen(Session session) {
+        System.out.println("WebSocket opened: " + session.getId());
+        notifyConnectionStatus("Connected");
+    }
+    
+    @OnClose
+    public void onClose(CloseReason reason) {
+        System.out.println("WebSocket closed: " + reason);
+        notifyConnectionStatus("Disconnected");
+        
+        // Auto-reconnect jika bukan normal closure
+        if (autoReconnect && 
+            reason.getCloseCode() != CloseReason.CloseCodes.NORMAL_CLOSURE &&
+            reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+            
+            scheduleReconnect();
+        }
+    }
+    
+    @OnError
+    public void onError(Throwable error) {
+        System.err.println("WebSocket error: " + error.getMessage());
+        error.printStackTrace();
+        notifyConnectionStatus("Error: " + error.getMessage());
+    }
+    
+    private void scheduleReconnect() {
+        reconnectAttempts++;
+        System.out.println("Scheduling reconnect attempt " + reconnectAttempts + "...");
+        
+        new Thread(() -> {
+            try {
+                Thread.sleep(RECONNECT_DELAY_MS);
+                
+                // TODO: Get token from somewhere - SessionManager needs to be passed
+                // For now, disable auto-reconnect
+                notifyConnectionStatus("Reconnect not implemented yet");
+            } catch (Exception e) {
+                System.err.println("Reconnect failed: " + e.getMessage());
+                
+                if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                    scheduleReconnect();
+                } else {
+                    notifyConnectionStatus("Reconnect failed after " + MAX_RECONNECT_ATTEMPTS + " attempts");
+                }
+            }
+        }).start();
+    }
+    
+    /**
+     * Disconnect dari WebSocket server
+     */
+    public void disconnect() {
+        autoReconnect = false; // Disable auto-reconnect
+        
+        if (session != null && session.isOpen()) {
+            try {
+                session.close(new CloseReason(
+                    CloseReason.CloseCodes.NORMAL_CLOSURE, 
+                    "User logout"
+                ));
+            } catch (IOException e) {
+                System.err.println("Error closing WebSocket: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Check if WebSocket is connected
+     */
+    public boolean isConnected() {
+        return session != null && session.isOpen();
+    }
+    
+    private void notifyConnectionStatus(String status) {
+        Platform.runLater(() -> {
+            if (onConnectionStatusChanged != null) {
+                onConnectionStatusChanged.accept(status);
+            }
+        });
+    }
+    
+    // ===== Setters for callbacks =====
+    
+    public void setOnPresensiCreated(Consumer<Presensi> callback) {
+        this.onPresensiCreated = callback;
+    }
+    
+    public void setOnPresensiUpdated(Consumer<Presensi> callback) {
+        this.onPresensiUpdated = callback;
+    }
+    
+    public void setOnStatsUpdate(Consumer<DashboardStats> callback) {
+        this.onStatsUpdate = callback;
+    }
+    
+    public void setOnConnectionStatusChanged(Consumer<String> callback) {
+        this.onConnectionStatusChanged = callback;
+    }
+    
+    public void setAutoReconnect(boolean autoReconnect) {
+        this.autoReconnect = autoReconnect;
+    }
+}

@@ -105,6 +105,42 @@ public class ApiClient {
     }
 
     /**
+     * PUT request dengan JWT token
+     */
+    public HttpResponse<String> put(String endpoint, String jsonBody) 
+            throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + endpoint))
+                .header("Content-Type", "application/json")
+                .timeout(TIMEOUT)
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody));
+
+        if (jwtToken != null) {
+            builder.header("Authorization", "Bearer " + jwtToken);
+        }
+
+        return httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+    
+    /**
+     * DELETE request dengan JWT token
+     */
+    public HttpResponse<String> delete(String endpoint) 
+            throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + endpoint))
+                .header("Content-Type", "application/json")
+                .timeout(TIMEOUT)
+                .DELETE();
+
+        if (jwtToken != null) {
+            builder.header("Authorization", "Bearer " + jwtToken);
+        }
+
+        return httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    /**
      * Parse JSON response ke Java object
      */
     public <T> T parseResponse(String json, Class<T> classOfT) {
@@ -125,6 +161,24 @@ public class ApiClient {
     public void setJwtToken(String jwtToken) {
         this.jwtToken = jwtToken;
     }
+    
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+    
+    public String getBaseUrl() {
+        return BASE_URL;
+    }
+    
+    public static ApiClient getInstance() {
+        // Singleton pattern (untuk simplicity)
+        if (instance == null) {
+            instance = new ApiClient();
+        }
+        return instance;
+    }
+    
+    private static ApiClient instance;
 
     // Inner class untuk parse login response
     private static class LoginResponse {

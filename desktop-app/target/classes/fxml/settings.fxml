@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.SettingsController"
+            prefWidth="700" prefHeight="600">
+    
+    <top>
+        <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+            <Label text="Settings" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+            <Label text="Configure application preferences" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+        </VBox>
+    </top>
+    
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-padding: 20;">
+            <VBox spacing="20">
+                <!-- General Settings -->
+                <VBox spacing="10" style="-fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 15; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: white;">
+                    <Label text="General Settings" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Server URL:" prefWidth="200"/>
+                        <TextField fx:id="serverUrlField" prefWidth="350"/>
+                    </HBox>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Auto-Refresh Interval (seconds):" prefWidth="200"/>
+                        <Spinner fx:id="refreshIntervalSpinner" prefWidth="100"/>
+                        <Label text="(10-300 seconds)" style="-fx-text-fill: #666; -fx-font-size: 10px;"/>
+                    </HBox>
+                    
+                    <CheckBox fx:id="enableWebSocketCheck" text="Enable WebSocket (real-time updates)"/>
+                    <CheckBox fx:id="autoReconnectCheck" text="Auto-reconnect on disconnect"/>
+                    <CheckBox fx:id="showNotificationsCheck" text="Show notifications"/>
+                </VBox>
+                
+                <!-- Export Settings -->
+                <VBox spacing="10" style="-fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 15; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: white;">
+                    <Label text="Export Settings" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Default export format:" prefWidth="200"/>
+                        <ToggleGroup fx:id="exportFormatGroup"/>
+                        <RadioButton text="PDF" toggleGroup="$exportFormatGroup" fx:id="pdfFormatRadio" selected="true"/>
+                        <RadioButton text="CSV" toggleGroup="$exportFormatGroup" fx:id="csvFormatRadio"/>
+                    </HBox>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Default export directory:" prefWidth="200"/>
+                        <TextField fx:id="exportDirField" prefWidth="250" editable="false"/>
+                        <Button text="Browse..." onAction="#handleBrowseExportDir"/>
+                    </HBox>
+                    
+                    <CheckBox fx:id="autoOpenExportCheck" text="Automatically open exported files"/>
+                </VBox>
+                
+                <!-- UI Settings -->
+                <VBox spacing="10" style="-fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 15; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: white;">
+                    <Label text="UI Settings" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Theme:" prefWidth="200"/>
+                        <ComboBox fx:id="themeComboBox" prefWidth="150">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Light"/>
+                                    <String fx:value="Dark"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </HBox>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Table rows per page:" prefWidth="200"/>
+                        <Spinner fx:id="rowsPerPageSpinner" prefWidth="100"/>
+                    </HBox>
+                    
+                    <CheckBox fx:id="compactModeCheck" text="Compact mode (smaller UI elements)"/>
+                </VBox>
+                
+                <!-- Advanced Settings -->
+                <VBox spacing="10" style="-fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 15; -fx-border-radius: 5; -fx-background-radius: 5; -fx-background-color: white;">
+                    <Label text="Advanced Settings" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Connection timeout (seconds):" prefWidth="200"/>
+                        <Spinner fx:id="connectionTimeoutSpinner" prefWidth="100"/>
+                    </HBox>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Read timeout (seconds):" prefWidth="200"/>
+                        <Spinner fx:id="readTimeoutSpinner" prefWidth="100"/>
+                    </HBox>
+                    
+                    <CheckBox fx:id="debugModeCheck" text="Enable debug mode (detailed logging)"/>
+                    <CheckBox fx:id="mockDataCheck" text="Use mock data (for testing without backend)"/>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+            <Button text="Reset to Defaults" onAction="#handleResetDefaults" style="-fx-min-width: 120;"/>
+            <Button text="Cancel" onAction="#handleCancel" style="-fx-min-width: 80;"/>
+            <Button text="Save" onAction="#handleSave" style="-fx-min-width: 80; -fx-background-color: #007bff; -fx-text-fill: white;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

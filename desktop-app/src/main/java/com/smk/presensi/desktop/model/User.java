@@ -1,5 +1,7 @@
 package com.smk.presensi.desktop.model;
 
+import java.time.LocalDateTime;
+
 /**
  * Model untuk User (Admin/Guru/Siswa)
  */
@@ -8,7 +10,12 @@ public class User {
     private String username;
     private String nama;
     private String email;
-    private String role; // ADMIN, GURU, SISWA
+    private String role; // ADMIN, USER
+    private String tipe; // GURU, SISWA
+    private String rfidCardId;
+    private Boolean enabled;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     // Constructors
     public User() {}
@@ -62,6 +69,46 @@ public class User {
         this.role = role;
     }
 
+    public String getTipe() {
+        return tipe;
+    }
+
+    public void setTipe(String tipe) {
+        this.tipe = tipe;
+    }
+
+    public String getRfidCardId() {
+        return rfidCardId;
+    }
+
+    public void setRfidCardId(String rfidCardId) {
+        this.rfidCardId = rfidCardId;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -69,6 +116,7 @@ public class User {
                 ", username='" + username + '\'' +
                 ", nama='" + nama + '\'' +
                 ", role='" + role + '\'' +
+                ", tipe='" + tipe + '\'' +
                 '}';
     }
 }

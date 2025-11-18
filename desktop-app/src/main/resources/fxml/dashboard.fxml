@@ -11,31 +11,57 @@
             stylesheets="@../css/dashboard.css"
             styleClass="root">
 
-    <!-- Top Bar -->
+    <!-- MenuBar and Top Bar -->
     <top>
-        <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
-            <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
-            </padding>
+        <VBox>
+            <MenuBar>
+                <Menu text="File">
+                    <MenuItem text="Export PDF..." onAction="#handleExportPdf"/>
+                    <MenuItem text="Export CSV..." onAction="#handleExportCsv"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Logout" onAction="#handleLogout"/>
+                </Menu>
+                
+                <Menu text="Manage">
+                    <MenuItem text="User Management" onAction="#handleUserManagement"/>
+                </Menu>
+                
+                <Menu text="Settings">
+                    <MenuItem text="Preferences..." onAction="#handleSettings"/>
+                </Menu>
+                
+                <Menu text="Help">
+                    <MenuItem text="About" onAction="#handleAbout"/>
+                </Menu>
+            </MenuBar>
             
-            <Label text="SIJA Presensi - Dashboard Admin" styleClass="title">
-                <font>
-                    <Font name="System Bold" size="20"/>
-                </font>
-            </Label>
-            
-            <Region HBox.hgrow="ALWAYS"/>
-            
-            <Label fx:id="userLabel" text="👤 User" styleClass="user-label"/>
-            
-            <CheckBox fx:id="mockDataCheckbox" text="Mock Data" selected="true"/>
-            
-            <Button fx:id="refreshButton" text="⟳ Refresh" styleClass="btn-primary"/>
-            
-            <Button fx:id="logoutButton" text="🚪 Logout" styleClass="btn-danger"/>
-            
-            <ProgressIndicator fx:id="loadingIndicator" prefWidth="30" prefHeight="30" visible="false"/>
-        </HBox>
+            <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                
+                <Label text="SIJA Presensi - Dashboard Admin" styleClass="title">
+                    <font>
+                        <Font name="System Bold" size="20"/>
+                    </font>
+                </Label>
+                
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <!-- Connection Status -->
+                <Label fx:id="connectionStatusLabel" text="🔴 Disconnected" styleClass="connection-status"/>
+                
+                <Label fx:id="userLabel" text="👤 User" styleClass="user-label"/>
+                
+                <CheckBox fx:id="mockDataCheckbox" text="Mock Data" selected="true"/>
+                
+                <Button fx:id="refreshButton" text="⟳ Refresh" styleClass="btn-primary"/>
+                
+                <Button fx:id="logoutButton" text="🚪 Logout" styleClass="btn-danger"/>
+                
+                <ProgressIndicator fx:id="loadingIndicator" prefWidth="30" prefHeight="30" visible="false"/>
+            </HBox>
+        </VBox>
     </top>
 
     <!-- Center Content -->
@@ -130,7 +156,7 @@
                 <Insets top="10" right="20" bottom="10" left="20"/>
             </padding>
             
-            <Label text="Status: Ready" styleClass="status-text"/>
+            <Label fx:id="statusLabel" text="Status: Ready" styleClass="status-text"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="SIJA Presensi Desktop v1.0.0" styleClass="version-text"/>
         </HBox>

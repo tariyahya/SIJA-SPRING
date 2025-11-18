@@ -135,4 +135,46 @@ public class PresensiService {
     public DashboardStats getMockStats() {
         return new DashboardStats(95, 85, 8, 2, 89.47);
     }
+    
+    /**
+     * Get presensi by date range (untuk export reports)
+     */
+    public List<Presensi> getPresensiByDateRange(LocalDate startDate, LocalDate endDate) 
+            throws IOException, InterruptedException {
+        String endpoint = "/laporan/periode?startDate=" + startDate + "&endDate=" + endDate;
+        
+        HttpResponse<String> response = apiClient.get(endpoint);
+        
+        if (response.statusCode() == 200) {
+            Type type = new TypeToken<Map<String, Object>>(){}.getType();
+            Map<String, Object> responseMap = gson.fromJson(response.body(), type);
+            
+            Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
+            List<Map<String, Object>> daftarPresensi = (List<Map<String, Object>>) data.get("daftarPresensi");
+            
+            List<Presensi> presensiList = new ArrayList<>();
+            for (Map<String, Object> item : daftarPresensi) {
+                Presensi p = new Presensi();
+                p.setId(((Double) item.get("id")).longValue());
+                p.setUserId(((Double) item.get("userId")).longValue());
+                p.setUsername((String) item.get("username"));
+                p.setTipe((String) item.get("tipe"));
+                p.setTanggal(LocalDate.parse((String) item.get("tanggal")));
+                p.setJamMasuk(item.get("jamMasuk") != null 
+                    ? java.time.LocalTime.parse((String) item.get("jamMasuk")) 
+                    : null);
+                p.setJamPulang(item.get("jamPulang") != null
+                    ? java.time.LocalTime.parse((String) item.get("jamPulang"))
+                    : null);
+                p.setStatus((String) item.get("status"));
+                p.setMethod((String) item.get("method"));
+                p.setKeterangan((String) item.get("keterangan"));
+                presensiList.add(p);
+            }
+            
+            return presensiList;
+        }
+        
+        throw new IOException("Failed to fetch presensi by date range: " + response.statusCode());
+    }
 }

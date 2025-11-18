@@ -14,7 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -56,6 +56,8 @@ public class DashboardController implements Initializable {
     @FXML private Button refreshButton;
     @FXML private Button logoutButton;
     @FXML private Label userLabel;
+    @FXML private Label connectionStatusLabel;
+    @FXML private Label statusLabel;
     @FXML private ProgressIndicator loadingIndicator;
     @FXML private Label errorLabel;
     @FXML private CheckBox mockDataCheckbox;
@@ -295,5 +297,113 @@ public class DashboardController implements Initializable {
                 }
             }
         });
+    }
+
+    /**
+     * Handle Export PDF dari menu
+     */
+    @FXML
+    private void handleExportPdf() {
+        // TODO: Implement PDF export functionality
+        updateStatus("Exporting to PDF...");
+        showInfo("Export PDF feature akan diimplementasikan.");
+    }
+
+    /**
+     * Handle Export CSV dari menu
+     */
+    @FXML
+    private void handleExportCsv() {
+        // TODO: Implement CSV export functionality
+        updateStatus("Exporting to CSV...");
+        showInfo("Export CSV feature akan diimplementasikan.");
+    }
+
+    /**
+     * Handle User Management dari menu
+     */
+    @FXML
+    private void handleUserManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/user-management.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("User Management");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+            
+        } catch (IOException e) {
+            showError("Error loading User Management: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle Settings dari menu
+     */
+    @FXML
+    private void handleSettings() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/settings.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Settings");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+            
+        } catch (IOException e) {
+            showError("Error loading Settings: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle About dari menu
+     */
+    @FXML
+    private void handleAbout() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("About");
+        alert.setHeaderText("SIJA Presensi Desktop App");
+        alert.setContentText(
+            "Version: 1.0.0\n" +
+            "Build: Tahap 03\n\n" +
+            "Desktop application untuk sistem presensi SIJA\n" +
+            "dengan integrasi RFID dan real-time monitoring.\n\n" +
+            "© 2024 SIJA"
+        );
+        alert.showAndWait();
+    }
+
+    /**
+     * Update status bar
+     */
+    private void updateStatus(String message) {
+        if (statusLabel != null) {
+            statusLabel.setText("Status: " + message);
+        }
+    }
+
+    /**
+     * Update connection status
+     */
+    private void updateConnectionStatus(boolean connected) {
+        if (connectionStatusLabel != null) {
+            if (connected) {
+                connectionStatusLabel.setText("🟢 Connected");
+                connectionStatusLabel.setStyle("-fx-text-fill: green;");
+            } else {
+                connectionStatusLabel.setText("🔴 Disconnected");
+                connectionStatusLabel.setStyle("-fx-text-fill: red;");
+            }
+        }
     }
 }
