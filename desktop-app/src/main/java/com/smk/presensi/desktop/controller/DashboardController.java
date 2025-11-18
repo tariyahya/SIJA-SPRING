@@ -2,6 +2,8 @@ package com.smk.presensi.desktop.controller;
 
 import com.smk.presensi.desktop.model.Presensi;
 import com.smk.presensi.desktop.service.ApiClient;
+import com.smk.presensi.desktop.service.ExportService;
+import com.smk.presensi.desktop.service.PresensiService;
 import com.smk.presensi.desktop.service.SessionManager;
 import com.smk.presensi.desktop.viewmodel.DashboardViewModel;
 import javafx.animation.Animation;
@@ -304,9 +306,51 @@ public class DashboardController implements Initializable {
      */
     @FXML
     private void handleExportPdf() {
-        // TODO: Implement PDF export functionality
-        updateStatus("Exporting to PDF...");
-        showInfo("Export PDF feature akan diimplementasikan.");
+        // Show dialog for date range
+        ExportDateRangeDialog dialog = new ExportDateRangeDialog();
+        dialog.showAndWait().ifPresent(dateRange -> {
+            // Get file location from file chooser
+            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+            fileChooser.setTitle("Save PDF Report");
+            fileChooser.setInitialFileName("presensi_" + java.time.LocalDate.now() + ".pdf");
+            fileChooser.getExtensionFilters().add(
+                new javafx.stage.FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+            );
+            
+            java.io.File file = fileChooser.showSaveDialog(presensiTable.getScene().getWindow());
+            if (file != null) {
+                updateStatus("Exporting to PDF...");
+                
+                // Export in background thread
+                new Thread(() -> {
+                    try {
+                        ApiClient apiClient = new ApiClient();
+                        PresensiService presensiService = new PresensiService(apiClient);
+                        ExportService exportService = new ExportService(presensiService);
+                        exportService.exportToPdf(dateRange[0], dateRange[1], file);
+                        
+                        javafx.application.Platform.runLater(() -> {
+                            updateStatus("PDF exported successfully");
+                            showInfo("PDF report exported to:\n" + file.getAbsolutePath());
+                            
+                            // Auto-open file
+                            if (java.awt.Desktop.isDesktopSupported()) {
+                                try {
+                                    java.awt.Desktop.getDesktop().open(file);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    } catch (Exception e) {
+                        javafx.application.Platform.runLater(() -> {
+                            updateStatus("Failed to export PDF");
+                            showError("Failed to export PDF: " + e.getMessage());
+                        });
+                    }
+                }).start();
+            }
+        });
     }
 
     /**
@@ -314,9 +358,51 @@ public class DashboardController implements Initializable {
      */
     @FXML
     private void handleExportCsv() {
-        // TODO: Implement CSV export functionality
-        updateStatus("Exporting to CSV...");
-        showInfo("Export CSV feature akan diimplementasikan.");
+        // Show dialog for date range
+        ExportDateRangeDialog dialog = new ExportDateRangeDialog();
+        dialog.showAndWait().ifPresent(dateRange -> {
+            // Get file location from file chooser
+            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+            fileChooser.setTitle("Save CSV Report");
+            fileChooser.setInitialFileName("presensi_" + java.time.LocalDate.now() + ".csv");
+            fileChooser.getExtensionFilters().add(
+                new javafx.stage.FileChooser.ExtensionFilter("CSV Files", "*.csv")
+            );
+            
+            java.io.File file = fileChooser.showSaveDialog(presensiTable.getScene().getWindow());
+            if (file != null) {
+                updateStatus("Exporting to CSV...");
+                
+                // Export in background thread
+                new Thread(() -> {
+                    try {
+                        ApiClient apiClient = new ApiClient();
+                        PresensiService presensiService = new PresensiService(apiClient);
+                        ExportService exportService = new ExportService(presensiService);
+                        exportService.exportToCsv(dateRange[0], dateRange[1], file);
+                        
+                        javafx.application.Platform.runLater(() -> {
+                            updateStatus("CSV exported successfully");
+                            showInfo("CSV report exported to:\n" + file.getAbsolutePath());
+                            
+                            // Auto-open file
+                            if (java.awt.Desktop.isDesktopSupported()) {
+                                try {
+                                    java.awt.Desktop.getDesktop().open(file);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    } catch (Exception e) {
+                        javafx.application.Platform.runLater(() -> {
+                            updateStatus("Failed to export CSV");
+                            showError("Failed to export CSV: " + e.getMessage());
+                        });
+                    }
+                }).start();
+            }
+        });
     }
 
     /**

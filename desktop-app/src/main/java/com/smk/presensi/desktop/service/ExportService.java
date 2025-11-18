@@ -11,7 +11,6 @@ import org.apache.commons.csv.CSVPrinter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,18 +34,16 @@ public class ExportService {
      * 
      * @param startDate Tanggal awal periode
      * @param endDate Tanggal akhir periode
+     * @param outputFile File tujuan export
      * @return File PDF yang telah dibuat
      */
-    public File exportToPdf(LocalDate startDate, LocalDate endDate) throws Exception {
+    public File exportToPdf(LocalDate startDate, LocalDate endDate, File outputFile) throws Exception {
         // 1. Fetch data dari API
         List<Presensi> dataList = presensiService.getPresensiByDateRange(startDate, endDate);
         
-        // 2. Create PDF filename
-        String filename = "presensi_" + LocalDate.now() + ".pdf";
-        
-        // 3. Create PDF document (Landscape orientation)
+        // 2. Create PDF document (Landscape orientation)
         Document document = new Document(PageSize.A4.rotate());
-        PdfWriter.getInstance(document, new FileOutputStream(filename));
+        PdfWriter.getInstance(document, new FileOutputStream(outputFile));
         
         document.open();
         
@@ -192,8 +189,8 @@ public class ExportService {
         // 10. Close document
         document.close();
         
-        System.out.println("PDF exported successfully: " + filename);
-        return new File(filename);
+        System.out.println("PDF exported successfully: " + outputFile.getAbsolutePath());
+        return outputFile;
     }
     
     /**
@@ -201,17 +198,15 @@ public class ExportService {
      * 
      * @param startDate Tanggal awal periode
      * @param endDate Tanggal akhir periode
+     * @param outputFile File tujuan export
      * @return File CSV yang telah dibuat
      */
-    public File exportToCsv(LocalDate startDate, LocalDate endDate) throws Exception {
+    public File exportToCsv(LocalDate startDate, LocalDate endDate, File outputFile) throws Exception {
         // 1. Fetch data dari API
         List<Presensi> dataList = presensiService.getPresensiByDateRange(startDate, endDate);
         
-        // 2. Create CSV filename
-        String filename = "presensi_" + LocalDate.now() + ".csv";
-        
-        // 3. Create CSV file
-        try (FileWriter writer = new FileWriter(filename);
+        // 2. Create CSV file
+        try (FileWriter writer = new FileWriter(outputFile);
              CSVPrinter csv = new CSVPrinter(writer, CSVFormat.DEFAULT
                  .withHeader("Tanggal", "User ID", "Username", "Tipe", "Status", 
                             "Jam Masuk", "Jam Pulang", "Keterangan"))) {
@@ -231,8 +226,8 @@ public class ExportService {
             }
         }
         
-        System.out.println("CSV exported successfully: " + filename);
-        return new File(filename);
+        System.out.println("CSV exported successfully: " + outputFile.getAbsolutePath());
+        return outputFile;
     }
     
     // ===== Helper Methods =====

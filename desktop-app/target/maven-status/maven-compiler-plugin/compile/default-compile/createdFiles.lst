@@ -19,6 +19,7 @@ com\smk\presensi\desktop\model\AppSettings.class
 com\smk\presensi\desktop\service\PresensiService.class
 com\smk\presensi\desktop\service\UserService.class
 com\smk\presensi\desktop\controller\LoginController.class
+com\smk\presensi\desktop\controller\ExportDateRangeDialog.class
 com\smk\presensi\desktop\controller\UserFormDialog.class
 com\smk\presensi\desktop\controller\UserManagementController$1.class
 com\smk\presensi\desktop\controller\DashboardController$1.class
