@@ -96,6 +96,13 @@ public class PresensiService {
     }
 
     /**
+     * Get today's presensi (shortcut for today's date)
+     */
+    public List<Presensi> getTodayPresensi() throws IOException, InterruptedException {
+        return getLaporanHarian(LocalDate.now());
+    }
+
+    /**
      * RFID Checkin (simulasi dari desktop app)
      */
     public boolean checkinRfid(String rfidCardId) throws IOException, InterruptedException {
