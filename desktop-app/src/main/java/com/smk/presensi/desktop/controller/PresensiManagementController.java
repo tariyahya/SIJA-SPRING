@@ -74,6 +74,9 @@ public class PresensiManagementController implements Initializable {
         presensiList = FXCollections.observableArrayList();
         filteredList = FXCollections.observableArrayList();
         
+        // Setup filters
+        setupFilters();
+        
         // Setup table
         setupTableColumns();
         
@@ -82,6 +85,20 @@ public class PresensiManagementController implements Initializable {
         
         // Load data
         loadData();
+    }
+    
+    private void setupFilters() {
+        // Setup tipe filter
+        tipeFilter.setItems(FXCollections.observableArrayList("ALL", "SISWA", "GURU"));
+        tipeFilter.setValue("ALL");
+        
+        // Setup status filter
+        statusFilter.setItems(FXCollections.observableArrayList("ALL", "HADIR", "TERLAMBAT", "ALPHA"));
+        statusFilter.setValue("ALL");
+        
+        // Setup date pickers with default values
+        startDatePicker.setValue(LocalDate.now());
+        endDatePicker.setValue(LocalDate.now());
     }
     
     private void setupTableColumns() {

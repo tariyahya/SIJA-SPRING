@@ -46,9 +46,12 @@
                     
                     <HBox spacing="10" alignment="CENTER_LEFT">
                         <Label text="Default export format:" prefWidth="200"/>
-                        <ToggleGroup fx:id="exportFormatGroup"/>
-                        <RadioButton text="PDF" toggleGroup="$exportFormatGroup" fx:id="pdfFormatRadio" selected="true"/>
-                        <RadioButton text="CSV" toggleGroup="$exportFormatGroup" fx:id="csvFormatRadio"/>
+                        <RadioButton text="PDF" fx:id="pdfFormatRadio" selected="true">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="exportFormatGroup"/>
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton text="CSV" fx:id="csvFormatRadio" toggleGroup="$exportFormatGroup"/>
                     </HBox>
                     
                     <HBox spacing="10" alignment="CENTER_LEFT">

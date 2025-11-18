@@ -19,23 +19,7 @@
     <TextField fx:id="namaField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
     
     <Label text="Mata Pelajaran:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-    <ComboBox fx:id="mapelCombo" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="250">
-        <items>
-            <javafx.collections.FXCollections fx:factory="observableArrayList">
-                <String fx:value="Matematika"/>
-                <String fx:value="Bahasa Indonesia"/>
-                <String fx:value="Bahasa Inggris"/>
-                <String fx:value="Pemrograman Web"/>
-                <String fx:value="Pemrograman Mobile"/>
-                <String fx:value="Basis Data"/>
-                <String fx:value="Jaringan Komputer"/>
-                <String fx:value="Sistem Operasi"/>
-                <String fx:value="PKN"/>
-                <String fx:value="Agama"/>
-                <String fx:value="Olahraga"/>
-            </javafx.collections.FXCollections>
-        </items>
-    </ComboBox>
+    <ComboBox fx:id="mapelCombo" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="250"/>
     
     <Label text="RFID Card ID:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
     <TextField fx:id="rfidField" GridPane.columnIndex="1" GridPane.rowIndex="3"/>

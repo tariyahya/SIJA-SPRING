@@ -31,7 +31,7 @@
                 </Menu>
                 
                 <Menu text="View">
-                    <MenuItem text="Analytics & Reports" onAction="#handleAnalytics"/>
+                    <MenuItem text="Analytics &amp; Reports" onAction="#handleAnalytics"/>
                     <MenuItem text="Dashboard" onAction="#handleRefresh"/>
                 </Menu>
                 

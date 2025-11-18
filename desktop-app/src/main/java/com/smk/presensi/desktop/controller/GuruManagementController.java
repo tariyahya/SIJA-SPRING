@@ -205,6 +205,13 @@ public class GuruManagementController implements Initializable {
             TextField rfidField = (TextField) form.lookup("#rfidField");
             TextField barcodeField = (TextField) form.lookup("#barcodeField");
             
+            // Populate mapel ComboBox
+            mapelCombo.setItems(FXCollections.observableArrayList(
+                "Matematika", "Bahasa Indonesia", "Bahasa Inggris", 
+                "Pemrograman Web", "Pemrograman Mobile", "Basis Data",
+                "Jaringan Komputer", "Sistem Operasi", "PKN", "Agama", "Olahraga"
+            ));
+            
             dialog.getDialogPane().setContent(form);
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             

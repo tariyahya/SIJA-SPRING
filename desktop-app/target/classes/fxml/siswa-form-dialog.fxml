@@ -22,17 +22,7 @@
     <TextField fx:id="kelasField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
     
     <Label text="Jurusan:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-    <ComboBox fx:id="jurusanCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="250">
-        <items>
-            <javafx.collections.FXCollections fx:factory="observableArrayList">
-                <String fx:value="RPL"/>
-                <String fx:value="TKJ"/>
-                <String fx:value="MM"/>
-                <String fx:value="OTKP"/>
-                <String fx:value="AKL"/>
-            </javafx.collections.FXCollections>
-        </items>
-    </ComboBox>
+    <ComboBox fx:id="jurusanCombo" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="250"/>
     
     <Label text="RFID Card ID:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
     <TextField fx:id="rfidField" GridPane.columnIndex="1" GridPane.rowIndex="4"/>

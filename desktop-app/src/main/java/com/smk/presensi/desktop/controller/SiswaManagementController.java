@@ -249,6 +249,9 @@ public class SiswaManagementController implements Initializable {
             TextField rfidField = (TextField) form.lookup("#rfidField");
             TextField barcodeField = (TextField) form.lookup("#barcodeField");
             
+            // Populate jurusan ComboBox
+            jurusanCombo.setItems(FXCollections.observableArrayList("RPL", "TKJ", "MM", "OTKP", "AKL"));
+            
             dialog.getDialogPane().setContent(form);
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
             
@@ -316,6 +319,9 @@ public class SiswaManagementController implements Initializable {
             ComboBox<String> jurusanCombo = (ComboBox<String>) form.lookup("#jurusanCombo");
             TextField rfidField = (TextField) form.lookup("#rfidField");
             TextField barcodeField = (TextField) form.lookup("#barcodeField");
+            
+            // Populate jurusan ComboBox
+            jurusanCombo.setItems(FXCollections.observableArrayList("RPL", "TKJ", "MM", "OTKP", "AKL"));
             
             nisField.setText(siswa.getNis());
             nisField.setDisable(true); // NIS tidak bisa diubah

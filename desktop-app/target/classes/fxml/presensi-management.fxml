@@ -40,26 +40,9 @@
                 
                 <DatePicker fx:id="endDatePicker" promptText="Tanggal Akhir" prefWidth="150"/>
                 
-                <ComboBox fx:id="tipeFilter" promptText="Filter Tipe" prefWidth="120">
-                    <items>
-                        <javafx.collections.FXCollections fx:factory="observableArrayList">
-                            <String fx:value="ALL"/>
-                            <String fx:value="SISWA"/>
-                            <String fx:value="GURU"/>
-                        </javafx.collections.FXCollections>
-                    </items>
-                </ComboBox>
+                <ComboBox fx:id="tipeFilter" promptText="Filter Tipe" prefWidth="120"/>
                 
-                <ComboBox fx:id="statusFilter" promptText="Filter Status" prefWidth="120">
-                    <items>
-                        <javafx.collections.FXCollections fx:factory="observableArrayList">
-                            <String fx:value="ALL"/>
-                            <String fx:value="HADIR"/>
-                            <String fx:value="TERLAMBAT"/>
-                            <String fx:value="ALPHA"/>
-                        </javafx.collections.FXCollections>
-                    </items>
-                </ComboBox>
+                <ComboBox fx:id="statusFilter" promptText="Filter Status" prefWidth="150"/>
                 
                 <TextField fx:id="searchField" promptText="🔍 Cari Username..." prefWidth="200"/>
                 
