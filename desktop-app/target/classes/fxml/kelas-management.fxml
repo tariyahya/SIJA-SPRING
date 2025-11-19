@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.KelasManagementController"
+            styleClass="root"
+            stylesheets="@../css/dashboard.css">
+
+    <top>
+        <VBox>
+            <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+
+                <Label text="Manajemen Kelas" styleClass="title">
+                    <font>
+                        <Font name="System Bold" size="20"/>
+                    </font>
+                </Label>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label fx:id="statusLabel" text="Ready" styleClass="user-label"/>
+                <ProgressIndicator fx:id="loadingIndicator" prefWidth="30" prefHeight="30" visible="false"/>
+            </HBox>
+
+            <!-- Search and Action Bar -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar">
+                <padding>
+                    <Insets top="10" right="20" bottom="10" left="20"/>
+                </padding>
+
+                <TextField fx:id="searchField" promptText="Cari nama kelas..." 
+                           prefWidth="250" HBox.hgrow="ALWAYS"/>
+
+                <ComboBox fx:id="jurusanFilter" promptText="Filter Jurusan" prefWidth="180"/>
+                <ComboBox fx:id="tingkatFilter" promptText="Filter Tingkat" prefWidth="140"/>
+
+                <Button fx:id="searchButton" text="Cari" styleClass="btn-primary"/>
+
+                <Button fx:id="resetButton" text="Reset" styleClass="btn-secondary"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button fx:id="addButton" text="Tambah Kelas" styleClass="btn-success"/>
+
+                <Button fx:id="refreshButton" text="Refresh" styleClass="btn-primary"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Info Label -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="infoLabel" text="Total: 0 kelas"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="assignSiswaButton" text="Assign Siswa ke Kelas" styleClass="btn-secondary" disable="true"/>
+            </HBox>
+
+            <!-- Table -->
+            <TableView fx:id="kelasTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+                    <TableColumn fx:id="namaColumn" text="Nama Kelas" prefWidth="200"/>
+                    <TableColumn fx:id="tingkatColumn" text="Tingkat" prefWidth="100"/>
+                    <TableColumn fx:id="jurusanColumn" text="Jurusan" prefWidth="120"/>
+                    <TableColumn fx:id="kapasitasColumn" text="Kapasitas" prefWidth="100"/>
+                    <TableColumn fx:id="waliColumn" text="Wali Kelas ID" prefWidth="140"/>
+                    <TableColumn fx:id="actionColumn" text="Actions" prefWidth="220"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+
+            <!-- Action Buttons -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="editButton" text="Edit" styleClass="btn-warning" disable="true"/>
+                <Button fx:id="deleteButton" text="Delete" styleClass="btn-danger" disable="true"/>
+                <Button fx:id="closeButton" text="Close" styleClass="btn-secondary"/>
+            </HBox>
+        </VBox>
+    </center>
+
+</BorderPane>

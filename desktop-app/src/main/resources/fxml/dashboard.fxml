@@ -26,6 +26,10 @@
                     <MenuItem text="Presensi Management" onAction="#handlePresensiManagement"/>
                     <MenuItem text="Siswa Management" onAction="#handleSiswaManagement"/>
                     <MenuItem text="Guru Management" onAction="#handleGuruManagement"/>
+                    <MenuItem text="Kelas Management" onAction="#handleKelasManagement"/>
+                    <MenuItem text="Jurusan Management" onAction="#handleJurusanManagement"/>
+                    <MenuItem text="Perizinan Siswa" onAction="#handleIzinManagement"/>
+                    <MenuItem text="DUDI &amp; PKL Management" onAction="#handleDudiManagement"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="User Management" onAction="#handleUserManagement"/>
                 </Menu>
@@ -33,6 +37,7 @@
                 <Menu text="View">
                     <MenuItem text="Analytics &amp; Reports" onAction="#handleAnalytics"/>
                     <MenuItem text="Dashboard" onAction="#handleRefresh"/>
+                    <MenuItem text="Dashboard Piket" onAction="#handlePiketDashboard"/>
                 </Menu>
                 
                 <Menu text="Settings">
@@ -62,7 +67,7 @@
                 
                 <Label fx:id="userLabel" text="👤 User" styleClass="user-label"/>
                 
-                <CheckBox fx:id="mockDataCheckbox" text="Mock Data" selected="true"/>
+                <CheckBox fx:id="mockDataCheckbox" text="Mock Data" selected="false"/>
                 
                 <Button fx:id="refreshButton" text="⟳ Refresh" styleClass="btn-primary"/>
                 

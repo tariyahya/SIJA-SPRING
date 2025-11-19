@@ -1,8 +1,11 @@
 package com.smk.presensi.service;
 
+import com.smk.presensi.dto.AssignSiswaToKelasRequest;
 import com.smk.presensi.dto.SiswaRequest;
 import com.smk.presensi.dto.SiswaResponse;
+import com.smk.presensi.entity.Kelas;
 import com.smk.presensi.entity.Siswa;
+import com.smk.presensi.repository.KelasRepository;
 import com.smk.presensi.repository.SiswaRepository;
 import org.springframework.stereotype.Service;
 
@@ -41,9 +44,10 @@ import java.util.List;
 public class SiswaService {
     // @Service membuat class ini menjadi Spring Bean yang bisa di-inject ke class lain
 
-    // Dependency: butuh SiswaRepository untuk akses database
+    // Dependency: butuh SiswaRepository & KelasRepository untuk akses database
     // 'final' = nilai tidak bisa diubah setelah di-set (best practice untuk dependency)
     private final SiswaRepository siswaRepository;
+    private final KelasRepository kelasRepository;
 
     /**
      * CONSTRUCTOR INJECTION - cara inject dependency yang recommended.
@@ -61,9 +65,11 @@ public class SiswaService {
      * Catatan: Tidak perlu @Autowired jika hanya ada 1 constructor (Spring auto-detect)
      * 
      * @param siswaRepository Repository untuk akses data siswa (di-inject oleh Spring)
+     * @param kelasRepository Repository untuk akses data kelas (di-inject oleh Spring)
      */
-    public SiswaService(SiswaRepository siswaRepository) {
+    public SiswaService(SiswaRepository siswaRepository, KelasRepository kelasRepository) {
         this.siswaRepository = siswaRepository; // Simpan dependency untuk dipakai di method lain
+        this.kelasRepository = kelasRepository;
     }
 
     /**
@@ -363,6 +369,66 @@ public class SiswaService {
             throw new RuntimeException("Siswa dengan ID " + id + " tidak ditemukan");
         }
         siswaRepository.deleteById(id);
+    }
+
+    /**
+     * Assign beberapa siswa ke satu KELAS tertentu.
+     *
+     * Aturan bisnis sederhana:
+     * - Field kelas di entity Siswa di-set ke nama kelas (kelas.getNama()).
+     * - Jika kelas punya jurusan, field jurusan di Siswa juga ikut di-set sama.
+     *
+     * @param kelasId ID kelas tujuan
+     * @param request berisi daftar ID siswa yang akan di-assign
+     * @return List SiswaResponse setelah update
+     */
+    public List<SiswaResponse> assignToKelas(Long kelasId, AssignSiswaToKelasRequest request) {
+        Kelas kelas = kelasRepository.findById(kelasId)
+                .orElseThrow(() -> new RuntimeException("Kelas dengan ID " + kelasId + " tidak ditemukan"));
+
+        if (request == null || request.siswaIds() == null || request.siswaIds().isEmpty()) {
+            throw new RuntimeException("Daftar ID siswa untuk assignment tidak boleh kosong");
+        }
+
+        // findAllById adalah method bawaan JpaRepository
+        List<Siswa> siswaList = siswaRepository.findAllById(request.siswaIds());
+        if (siswaList.isEmpty()) {
+            throw new RuntimeException("Tidak ada siswa yang ditemukan untuk ID yang diberikan");
+        }
+
+        // Capacity management: jika kelas punya kapasitas, pastikan tidak terlampaui
+        Integer kapasitas = kelas.getKapasitas();
+        if (kapasitas != null && kapasitas > 0) {
+            long existingCount = siswaRepository.countByKelas(kelas.getNama());
+
+            long newAssignments = siswaList.stream()
+                    .filter(s -> s.getKelas() == null
+                            || !kelas.getNama().equalsIgnoreCase(s.getKelas()))
+                    .count();
+
+            long totalAfterAssign = existingCount + newAssignments;
+            if (totalAfterAssign > kapasitas) {
+                throw new RuntimeException(
+                        "Kapasitas kelas \"" + kelas.getNama() + "\" terlampaui. " +
+                                "Kapasitas: " + kapasitas +
+                                ", saat ini: " + existingCount +
+                                ", tambahan: " + newAssignments +
+                                ", total: " + totalAfterAssign
+                );
+            }
+        }
+
+        for (Siswa siswa : siswaList) {
+            siswa.setKelas(kelas.getNama());
+            if (kelas.getJurusan() != null && !kelas.getJurusan().isBlank()) {
+                siswa.setJurusan(kelas.getJurusan());
+            }
+        }
+
+        List<Siswa> saved = siswaRepository.saveAll(siswaList);
+        return saved.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     /**

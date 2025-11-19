@@ -91,7 +91,9 @@ public class UserFormDialog extends Dialog<User> {
             usernameField.setText(existingUser.getUsername());
             emailField.setText(existingUser.getEmail());
             namaField.setText(existingUser.getNama());
-            roleComboBox.setValue(existingUser.getRole());
+            if (existingUser.getRole() != null && !existingUser.getRole().isBlank()) {
+                roleComboBox.setValue(existingUser.getRole());
+            }
             tipeComboBox.setValue(existingUser.getTipe());
             rfidCardIdField.setText(existingUser.getRfidCardId());
             enabledCheckBox.setSelected(existingUser.getEnabled() != null ? existingUser.getEnabled() : true);
@@ -100,7 +102,7 @@ public class UserFormDialog extends Dialog<User> {
             usernameField.setDisable(true);
         } else {
             // Default values for new user
-            roleComboBox.setValue("USER");
+            roleComboBox.setValue("ROLE_SISWA");
             tipeComboBox.setValue("SISWA");
             enabledCheckBox.setSelected(true);
         }

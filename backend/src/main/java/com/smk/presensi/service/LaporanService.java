@@ -2,18 +2,23 @@ package com.smk.presensi.service;
 
 import com.smk.presensi.dto.laporan.LaporanBulananResponse;
 import com.smk.presensi.dto.laporan.LaporanHarianResponse;
+import com.smk.presensi.dto.laporan.RekapSiswaPerJurusanResponse;
+import com.smk.presensi.dto.laporan.RekapSiswaPerKelasResponse;
 import com.smk.presensi.dto.laporan.StatistikResponse;
 import com.smk.presensi.dto.presensi.PresensiResponse;
 import com.smk.presensi.entity.Presensi;
+import com.smk.presensi.entity.Siswa;
 import com.smk.presensi.enums.MethodPresensi;
 import com.smk.presensi.enums.StatusPresensi;
 import com.smk.presensi.repository.PresensiRepository;
+import com.smk.presensi.repository.SiswaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +38,9 @@ public class LaporanService {
     
     @Autowired
     private PresensiRepository presensiRepository;
+    
+     @Autowired
+     private SiswaRepository siswaRepository;
     
     /**
      * Generate laporan harian untuk tanggal tertentu.
@@ -262,6 +270,62 @@ public class LaporanService {
         return presensiList.stream()
                 .map(this::toPresensiResponse)
                 .collect(Collectors.toList());
+    }
+
+    // ===== SISWA REKAP (PER KELAS & JURUSAN) =====
+
+    /**
+     * Rekap jumlah siswa per kelas (dan jurusan terkait).
+     *
+     * Data diambil dari tabel siswa (field kelas & jurusan),
+     * kemudian dikelompokkan per nama kelas.
+     */
+    public List<RekapSiswaPerKelasResponse> getRekapSiswaPerKelas() {
+        List<Siswa> siswaList = siswaRepository.findAll();
+
+        // Map kelas -> total siswa
+        Map<String, Long> countPerKelas = siswaList.stream()
+                .filter(s -> s.getKelas() != null && !s.getKelas().isBlank())
+                .collect(Collectors.groupingBy(Siswa::getKelas, Collectors.counting()));
+
+        // Map kelas -> jurusan (ambil jurusan pertama yang tidak kosong)
+        Map<String, String> jurusanPerKelas = siswaList.stream()
+                .filter(s -> s.getKelas() != null && !s.getKelas().isBlank())
+                .collect(Collectors.toMap(
+                        Siswa::getKelas,
+                        Siswa::getJurusan,
+                        (existing, replacement) -> (existing != null && !existing.isBlank())
+                                ? existing
+                                : replacement
+                ));
+
+        return countPerKelas.entrySet().stream()
+                .map(entry -> new RekapSiswaPerKelasResponse(
+                        entry.getKey(),
+                        jurusanPerKelas.get(entry.getKey()),
+                        entry.getValue()
+                ))
+                .sorted((a, b) -> a.kelas().compareToIgnoreCase(b.kelas()))
+                .toList();
+    }
+
+    /**
+     * Rekap jumlah siswa per jurusan.
+     */
+    public List<RekapSiswaPerJurusanResponse> getRekapSiswaPerJurusan() {
+        List<Siswa> siswaList = siswaRepository.findAll();
+
+        Map<String, Long> countPerJurusan = siswaList.stream()
+                .filter(s -> s.getJurusan() != null && !s.getJurusan().isBlank())
+                .collect(Collectors.groupingBy(Siswa::getJurusan, Collectors.counting()));
+
+        return countPerJurusan.entrySet().stream()
+                .map(entry -> new RekapSiswaPerJurusanResponse(
+                        entry.getKey(),
+                        entry.getValue()
+                ))
+                .sorted((a, b) -> a.jurusan().compareToIgnoreCase(b.jurusan()))
+                .toList();
     }
     
     /**

@@ -548,6 +548,106 @@ public class DashboardController implements Initializable {
     }
     
     /**
+     * Handle Perizinan Siswa dari menu
+     */
+    @FXML
+    private void handleIzinManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/approval-izin.fxml")
+            );
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Perizinan Siswa");
+            stage.setScene(new Scene(root, 1100, 650));
+            stage.showAndWait();
+
+            viewModel.refreshData();
+
+        } catch (IOException e) {
+            showError("Error loading Perizinan view: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle DUDI & PKL Management dari menu
+     */
+    @FXML
+    private void handleDudiManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/dudi-management.fxml")
+            );
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manajemen DUDI & PKL");
+            stage.setScene(new Scene(root, 1100, 650));
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            showError("Error loading DUDI Management: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle Jurusan Management dari menu
+     */
+    @FXML
+    private void handleJurusanManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/jurusan-management.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manajemen Jurusan");
+            stage.setScene(new Scene(root, 1000, 600));
+            stage.showAndWait();
+            
+            // Refresh dashboard setelah window ditutup
+            viewModel.refreshData();
+            
+        } catch (IOException e) {
+            showError("Error loading Jurusan Management: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Handle Kelas Management dari menu
+     */
+    @FXML
+    private void handleKelasManagement() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/kelas-management.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manajemen Kelas");
+            stage.setScene(new Scene(root, 1100, 700));
+            stage.showAndWait();
+            
+            // Refresh dashboard setelah window ditutup
+            viewModel.refreshData();
+            
+        } catch (IOException e) {
+            showError("Error loading Kelas Management: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
      * Handle Analytics dari menu
      */
     @FXML
@@ -566,6 +666,29 @@ public class DashboardController implements Initializable {
             
         } catch (IOException e) {
             showError("Error loading Analytics: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handle Dashboard Piket dari menu View
+     */
+    @FXML
+    private void handlePiketDashboard() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/dashboard-piket.fxml")
+            );
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Dashboard Guru Piket");
+            stage.setScene(new Scene(root, 1100, 650));
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            showError("Error loading Dashboard Piket: " + e.getMessage());
             e.printStackTrace();
         }
     }

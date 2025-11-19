@@ -27,15 +27,14 @@ public class DesktopApp extends Application {
             );
             Parent root = loader.load();
 
-            // Create Scene
-            Scene scene = new Scene(root, 500, 650);
-
             // Configure Stage
             primaryStage.setTitle("SIJA Presensi - Login");
+            Scene scene = new Scene(root, 500, 650);
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(500);
             primaryStage.setMinHeight(650);
-            primaryStage.setResizable(false); // Fixed size untuk login screen
+            // Allow user to resize / maximize window
+            primaryStage.setResizable(true);
             
             // Show window
             primaryStage.show();

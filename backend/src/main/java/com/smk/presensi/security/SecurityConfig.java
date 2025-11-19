@@ -139,7 +139,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints (tidak perlu authentication)
                         // Auth endpoints: login, register
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         
                         // H2 Console (untuk development)
                         .requestMatchers("/h2-console/**").permitAll()

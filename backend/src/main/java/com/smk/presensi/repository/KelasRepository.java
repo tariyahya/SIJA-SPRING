@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository untuk mengakses data KELAS dari database.
@@ -74,4 +75,7 @@ public interface KelasRepository extends JpaRepository<Kelas, Long> {
     
     // Semua query method ini TIDAK PERLU kita implementasi!
     // Cukup tulis nama method sesuai pattern, Spring Data JPA handle sisanya.
+    Optional<Kelas> findByNama(String nama);
+
+    boolean existsByNama(String nama);
 }

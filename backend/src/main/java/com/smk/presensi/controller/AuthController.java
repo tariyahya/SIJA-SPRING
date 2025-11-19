@@ -5,6 +5,7 @@ import com.smk.presensi.dto.auth.LoginRequest;
 import com.smk.presensi.dto.auth.LoginResponse;
 import com.smk.presensi.dto.auth.RegisterRequest;
 import com.smk.presensi.service.AuthService;
+import com.smk.presensi.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     
     private final AuthService authService;
+    private final UserRepository userRepository;
     
     /**
      * Constructor injection.
      */
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UserRepository userRepository) {
         this.authService = authService;
+        this.userRepository = userRepository;
     }
     
     /**
@@ -138,5 +141,51 @@ public class AuthController {
                     .badRequest()
                     .body(new MessageResponse(e.getMessage()));
         }
+    }
+
+    /**
+     * ENDPOINT: Get current authenticated user info.
+     *
+     * URL: GET /api/auth/me
+     * Access: authenticated user only
+     *
+     * Response:
+     * {
+     *   "id": 1,
+     *   "username": "admin",
+     *   "nama": "admin",
+     *   "email": "admin@smk.sch.id",
+     *   "role": "ADMIN"
+     * }
+     */
+    @GetMapping("/me")
+    public ResponseEntity<?> me(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("User not authenticated"));
+        }
+
+        String username = authentication.getName();
+
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        String primaryRole = user.getRoles().stream()
+                .findFirst()
+                .map(role -> {
+                    String name = role.getName().name(); // e.g. ROLE_ADMIN
+                    return name.startsWith("ROLE_") ? name.substring(5) : name;
+                })
+                .orElse("USER");
+
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("id", user.getId());
+        body.put("username", user.getUsername());
+        // Saat ini entity User belum punya field nama; gunakan username sebagai fallback
+        body.put("nama", user.getUsername());
+        body.put("email", user.getEmail());
+        body.put("role", primaryRole);
+
+        return ResponseEntity.ok(body);
     }
 }

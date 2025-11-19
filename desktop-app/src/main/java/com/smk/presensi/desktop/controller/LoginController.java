@@ -121,6 +121,9 @@ public class LoginController implements Initializable {
             Scene scene = new Scene(root, 1200, 700);
             stage.setScene(scene);
             stage.setTitle("SIJA Presensi - Dashboard Admin");
+            stage.setMinWidth(1024);
+            stage.setMinHeight(600);
+            stage.setResizable(true);
 
         } catch (IOException e) {
             showError("Error loading dashboard: " + e.getMessage());

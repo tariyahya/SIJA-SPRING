@@ -48,7 +48,8 @@ public class DashboardViewModel {
         this.persentaseHadir = new SimpleDoubleProperty(0.0);
         this.loading = new SimpleBooleanProperty(false);
         this.errorMessage = new SimpleStringProperty("");
-        this.useMockData = new SimpleBooleanProperty(true); // Default: use mock data
+        // Default: gunakan data nyata dari backend (PostgreSQL)
+        this.useMockData = new SimpleBooleanProperty(false);
     }
 
     /**

@@ -160,5 +160,5 @@ public interface SiswaRepository extends JpaRepository<Siswa, Long> {
     // Optional<Siswa> findByNama(String nama);
     // List<Siswa> findByJurusan(String jurusan);
     // List<Siswa> findByKelasAndJurusan(String kelas, String jurusan);
-    // long countByKelas(String kelas);
+    long countByKelas(String kelas);
 }

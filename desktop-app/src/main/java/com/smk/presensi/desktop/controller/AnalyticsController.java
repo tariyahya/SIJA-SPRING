@@ -1,8 +1,11 @@
 package com.smk.presensi.desktop.controller;
 
 import com.smk.presensi.desktop.model.Presensi;
+import com.smk.presensi.desktop.model.RekapSiswaPerJurusan;
+import com.smk.presensi.desktop.model.RekapSiswaPerKelas;
 import com.smk.presensi.desktop.service.ApiClient;
 import com.smk.presensi.desktop.service.CachedPresensiService;
+import com.smk.presensi.desktop.service.LaporanSiswaService;
 import com.smk.presensi.desktop.service.PresensiService;
 import com.smk.presensi.desktop.util.ChartUtils;
 import javafx.application.Platform;
@@ -12,6 +15,8 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,8 +37,19 @@ public class AnalyticsController {
     @FXML private Label statusLabel;
     @FXML private ProgressIndicator progressIndicator;
 
+    // Rekap siswa (per kelas & jurusan)
+    @FXML private TableView<RekapSiswaPerKelas> rekapKelasTable;
+    @FXML private TableColumn<RekapSiswaPerKelas, String> rekapKelasKelasColumn;
+    @FXML private TableColumn<RekapSiswaPerKelas, String> rekapKelasJurusanColumn;
+    @FXML private TableColumn<RekapSiswaPerKelas, Number> rekapKelasTotalColumn;
+
+    @FXML private TableView<RekapSiswaPerJurusan> rekapJurusanTable;
+    @FXML private TableColumn<RekapSiswaPerJurusan, String> rekapJurusanJurusanColumn;
+    @FXML private TableColumn<RekapSiswaPerJurusan, Number> rekapJurusanTotalColumn;
+
     private CachedPresensiService cachedService;
     private PresensiService presensiService;
+    private LaporanSiswaService laporanSiswaService;
 
     @FXML
     public void initialize() {
@@ -41,13 +57,15 @@ public class AnalyticsController {
         ApiClient apiClient = ApiClient.getInstance();
         presensiService = new PresensiService(apiClient);
         cachedService = new CachedPresensiService(presensiService);
+        laporanSiswaService = new LaporanSiswaService(apiClient);
 
         // Set default date range (last 30 days)
         endDatePicker.setValue(LocalDate.now());
         startDatePicker.setValue(LocalDate.now().minusDays(30));
 
-        // Configure charts
+        // Configure charts & tables
         configureCharts();
+        configureRekapTables();
 
         // Load initial data
         refreshCharts();
@@ -76,9 +94,42 @@ public class AnalyticsController {
         ChartUtils.configureIntegerAxis(lineYAxis);
     }
 
+    private void configureRekapTables() {
+        if (rekapKelasTable != null) {
+            rekapKelasKelasColumn.setCellValueFactory(new PropertyValueFactory<>("kelas"));
+            rekapKelasJurusanColumn.setCellValueFactory(new PropertyValueFactory<>("jurusan"));
+            rekapKelasTotalColumn.setCellValueFactory(new PropertyValueFactory<>("totalSiswa"));
+        }
+
+        if (rekapJurusanTable != null) {
+            rekapJurusanJurusanColumn.setCellValueFactory(new PropertyValueFactory<>("jurusan"));
+            rekapJurusanTotalColumn.setCellValueFactory(new PropertyValueFactory<>("totalSiswa"));
+        }
+    }
+
     @FXML
     private void handleRefresh() {
         refreshCharts();
+    }
+
+    @FXML
+    private void handleRekapKelasRefresh() {
+        loadRekapKelas();
+    }
+
+    @FXML
+    private void handleRekapJurusanRefresh() {
+        loadRekapJurusan();
+    }
+
+    @FXML
+    private void handleRekapKelasExportCsv() {
+        exportRekapKelasToCsv();
+    }
+
+    @FXML
+    private void handleRekapJurusanExportCsv() {
+        exportRekapJurusanToCsv();
     }
 
     private void refreshCharts() {
@@ -125,6 +176,68 @@ public class AnalyticsController {
 
         task.setOnFailed(e -> {
             showError("Failed to load data: " + task.getException().getMessage());
+            setLoading(false);
+        });
+
+        new Thread(task).start();
+    }
+
+    private void loadRekapKelas() {
+        if (laporanSiswaService == null || rekapKelasTable == null) {
+            return;
+        }
+
+        setLoading(true);
+        statusLabel.setText("Loading rekap siswa per kelas...");
+
+        Task<List<RekapSiswaPerKelas>> task = new Task<>() {
+            @Override
+            protected List<RekapSiswaPerKelas> call() throws Exception {
+                return laporanSiswaService.getRekapPerKelas();
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            List<RekapSiswaPerKelas> data = task.getValue();
+            rekapKelasTable.setItems(FXCollections.observableArrayList(data));
+            statusLabel.setText("Rekap siswa per kelas loaded (" + data.size() + " baris)");
+            statusLabel.setStyle("-fx-text-fill: #4CAF50;");
+            setLoading(false);
+        });
+
+        task.setOnFailed(e -> {
+            showError("Failed to load rekap per kelas: " + task.getException().getMessage());
+            setLoading(false);
+        });
+
+        new Thread(task).start();
+    }
+
+    private void loadRekapJurusan() {
+        if (laporanSiswaService == null || rekapJurusanTable == null) {
+            return;
+        }
+
+        setLoading(true);
+        statusLabel.setText("Loading rekap siswa per jurusan...");
+
+        Task<List<RekapSiswaPerJurusan>> task = new Task<>() {
+            @Override
+            protected List<RekapSiswaPerJurusan> call() throws Exception {
+                return laporanSiswaService.getRekapPerJurusan();
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            List<RekapSiswaPerJurusan> data = task.getValue();
+            rekapJurusanTable.setItems(FXCollections.observableArrayList(data));
+            statusLabel.setText("Rekap siswa per jurusan loaded (" + data.size() + " baris)");
+            statusLabel.setStyle("-fx-text-fill: #4CAF50;");
+            setLoading(false);
+        });
+
+        task.setOnFailed(e -> {
+            showError("Failed to load rekap per jurusan: " + task.getException().getMessage());
             setLoading(false);
         });
 
@@ -220,6 +333,72 @@ public class AnalyticsController {
         refreshButton.setDisable(loading);
         startDatePicker.setDisable(loading);
         endDatePicker.setDisable(loading);
+    }
+
+    private void exportRekapKelasToCsv() {
+        if (rekapKelasTable == null || rekapKelasTable.getItems().isEmpty()) {
+            showWarning("Tidak ada data rekap kelas untuk diexport");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Rekap Siswa per Kelas (CSV)");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+        fileChooser.setInitialFileName("rekap-siswa-per-kelas.csv");
+
+        java.io.File file = fileChooser.showSaveDialog(statusLabel.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+
+        try (java.io.FileWriter writer = new java.io.FileWriter(file)) {
+            writer.write("Kelas,Jurusan,Total Siswa\n");
+            for (RekapSiswaPerKelas row : rekapKelasTable.getItems()) {
+                String kelas = row.getKelas() != null ? row.getKelas() : "";
+                String jurusan = row.getJurusan() != null ? row.getJurusan() : "";
+                writer.write(String.format("\"%s\",\"%s\",%d%n",
+                        kelas.replace("\"", "\"\""),
+                        jurusan.replace("\"", "\"\""),
+                        row.getTotalSiswa()));
+            }
+            showInfo("Rekap siswa per kelas berhasil diexport ke CSV");
+        } catch (Exception ex) {
+            showError("Gagal export rekap kelas: " + ex.getMessage());
+        }
+    }
+
+    private void exportRekapJurusanToCsv() {
+        if (rekapJurusanTable == null || rekapJurusanTable.getItems().isEmpty()) {
+            showWarning("Tidak ada data rekap jurusan untuk diexport");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Rekap Siswa per Jurusan (CSV)");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+        fileChooser.setInitialFileName("rekap-siswa-per-jurusan.csv");
+
+        java.io.File file = fileChooser.showSaveDialog(statusLabel.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+
+        try (java.io.FileWriter writer = new java.io.FileWriter(file)) {
+            writer.write("Jurusan,Total Siswa\n");
+            for (RekapSiswaPerJurusan row : rekapJurusanTable.getItems()) {
+                String jurusan = row.getJurusan() != null ? row.getJurusan() : "";
+                writer.write(String.format("\"%s\",%d%n",
+                        jurusan.replace("\"", "\"\""),
+                        row.getTotalSiswa()));
+            }
+            showInfo("Rekap siswa per jurusan berhasil diexport ke CSV");
+        } catch (Exception ex) {
+            showError("Gagal export rekap jurusan: " + ex.getMessage());
+        }
     }
 
     private void showError(String message) {

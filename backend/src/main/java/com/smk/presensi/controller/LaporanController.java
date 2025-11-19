@@ -2,6 +2,8 @@ package com.smk.presensi.controller;
 
 import com.smk.presensi.dto.laporan.LaporanBulananResponse;
 import com.smk.presensi.dto.laporan.LaporanHarianResponse;
+import com.smk.presensi.dto.laporan.RekapSiswaPerJurusanResponse;
+import com.smk.presensi.dto.laporan.RekapSiswaPerKelasResponse;
 import com.smk.presensi.dto.laporan.StatistikResponse;
 import com.smk.presensi.service.LaporanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -202,6 +205,42 @@ public class LaporanController {
         }
         response.put("data", statistik);
         
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * GET /api/laporan/rekap-siswa/kelas
+     * Rekap jumlah siswa per kelas.
+     *
+     * Access: ADMIN or GURU
+     */
+    @GetMapping("/rekap-siswa/kelas")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU')")
+    public ResponseEntity<Map<String, Object>> getRekapSiswaPerKelas() {
+        List<RekapSiswaPerKelasResponse> data = laporanService.getRekapSiswaPerKelas();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Rekap siswa per kelas berhasil diambil");
+        response.put("data", data);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * GET /api/laporan/rekap-siswa/jurusan
+     * Rekap jumlah siswa per jurusan.
+     *
+     * Access: ADMIN or GURU
+     */
+    @GetMapping("/rekap-siswa/jurusan")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GURU')")
+    public ResponseEntity<Map<String, Object>> getRekapSiswaPerJurusan() {
+        List<RekapSiswaPerJurusanResponse> data = laporanService.getRekapSiswaPerJurusan();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Rekap siswa per jurusan berhasil diambil");
+        response.put("data", data);
+
         return ResponseEntity.ok(response);
     }
 
