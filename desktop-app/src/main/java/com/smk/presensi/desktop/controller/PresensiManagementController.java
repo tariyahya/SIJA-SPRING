@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
  * Handles CRUD operations for attendance records
  */
 public class PresensiManagementController implements Initializable {
+
+    private static final List<String> STATUS_OPTIONS = List.of("HADIR", "TERLAMBAT", "ALPHA", "IZIN", "SAKIT", "DISPENSASI");
     
     // Table
     @FXML private TableView<Presensi> presensiTable;
@@ -100,7 +102,10 @@ public class PresensiManagementController implements Initializable {
         tipeFilter.setValue("ALL");
         
         // Setup status filter
-        statusFilter.setItems(FXCollections.observableArrayList("ALL", "HADIR", "TERLAMBAT", "ALPHA"));
+        ObservableList<String> statusChoices = FXCollections.observableArrayList();
+        statusChoices.add("ALL");
+        statusChoices.addAll(STATUS_OPTIONS);
+        statusFilter.setItems(statusChoices);
         statusFilter.setValue("ALL");
         
         // Setup date pickers with default values
@@ -232,7 +237,7 @@ public class PresensiManagementController implements Initializable {
             Button selectUserButton = (Button) form.lookup("#selectUserButton");
 
             tipeCombo.setItems(FXCollections.observableArrayList("SISWA", "GURU"));
-            statusCombo.setItems(FXCollections.observableArrayList("HADIR", "TERLAMBAT", "ALPHA"));
+            statusCombo.setItems(FXCollections.observableArrayList(STATUS_OPTIONS));
             methodCombo.setItems(FXCollections.observableArrayList("MANUAL", "RFID", "BARCODE", "FACE"));
 
             tanggalPicker.setValue(LocalDate.now());
@@ -332,7 +337,7 @@ public class PresensiManagementController implements Initializable {
             Button selectUserButton = (Button) form.lookup("#selectUserButton");
 
                 tipeCombo.setItems(FXCollections.observableArrayList("SISWA", "GURU"));
-                statusCombo.setItems(FXCollections.observableArrayList("HADIR", "TERLAMBAT", "ALPHA"));
+                statusCombo.setItems(FXCollections.observableArrayList(STATUS_OPTIONS));
                 methodCombo.setItems(FXCollections.observableArrayList("MANUAL", "RFID", "BARCODE", "FACE"));
 
                 userIdField.setText(selected.getUserId() != null ? selected.getUserId().toString() : "");

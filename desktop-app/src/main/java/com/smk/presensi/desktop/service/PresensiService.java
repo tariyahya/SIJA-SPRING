@@ -138,6 +138,7 @@ public class PresensiService {
      */
     public List<Presensi> getMockData() {
         List<Presensi> mockList = new ArrayList<>();
+        String[] statuses = {"HADIR", "TERLAMBAT", "IZIN", "SAKIT", "ALPHA", "DISPENSASI"};
         
         for (int i = 1; i <= 20; i++) {
             Presensi p = new Presensi();
@@ -148,7 +149,7 @@ public class PresensiService {
             p.setTanggal(LocalDate.now());
             p.setJamMasuk(java.time.LocalTime.of(7, 5 + (i % 30), 0));
             p.setJamPulang(i % 3 == 0 ? java.time.LocalTime.of(15, 0, 0) : null);
-            p.setStatus(i % 10 == 0 ? "TERLAMBAT" : "HADIR");
+            p.setStatus(statuses[i % statuses.length]);
             p.setMethod(i % 4 == 0 ? "RFID" : "MANUAL");
             p.setKeterangan("Presensi hari ini");
             mockList.add(p);

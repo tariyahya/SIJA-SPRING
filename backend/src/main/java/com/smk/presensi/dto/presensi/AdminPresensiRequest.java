@@ -34,7 +34,11 @@ public record AdminPresensiRequest(
 
         Double latitude,
         Double longitude,
-        String keterangan
+        String keterangan,
+
+        Long kelasId,
+        String mapel,
+        String materi
 ) {
 }
 

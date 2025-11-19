@@ -33,6 +33,11 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
 
         <!-- HTTP Client (Java 11+ built-in) -->
         <!-- Using java.net.http.HttpClient - no extra dependency needed -->

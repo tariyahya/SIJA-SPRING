@@ -1,0 +1,108 @@
+/* Analytics View Styling */
+
+.root {
+    -fx-background-color: #f5f5f5;
+}
+
+/* Chart styling */
+.chart {
+    -fx-background-color: white;
+}
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.chart-legend {
+    -fx-background-color: white;
+    -fx-padding: 10px;
+}
+
+/* PieChart specific */
+.chart-pie-label {
+    -fx-font-size: 11px;
+    -fx-fill: #333;
+}
+
+.chart-pie-label-line {
+    -fx-stroke: #999;
+    -fx-stroke-width: 1;
+}
+
+/* BarChart specific */
+.default-color0.chart-bar {
+    -fx-bar-fill: #2196F3;
+}
+
+.default-color0.chart-bar:hover {
+    -fx-bar-fill: #1976D2;
+    -fx-cursor: hand;
+}
+
+/* LineChart specific */
+.chart-series-line {
+    -fx-stroke-width: 3px;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: #2196F3;
+}
+
+.chart-line-symbol {
+    -fx-background-color: #2196F3, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+/* Axis styling */
+.axis {
+    -fx-font-size: 12px;
+    -fx-tick-label-fill: #666;
+}
+
+.axis-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+/* Button styling */
+.button {
+    -fx-background-radius: 3px;
+    -fx-font-size: 13px;
+}
+
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+.button:pressed {
+    -fx-opacity: 0.8;
+}
+
+/* DatePicker styling */
+.date-picker {
+    -fx-background-color: white;
+}
+
+.date-picker-popup {
+    -fx-background-color: white;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #f5f5f5;
+}
+
+/* Separator */
+.separator .line {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px 0 0 0;
+}

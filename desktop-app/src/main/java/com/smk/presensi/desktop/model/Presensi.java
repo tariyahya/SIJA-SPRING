@@ -15,7 +15,7 @@ public class Presensi {
     private LocalDate tanggal;
     private LocalTime jamMasuk;
     private LocalTime jamPulang;
-    private String status; // HADIR, TERLAMBAT, ALPHA
+    private String status; // HADIR, TERLAMBAT, ALPHA, IZIN, SAKIT, DISPENSASI
     private String method; // MANUAL, RFID, BARCODE, FACE
     private String keterangan;
 

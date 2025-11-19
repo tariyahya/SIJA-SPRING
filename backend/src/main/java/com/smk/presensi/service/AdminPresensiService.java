@@ -4,6 +4,11 @@ import com.smk.presensi.dto.presensi.AdminPresensiRequest;
 import com.smk.presensi.dto.presensi.PresensiResponse;
 import com.smk.presensi.entity.Presensi;
 import com.smk.presensi.entity.User;
+import com.smk.presensi.entity.Kelas;
+import com.smk.presensi.repository.KelasRepository;
+import com.smk.presensi.repository.GuruRepository;
+import com.smk.presensi.dto.jurnal.GuruJurnalRequest;
+import com.smk.presensi.service.GuruJurnalService;
 import com.smk.presensi.repository.PresensiRepository;
 import com.smk.presensi.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -22,11 +27,20 @@ public class AdminPresensiService {
 
     private final PresensiRepository presensiRepository;
     private final UserRepository userRepository;
+    private final KelasRepository kelasRepository;
+    private final GuruRepository guruRepository;
+    private final GuruJurnalService guruJurnalService;
 
     public AdminPresensiService(PresensiRepository presensiRepository,
-                                UserRepository userRepository) {
+                                UserRepository userRepository,
+                                KelasRepository kelasRepository,
+                                GuruRepository guruRepository,
+                                GuruJurnalService guruJurnalService) {
         this.presensiRepository = presensiRepository;
         this.userRepository = userRepository;
+        this.kelasRepository = kelasRepository;
+        this.guruRepository = guruRepository;
+        this.guruJurnalService = guruJurnalService;
     }
 
     /**
@@ -55,6 +69,7 @@ public class AdminPresensiService {
         applyRequestToEntity(request, presensi, user);
 
         Presensi saved = presensiRepository.save(presensi);
+        maybeCreateGuruJurnal(saved);
         return toResponse(saved);
     }
 
@@ -72,6 +87,7 @@ public class AdminPresensiService {
         applyRequestToEntity(request, presensi, user);
 
         Presensi saved = presensiRepository.save(presensi);
+        maybeCreateGuruJurnal(saved);
         return toResponse(saved);
     }
 
@@ -97,23 +113,68 @@ public class AdminPresensiService {
         presensi.setLatitude(request.latitude());
         presensi.setLongitude(request.longitude());
         presensi.setKeterangan(request.keterangan());
+
+        if (request.kelasId() != null) {
+            Kelas kelas = kelasRepository.findById(request.kelasId())
+                    .orElseThrow(() -> new RuntimeException("Kelas ID " + request.kelasId() + " tidak ditemukan"));
+            presensi.setKelas(kelas);
+        } else {
+            presensi.setKelas(null);
+        }
+
+        presensi.setMapel(request.mapel());
+        presensi.setMateri(request.materi());
     }
 
     private PresensiResponse toResponse(Presensi presensi) {
         return new PresensiResponse(
-                presensi.getId(),
-                presensi.getUser().getId(),
-                presensi.getUser().getUsername(),
-                presensi.getTipe(),
-                presensi.getTanggal(),
-                presensi.getJamMasuk(),
-                presensi.getJamPulang(),
-                presensi.getStatus(),
-                presensi.getMethod(),
-                presensi.getLatitude(),
-                presensi.getLongitude(),
-                presensi.getKeterangan()
+            presensi.getId(),
+            presensi.getUser().getId(),
+            presensi.getUser().getUsername(),
+            presensi.getTipe(),
+            presensi.getTanggal(),
+            presensi.getJamMasuk(),
+            presensi.getJamPulang(),
+            presensi.getStatus(),
+            presensi.getMethod(),
+            presensi.getLatitude(),
+            presensi.getLongitude(),
+            presensi.getKeterangan(),
+            presensi.getKelas() != null ? presensi.getKelas().getId() : null,
+            presensi.getKelas() != null ? presensi.getKelas().getNama() : null,
+            presensi.getMapel(),
+            presensi.getMateri()
         );
+    }
+
+    private void maybeCreateGuruJurnal(Presensi presensi) {
+        if (presensi == null) return;
+        if (presensi.getTipe() == null) return;
+        if (presensi.getTipe() != com.smk.presensi.enums.TipeUser.GURU) return;
+
+        try {
+            java.util.Optional<com.smk.presensi.entity.Guru> guruOpt = guruRepository.findByUser(presensi.getUser());
+            if (guruOpt.isEmpty()) return;
+            com.smk.presensi.entity.Guru guru = guruOpt.get();
+
+            Long kelasId = presensi.getKelas() != null ? presensi.getKelas().getId() : null;
+            java.time.LocalDate tanggal = presensi.getTanggal() != null ? presensi.getTanggal() : java.time.LocalDate.now();
+
+            GuruJurnalRequest req = new GuruJurnalRequest(
+                    guru.getId(),
+                    presensi.getId(),
+                    kelasId,
+                    tanggal,
+                    presensi.getMapel(),
+                    presensi.getMateri(),
+                    presensi.getStatus(),
+                    presensi.getKeterangan(),
+                    true
+            );
+            guruJurnalService.create(req);
+        } catch (Exception ex) {
+            // swallow errors
+        }
     }
 }
 

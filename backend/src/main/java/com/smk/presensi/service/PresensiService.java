@@ -13,6 +13,8 @@ import com.smk.presensi.enums.MethodPresensi;
 import com.smk.presensi.enums.StatusPresensi;
 import com.smk.presensi.enums.TipeUser;
 import com.smk.presensi.repository.GuruRepository;
+import com.smk.presensi.dto.jurnal.GuruJurnalRequest;
+import com.smk.presensi.service.GuruJurnalService;
 import com.smk.presensi.repository.PresensiRepository;
 import com.smk.presensi.repository.SiswaRepository;
 import com.smk.presensi.repository.UserRepository;
@@ -33,6 +35,7 @@ public class PresensiService {
     private final UserRepository userRepository;
     private final SiswaRepository siswaRepository;
     private final GuruRepository guruRepository;
+    private final GuruJurnalService guruJurnalService;
     private final GeolocationService geolocationService;
 
     // Inject config dari application.properties
@@ -47,12 +50,14 @@ public class PresensiService {
             UserRepository userRepository,
             SiswaRepository siswaRepository,
             GuruRepository guruRepository,
+            GuruJurnalService guruJurnalService,
             GeolocationService geolocationService
     ) {
         this.presensiRepository = presensiRepository;
         this.userRepository = userRepository;
         this.siswaRepository = siswaRepository;
         this.guruRepository = guruRepository;
+        this.guruJurnalService = guruJurnalService;
         this.geolocationService = geolocationService;
     }
 
@@ -93,8 +98,10 @@ public class PresensiService {
 
         // 6. Save ke database
         Presensi saved = presensiRepository.save(presensi);
+        // 7. Auto-create guru jurnal jika presensi adalah untuk guru
+        maybeCreateGuruJurnal(saved);
 
-        // 7. Convert Entity → DTO
+        // 8. Convert Entity → DTO
         return toResponse(saved);
     }
 
@@ -217,8 +224,46 @@ public class PresensiService {
                 presensi.getMethod(),
                 presensi.getLatitude(),
                 presensi.getLongitude(),
-                presensi.getKeterangan()
+            presensi.getKeterangan(),
+            presensi.getKelas() != null ? presensi.getKelas().getId() : null,
+            presensi.getKelas() != null ? presensi.getKelas().getNama() : null,
+            presensi.getMapel(),
+            presensi.getMateri()
         );
+    }
+
+    /**
+     * Jika presensi milik GURU, buatkan otomatis entry GuruJurnal yang terkait.
+     * Failure pada pembuatan jurnal tidak akan membatalkan proses presensi.
+     */
+    private void maybeCreateGuruJurnal(Presensi presensi) {
+        if (presensi == null) return;
+        if (presensi.getTipe() != TipeUser.GURU) return;
+
+        try {
+            java.util.Optional<Guru> guruOpt = guruRepository.findByUser(presensi.getUser());
+            if (guruOpt.isEmpty()) return;
+            Guru guru = guruOpt.get();
+
+            Long kelasId = presensi.getKelas() != null ? presensi.getKelas().getId() : null;
+            java.time.LocalDate tanggal = presensi.getTanggal() != null ? presensi.getTanggal() : java.time.LocalDate.now();
+
+            GuruJurnalRequest req = new GuruJurnalRequest(
+                    guru.getId(),
+                    presensi.getId(),
+                    kelasId,
+                    tanggal,
+                    presensi.getMapel(),
+                    presensi.getMateri(),
+                    presensi.getStatus(),
+                    presensi.getKeterangan(),
+                    true
+            );
+
+            guruJurnalService.create(req);
+        } catch (Exception ex) {
+            // Jangan lempar exception lebih jauh — pembuatan jurnal harus non-blocking.
+        }
     }
 
     /**
@@ -289,7 +334,8 @@ public class PresensiService {
         
         // 6. Save
         Presensi saved = presensiRepository.save(presensi);
-        
+        maybeCreateGuruJurnal(saved);
+
         // 7. Convert ke DTO
         return toResponse(saved);
     }
@@ -376,7 +422,8 @@ public class PresensiService {
         
         // 6. Save
         Presensi saved = presensiRepository.save(presensi);
-        
+        maybeCreateGuruJurnal(saved);
+
         // 7. Convert ke DTO
         return toResponse(saved);
     }
@@ -443,7 +490,8 @@ public class PresensiService {
         
         // 6. Save
         Presensi saved = presensiRepository.save(presensi);
-        
+        maybeCreateGuruJurnal(saved);
+
         // 7. Convert ke DTO
         return toResponse(saved);
     }
@@ -490,7 +538,8 @@ public class PresensiService {
         
         // 6. Save
         Presensi saved = presensiRepository.save(presensi);
-        
+        maybeCreateGuruJurnal(saved);
+
         // 7. Convert ke DTO
         return toResponse(saved);
     }

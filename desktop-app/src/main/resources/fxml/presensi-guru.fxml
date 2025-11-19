@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.PresensiGuruController"
+            stylesheets="@../css/dashboard.css">
+
+    <top>
+        <VBox spacing="8">
+            <padding>
+                <Insets top="15" right="20" bottom="10" left="20"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label text="👩‍🏫 Presensi Guru" styleClass="title">
+                    <font>
+                        <Font name="System Bold" size="22"/>
+                    </font>
+                </Label>
+                <Label text="Auto jurnal aktif" styleClass="subtitle"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="statusLabel" text="Ready" styleClass="user-label"/>
+                <ProgressIndicator fx:id="loadingIndicator" prefHeight="24" prefWidth="24" visible="false"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <DatePicker fx:id="tanggalPicker" promptText="Tanggal Presensi"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <CheckBox fx:id="mockDataCheckbox" text="Mock data"/>
+                <Button fx:id="refreshButton" text="⟳ Refresh" styleClass="btn-primary"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.42">
+            <items>
+                <ScrollPane fitToWidth="true">
+                    <content>
+                        <VBox spacing="15" styleClass="card">
+                            <padding>
+                                <Insets top="20" right="20" bottom="20" left="20"/>
+                            </padding>
+
+                            <Label text="Form Presensi Guru" styleClass="section-title"/>
+
+                            <GridPane hgap="10" vgap="12">
+                                <columnConstraints>
+                                    <ColumnConstraints halignment="RIGHT" prefWidth="140"/>
+                                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <Label text="Guru Pengajar" GridPane.rowIndex="0"/>
+                                <ComboBox fx:id="guruCombo" promptText="Pilih guru" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="260"/>
+
+                                <Label text="Kelas" GridPane.rowIndex="1"/>
+                                <ComboBox fx:id="kelasCombo" promptText="Pilih kelas" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="260"/>
+
+                                <Label text="Mapel" GridPane.rowIndex="2"/>
+                                <TextField fx:id="mapelField" promptText="Contoh: Matematika" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                                <Label text="Jam" GridPane.rowIndex="3"/>
+                                <HBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                    <TextField fx:id="jamMulaiField" promptText="Mulai (07:30)" prefWidth="110"/>
+                                    <TextField fx:id="jamSelesaiField" promptText="Selesai (09:10)" prefWidth="110"/>
+                                </HBox>
+
+                                <Label text="Status" GridPane.rowIndex="4"/>
+                                <ComboBox fx:id="statusCombo" GridPane.columnIndex="1" GridPane.rowIndex="4" prefWidth="160"/>
+
+                                <Label text="Materi / Agenda" GridPane.rowIndex="5"/>
+                                <TextArea fx:id="materiArea" GridPane.columnIndex="1" GridPane.rowIndex="5" prefRowCount="3" wrapText="true"/>
+
+                                <Label text="Catatan" GridPane.rowIndex="6"/>
+                                <TextArea fx:id="catatanArea" GridPane.columnIndex="1" GridPane.rowIndex="6" prefRowCount="2" wrapText="true"/>
+                            </GridPane>
+
+                            <HBox spacing="10" alignment="CENTER_RIGHT">
+                                <Button fx:id="resetButton" text="Reset" styleClass="btn-secondary"/>
+                                <Button fx:id="submitButton" text="Simpan Presensi" styleClass="btn-success"/>
+                            </HBox>
+
+                            <Label text="Setiap presensi guru otomatis menambah entri jurnal mengajar." styleClass="help-text"/>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+
+                <VBox fx:id="journalInfoBox" spacing="10" alignment="TOP_LEFT">
+                    <padding>
+                        <Insets top="10" right="20" bottom="20" left="10"/>
+                    </padding>
+
+                    <Label text="Riwayat Presensi Guru" styleClass="section-title"/>
+                    <TableView fx:id="presensiTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="tanggalColumn" text="Tanggal" prefWidth="100"/>
+                            <TableColumn fx:id="guruColumn" text="Guru" prefWidth="140"/>
+                            <TableColumn fx:id="kelasColumn" text="Kelas" prefWidth="120"/>
+                            <TableColumn fx:id="mapelColumn" text="Mapel" prefWidth="120"/>
+                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="90"/>
+                            <TableColumn fx:id="materiColumn" text="Materi" prefWidth="180"/>
+                            <TableColumn fx:id="jurnalColumn" text="Jurnal" prefWidth="90"/>
+                            <TableColumn fx:id="keteranganColumn" text="Catatan" prefWidth="200"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </items>
+        </SplitPane>
+    </center>
+
+</BorderPane>

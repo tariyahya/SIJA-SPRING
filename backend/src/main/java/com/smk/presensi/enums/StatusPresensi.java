@@ -5,5 +5,6 @@ public enum StatusPresensi {
     TERLAMBAT,
     IZIN,
     SAKIT,
-    ALPHA
+    ALPHA,
+    DISPENSASI
 }

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.UlanganHarianController"
+            styleClass="root"
+            stylesheets="@../css/dashboard.css">
+
+    <top>
+        <VBox>
+            <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+
+                <Label text="Penilaian Ulangan Harian (UH)" styleClass="title">
+                    <font>
+                        <Font name="System Bold" size="20"/>
+                    </font>
+                </Label>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label fx:id="statusLabel" text="Ready" styleClass="user-label"/>
+                <ProgressIndicator fx:id="loadingIndicator" prefWidth="30" prefHeight="30" visible="false"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Form Input UH -->
+            <TitledPane text="Input Ulangan Harian" expanded="true">
+                <content>
+                    <GridPane hgap="10" vgap="8">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10"/>
+                        </padding>
+
+                        <Label text="Guru:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <ComboBox fx:id="guruCombo" prefWidth="220" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="Kelas:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                        <ComboBox fx:id="kelasCombo" prefWidth="180" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                        <Label text="Tanggal:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <DatePicker fx:id="tanggalPicker" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Jenis UH:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                        <ComboBox fx:id="jenisCombo" prefWidth="150" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                        <Label text="Mapel:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextField fx:id="mapelField" promptText="Misal: Matematika" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                        <Label text="Materi:" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                        <TextField fx:id="materiField" promptText="Bab / kompetensi" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                        <Label text="Nilai Rata-rata:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <TextField fx:id="nilaiRataField" promptText="Contoh: 78.5" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <Label text="Jumlah Peserta:" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+                        <TextField fx:id="jumlahPesertaField" promptText="Misal: 32" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+
+                        <Label text="Jumlah Remedial:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <TextField fx:id="jumlahRemedialField" promptText="Misal: 5" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                        <Label text="Catatan:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <TextArea fx:id="catatanArea" prefRowCount="2" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+
+                        <HBox spacing="10" alignment="CENTER_RIGHT" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="4">
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="resetButton" text="Reset" styleClass="btn-secondary"/>
+                            <Button fx:id="submitButton" text="Simpan UH" styleClass="btn-primary"/>
+                        </HBox>
+                    </GridPane>
+                </content>
+            </TitledPane>
+
+            <!-- Filter & Tabel Riwayat UH -->
+            <TitledPane text="Riwayat Ulangan Harian" expanded="true">
+                <content>
+                    <VBox spacing="8">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Filter Guru:"/>
+                            <ComboBox fx:id="filterGuruCombo" prefWidth="180"/>
+                            <Label text="Periode:"/>
+                            <DatePicker fx:id="startDatePicker"/>
+                            <Label text="s/d"/>
+                            <DatePicker fx:id="endDatePicker"/>
+                            <Button fx:id="filterButton" text="Terapkan" styleClass="btn-primary"/>
+                            <Button fx:id="refreshButton" text="Refresh" styleClass="btn-secondary"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="infoLabel" text="0 data"/>
+                        </HBox>
+
+                        <TableView fx:id="uhTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="tanggalColumn" text="Tanggal" prefWidth="90"/>
+                                <TableColumn fx:id="guruColumn" text="Guru" prefWidth="160"/>
+                                <TableColumn fx:id="kelasColumn" text="Kelas" prefWidth="100"/>
+                                <TableColumn fx:id="mapelColumn" text="Mapel" prefWidth="120"/>
+                                <TableColumn fx:id="jenisColumn" text="Jenis" prefWidth="70"/>
+                                <TableColumn fx:id="nilaiRataColumn" text="Rata-rata" prefWidth="80"/>
+                                <TableColumn fx:id="pesertaColumn" text="Peserta" prefWidth="70"/>
+                                <TableColumn fx:id="remedialColumn" text="Remedial" prefWidth="80"/>
+                                <TableColumn fx:id="autoColumn" text="Auto" prefWidth="60"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </content>
+            </TitledPane>
+        </VBox>
+    </center>
+</BorderPane>
+

@@ -22,6 +22,10 @@ public record PresensiResponse(
         MethodPresensi method,
         Double latitude,
         Double longitude,
-        String keterangan
+        String keterangan,
+        Long kelasId,
+        String kelasNama,
+        String mapel,
+        String materi
 ) {
 }

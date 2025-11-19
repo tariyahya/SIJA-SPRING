@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smk.presensi.desktop.controller.DashboardHomeController">
+    <content>
+        <VBox spacing="20.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            
+            <!-- Row 1: Statistics Cards -->
+            <HBox spacing="15.0">
+                <!-- Card 1: Total Siswa -->
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-title" text="Total Siswa" />
+                    <Label fx:id="totalSiswaLabel" styleClass="stat-value" text="0" />
+                    <Label styleClass="stat-subtitle" text="Tahun Ajaran 2024/2025" />
+                </VBox>
+                
+                <!-- Card 2: Total Guru & Tendik -->
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-title" text="Total Guru &amp; Tendik" />
+                    <Label fx:id="totalGuruLabel" styleClass="stat-value" text="0" />
+                </VBox>
+                
+                <!-- Card 3: Kehadiran Siswa Hari Ini -->
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-title" text="Kehadiran Siswa Hari Ini" />
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <VBox alignment="CENTER">
+                            <Label style="-fx-text-fill: #28a745; -fx-font-weight: bold;" text="Hadir" />
+                            <Label fx:id="siswaHadirLabel" text="0" />
+                        </VBox>
+                        <VBox alignment="CENTER">
+                            <Label style="-fx-text-fill: #ffc107; -fx-font-weight: bold;" text="Izin" />
+                            <Label fx:id="siswaIzinLabel" text="0" />
+                        </VBox>
+                        <VBox alignment="CENTER">
+                            <Label style="-fx-text-fill: #17a2b8; -fx-font-weight: bold;" text="Sakit" />
+                            <Label fx:id="siswaSakitLabel" text="0" />
+                        </VBox>
+                        <VBox alignment="CENTER">
+                            <Label style="-fx-text-fill: #dc3545; -fx-font-weight: bold;" text="Alfa" />
+                            <Label fx:id="siswaAlfaLabel" text="0" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+                
+                <!-- Card 4: Kehadiran Guru Hari Ini -->
+                <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="stat-title" text="Kehadiran Guru Hari Ini" />
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <VBox alignment="CENTER">
+                            <Label style="-fx-text-fill: #28a745; -fx-font-weight: bold;" text="Hadir" />
+                            <Label fx:id="guruHadirLabel" text="0" />
+                        </VBox>
+                        <VBox alignment="CENTER">
+                            <Label style="-fx-text-fill: #dc3545; -fx-font-weight: bold;" text="Absen" />
+                            <Label fx:id="guruAbsenLabel" text="0" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </HBox>
+            
+            <!-- Row 2: Charts -->
+            <HBox spacing="20.0">
+                <!-- Grafik Kehadiran Siswa -->
+                <VBox styleClass="chart-container" HBox.hgrow="ALWAYS">
+                    <Label styleClass="section-title" text="Grafik Kehadiran Siswa (7 Hari Terakhir)">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <LineChart fx:id="attendanceChart">
+                        <xAxis>
+                            <CategoryAxis side="BOTTOM" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis side="LEFT" />
+                        </yAxis>
+                    </LineChart>
+                </VBox>
+                
+                <!-- Grafik Rekap Jurusan -->
+                <VBox styleClass="chart-container" HBox.hgrow="ALWAYS">
+                    <Label styleClass="section-title" text="Rekap Kehadiran per Jurusan">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <BarChart fx:id="jurusanChart">
+                        <xAxis>
+                            <CategoryAxis side="BOTTOM" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis side="LEFT" />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </HBox>
+            
+            <!-- Row 3: Tables & Notifications -->
+            <HBox spacing="20.0">
+                <!-- Tabel Siswa Kehadiran Rendah -->
+                <VBox spacing="10.0" styleClass="table-container" HBox.hgrow="ALWAYS">
+                    <Label styleClass="section-title" text="Siswa dengan Kehadiran Rendah (di bawah 80 persen)">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <TableView fx:id="lowAttendanceTable" prefHeight="200.0">
+                        <columns>
+                            <TableColumn fx:id="nisColumn" text="NIS" prefWidth="80" />
+                            <TableColumn fx:id="namaColumn" text="Nama" prefWidth="150" />
+                            <TableColumn fx:id="kelasColumn" text="Kelas" prefWidth="80" />
+                            <TableColumn fx:id="attendancePctColumn" text="Persentase Kehadiran" prefWidth="150" />
+                        </columns>
+                    </TableView>
+                </VBox>
+                
+                <!-- Panel Notifikasi -->
+                <VBox spacing="10.0" styleClass="notification-panel" HBox.hgrow="ALWAYS" maxWidth="300">
+                    <Label styleClass="section-title" text="Notifikasi &amp; Pengingat">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <VBox spacing="5.0">
+                        <Label style="-fx-background-color: #fff3cd; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #ffeeba; -fx-border-radius: 5;" text="⚠️ 5 Siswa PKL akan berakhir minggu ini" wrapText="true" />
+                        <Label style="-fx-background-color: #d4edda; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #c3e6cb; -fx-border-radius: 5;" text="✅ Laporan Bulanan Guru sudah lengkap" wrapText="true" />
+                        <Label style="-fx-background-color: #f8d7da; -fx-padding: 10; -fx-background-radius: 5; -fx-border-color: #f5c6cb; -fx-border-radius: 5;" text="❗ Rapat Dewan Guru: Jumat, 13:00 WIB" wrapText="true" />
+                    </VBox>
+                </VBox>
+            </HBox>
+            
+        </VBox>
+    </content>
+</ScrollPane>

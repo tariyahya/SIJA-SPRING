@@ -118,7 +118,7 @@ public class KelasManagementController implements Initializable {
     }
 
     private void setupFilters() {
-        tingkatFilter.setItems(FXCollections.observableArrayList("X", "XI", "XII"));
+        tingkatFilter.setItems(FXCollections.observableArrayList("X", "XI", "XII", "XIII"));
     }
 
     private void setupEventHandlers() {
@@ -428,7 +428,7 @@ public class KelasManagementController implements Initializable {
         TextField waliField = new TextField();
 
         namaField.setPromptText("Nama kelas (misal: XII SIJA 1)");
-        tingkatCombo.setItems(FXCollections.observableArrayList("X", "XI", "XII"));
+        tingkatCombo.setItems(FXCollections.observableArrayList("X", "XI", "XII", "XIII"));
         tingkatCombo.setPromptText("Tingkat");
         jurusanField.setPromptText("Jurusan (misal: SIJA)");
         kapasitasField.setPromptText("Kapasitas siswa (kosongkan jika tidak dibatasi)");

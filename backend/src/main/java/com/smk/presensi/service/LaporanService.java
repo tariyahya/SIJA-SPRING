@@ -344,7 +344,11 @@ public class LaporanService {
                 presensi.getMethod(),
                 presensi.getLatitude(),
                 presensi.getLongitude(),
-                presensi.getKeterangan()
+                presensi.getKeterangan(),
+                presensi.getKelas() != null ? presensi.getKelas().getId() : null,
+                presensi.getKelas() != null ? presensi.getKelas().getNama() : null,
+                presensi.getMapel(),
+                presensi.getMateri()
         );
     }
 

@@ -4,6 +4,7 @@ import com.smk.presensi.enums.MethodPresensi;
 import com.smk.presensi.enums.StatusPresensi;
 import com.smk.presensi.enums.TipeUser;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -48,6 +49,16 @@ public class Presensi {
 
     @Column(length = 500)
     private String keterangan;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "kelas_id")
+    private Kelas kelas;
+
+    @Column(name = "mapel", length = 150)
+    private String mapel;
+
+    @Column(name = "materi", length = 500)
+    private String materi;
 
     public Presensi() {
     }
@@ -139,5 +150,29 @@ public class Presensi {
 
     public void setKeterangan(String keterangan) {
         this.keterangan = keterangan;
+    }
+
+    public Kelas getKelas() {
+        return kelas;
+    }
+
+    public void setKelas(Kelas kelas) {
+        this.kelas = kelas;
+    }
+
+    public String getMapel() {
+        return mapel;
+    }
+
+    public void setMapel(String mapel) {
+        this.mapel = mapel;
+    }
+
+    public String getMateri() {
+        return materi;
+    }
+
+    public void setMateri(String materi) {
+        this.materi = materi;
     }
 }

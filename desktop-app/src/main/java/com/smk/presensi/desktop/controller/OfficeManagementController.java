@@ -11,8 +11,13 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import netscape.javascript.JSObject;
 
 import java.net.URL;
 import java.util.Optional;
@@ -165,14 +170,48 @@ public class OfficeManagementController implements Initializable {
 
     private LokasiKantor showForm(LokasiKantor existing) {
         Dialog<LokasiKantor> dialog = new Dialog<>();
-        dialog.setTitle(existing == null ? "Add Location" : "Edit Location");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.setTitle(existing == null ? "Tambah Lokasi" : "Edit Lokasi");
+        
+        // Custom button types with Indonesian labels
+        ButtonType simpanButtonType = new ButtonType("Simpan", ButtonBar.ButtonData.OK_DONE);
+        ButtonType batalButtonType = new ButtonType("Batal", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(simpanButtonType, batalButtonType);
 
         TextField namaField = new TextField();
         TextField latField = new TextField();
         TextField longField = new TextField();
         TextField radiusField = new TextField();
         TextField alamatField = new TextField();
+        radiusField.setText("50");
+        
+        // Create WebView for Leaflet map
+        WebView webView = new WebView();
+        webView.setPrefSize(600, 450);
+        WebEngine webEngine = webView.getEngine();
+        
+        // Load map HTML
+        URL mapUrl = getClass().getResource("/html/location-picker.html");
+        if (mapUrl != null) {
+            webEngine.load(mapUrl.toExternalForm());
+        }
+        
+        // Bridge to capture coordinates from JavaScript
+        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                JSObject window = (JSObject) webEngine.executeScript("window");
+                window.setMember("javaConnector", new JavaScriptBridge(latField, longField, alamatField));
+                
+                // Set initial coordinates if editing existing location
+                if (existing != null && existing.getLatitude() != null && existing.getLongitude() != null) {
+                    String script = String.format("setInitialCoordinates(%f, %f);", 
+                                                  existing.getLatitude(), existing.getLongitude());
+                    webEngine.executeScript(script);
+                }
+
+                // Force sync current coordinates to JavaFX fields
+                webEngine.executeScript("if (typeof forceSyncCoordinates === 'function') { forceSyncCoordinates(); }");
+            }
+        });
 
         if (existing != null) {
             namaField.setText(existing.getNama());
@@ -190,11 +229,19 @@ public class OfficeManagementController implements Initializable {
         grid.add(new Label("Longitude:"), 0, 2); grid.add(longField, 1, 2);
         grid.add(new Label("Radius (m):"), 0, 3); grid.add(radiusField, 1, 3);
         grid.add(new Label("Alamat:"), 0, 4); grid.add(alamatField, 1, 4);
-
-        dialog.getDialogPane().setContent(grid);
+        
+        // Make lat/long fields read-only (updated by map)
+        latField.setEditable(false);
+        longField.setEditable(false);
+        latField.setStyle("-fx-background-color: #f0f0f0;");
+        longField.setStyle("-fx-background-color: #f0f0f0;");
+        
+        VBox container = new VBox(10, grid, webView);
+        dialog.getDialogPane().setContent(container);
+        dialog.getDialogPane().setPrefWidth(650);
 
         dialog.setResultConverter(btn -> {
-            if (btn == ButtonType.OK) {
+            if (btn == simpanButtonType) {
                 LokasiKantor loc = existing != null ? existing : new LokasiKantor();
                 loc.setNama(namaField.getText());
                 try {
@@ -209,5 +256,33 @@ public class OfficeManagementController implements Initializable {
         });
 
         return dialog.showAndWait().orElse(null);
+    }
+    
+    /**
+     * JavaScript bridge to communicate between Leaflet map and JavaFX
+     */
+    public static class JavaScriptBridge {
+        private final TextField latField;
+        private final TextField longField;
+        private final TextField alamatField;
+        
+        public JavaScriptBridge(TextField latField, TextField longField, TextField alamatField) {
+            this.latField = latField;
+            this.longField = longField;
+            this.alamatField = alamatField;
+        }
+        
+        public void updateCoordinates(double lat, double lng) {
+            Platform.runLater(() -> {
+                latField.setText(String.format("%.6f", lat));
+                longField.setText(String.format("%.6f", lng));
+            });
+        }
+        
+        public void updateAddress(String address) {
+            Platform.runLater(() -> {
+                alamatField.setText(address);
+            });
+        }
     }
 }
