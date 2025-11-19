@@ -17,29 +17,74 @@
     </top>
 
     <center>
-        <VBox spacing="20" style="-fx-padding: 30;" alignment="TOP_CENTER">
-            
-            <HBox spacing="20" alignment="CENTER">
-                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5;">
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <FlowPane hgap="20" vgap="20" alignment="TOP_CENTER" style="-fx-padding: 20;">
+                
+                <!-- Siswa -->
+                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: white;">
                     <Label text="Data Siswa" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
                     <Button fx:id="exportSiswaBtn" text="Export to Excel" onAction="#handleExportSiswa" prefWidth="150" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
                     <Button text="Import from Excel" disable="true" prefWidth="150"/>
+                    <Hyperlink text="Download Template" onAction="#handleTemplateSiswa"/>
                 </VBox>
 
-                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5;">
+                <!-- DUDI -->
+                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: white;">
                     <Label text="Data DUDI" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
                     <Button fx:id="exportDudiBtn" text="Export to Excel" onAction="#handleExportDudi" prefWidth="150" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
                     <Button text="Import from Excel" disable="true" prefWidth="150"/>
+                    <Hyperlink text="Download Template" onAction="#handleTemplateDudi"/>
                 </VBox>
-            </HBox>
 
-            <Separator/>
+                <!-- Guru -->
+                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: white;">
+                    <Label text="Data Guru" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                    <Button text="Export to Excel" onAction="#handleExportGuru" prefWidth="150" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                    <Button text="Import from Excel" disable="true" prefWidth="150"/>
+                    <Hyperlink text="Download Template" onAction="#handleTemplateGuru"/>
+                </VBox>
 
-            <VBox spacing="10" alignment="CENTER">
-                <Label fx:id="statusLabel" text="Ready"/>
-                <ProgressIndicator fx:id="loadingIndicator" visible="false"/>
-            </VBox>
+                <!-- Kelas -->
+                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: white;">
+                    <Label text="Data Kelas" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                    <Button text="Export to Excel" onAction="#handleExportKelas" prefWidth="150" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                    <Button text="Import from Excel" disable="true" prefWidth="150"/>
+                    <Hyperlink text="Download Template" onAction="#handleTemplateKelas"/>
+                </VBox>
 
-        </VBox>
+                <!-- Jurusan -->
+                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: white;">
+                    <Label text="Data Jurusan" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                    <Button text="Export to Excel" onAction="#handleExportJurusan" prefWidth="150" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                    <Button text="Import from Excel" disable="true" prefWidth="150"/>
+                    <Hyperlink text="Download Template" onAction="#handleTemplateJurusan"/>
+                </VBox>
+
+                <!-- Users -->
+                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: white;">
+                    <Label text="Data Users" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                    <Button text="Export to Excel" onAction="#handleExportUsers" prefWidth="150" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                    <Button text="Import from Excel" disable="true" prefWidth="150"/>
+                    <Hyperlink text="Download Template" onAction="#handleTemplateUser"/>
+                </VBox>
+
+                <!-- Presensi -->
+                <VBox spacing="10" alignment="CENTER" style="-fx-border-color: #ddd; -fx-padding: 20; -fx-background-radius: 5; -fx-border-radius: 5; -fx-background-color: white;">
+                    <Label text="Data Presensi" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                    <Button text="Export to Excel" onAction="#handleExportPresensi" prefWidth="150" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                    <Button text="Import from Excel" disable="true" prefWidth="150"/>
+                    <Hyperlink text="Download Template" onAction="#handleTemplatePresensi"/>
+                </VBox>
+
+            </FlowPane>
+        </ScrollPane>
     </center>
+
+    <bottom>
+        <VBox spacing="10" style="-fx-padding: 10;" alignment="CENTER">
+            <Separator/>
+            <Label fx:id="statusLabel" text="Ready"/>
+            <ProgressIndicator fx:id="loadingIndicator" visible="false"/>
+        </VBox>
+    </bottom>
 </BorderPane>

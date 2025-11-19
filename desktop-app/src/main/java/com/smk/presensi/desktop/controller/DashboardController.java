@@ -739,4 +739,27 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Handle Dashboard Piket dari menu
+     */
+    @FXML
+    private void handlePiketDashboard() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/dashboard-piket.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            // Dashboard Piket biasanya full screen atau window besar
+            stage.setTitle("Dashboard Piket");
+            stage.setScene(new Scene(root, 1280, 720));
+            stage.show();
+            
+        } catch (IOException e) {
+            showError("Error loading Dashboard Piket: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

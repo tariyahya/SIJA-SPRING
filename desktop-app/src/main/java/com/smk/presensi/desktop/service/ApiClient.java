@@ -192,6 +192,35 @@ public class ApiClient {
     }
 
     /**
+     * POST request untuk upload file (Multipart)
+     */
+    public HttpResponse<String> postFile(String endpoint, File file) throws IOException, InterruptedException {
+        String boundary = "---ContentBoundary" + System.currentTimeMillis();
+        
+        // Construct multipart body
+        var byteArrays = new java.util.ArrayList<byte[]>();
+        String header = "--" + boundary + "\r\n" +
+                        "Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n" +
+                        "Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\r\n\r\n";
+        
+        byteArrays.add(header.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        byteArrays.add(java.nio.file.Files.readAllBytes(file.toPath()));
+        byteArrays.add(("\r\n--" + boundary + "--\r\n").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + endpoint))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .timeout(Duration.ofMinutes(5)) // Longer timeout for upload
+                .POST(HttpRequest.BodyPublishers.ofByteArrays(byteArrays));
+
+        if (jwtToken != null) {
+            builder.header("Authorization", "Bearer " + jwtToken);
+        }
+
+        return httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    /**
      * Parse JSON response ke Java object
      */
     public <T> T parseResponse(String json, Class<T> classOfT) {

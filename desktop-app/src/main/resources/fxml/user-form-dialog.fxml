@@ -2,7 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 
 <DialogPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -94,7 +97,7 @@
     
     <buttonTypes>
         <ButtonType fx:constant="CANCEL"/>
-        <ButtonType fx:constant="OK" buttonData="OK_DONE" text="Save"/>
+        <ButtonType text="Save" buttonData="OK_DONE"/>
     </buttonTypes>
     
 </DialogPane>
