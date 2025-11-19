@@ -177,6 +177,15 @@ public class PresensiService {
     }
 
     /**
+     * Get all presensi data.
+     */
+    public List<PresensiResponse> findAll() {
+        return presensiRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
      * HELPER: Hitung status berdasarkan jam masuk.
      */
     private StatusPresensi hitungStatus(LocalTime jamMasuk) {

@@ -117,7 +117,29 @@ public class DataSeeder implements CommandLineRunner {
     private void seedAdminUser() {
         // Cek apakah admin user sudah ada
         if (userRepository.existsByUsername("admin")) {
-            logger.info("Admin user already exists, skipping admin seeding");
+            logger.info("Admin user already exists. Resetting password to default...");
+            
+            User admin = userRepository.findByUsername("admin")
+                    .orElseThrow(() -> new RuntimeException("Admin user found but cannot be retrieved"));
+            
+            // Reset password ke admin123
+            String hashedPassword = passwordEncoder.encode("admin123");
+            admin.setPassword(hashedPassword);
+            
+            // Pastikan punya ROLE_ADMIN
+            Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+                    .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found!"));
+            
+            boolean hasRole = admin.getRoles().stream()
+                    .anyMatch(r -> r.getName() == RoleName.ROLE_ADMIN);
+            
+            if (!hasRole) {
+                admin.addRole(adminRole);
+            }
+            
+            userRepository.save(admin);
+            
+            logger.info("Admin user updated: password reset to 'admin123'");
             return;
         }
         
