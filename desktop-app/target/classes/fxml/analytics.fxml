@@ -98,6 +98,59 @@
                     </LineChart>
                 </VBox>
 
+                <!-- Row 3: Rekap Siswa per Kelas &amp; Jurusan -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-padding: 20; 
+                             -fx-background-radius: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
+                    <Label text="Rekap Siswa per Kelas &amp; Jurusan"
+                           style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <TabPane>
+                        <tabs>
+                            <Tab text="Per Kelas" closable="false">
+                                <content>
+                                    <VBox spacing="10">
+                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                            <Button text="Reload Rekap Kelas"
+                                                    onAction="#handleRekapKelasRefresh"
+                                                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;"/>
+                                            <Button text="Export CSV (Per Kelas)"
+                                                    onAction="#handleRekapKelasExportCsv"
+                                                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-cursor: hand;"/>
+                                        </HBox>
+                                        <TableView fx:id="rekapKelasTable" prefHeight="250">
+                                            <columns>
+                                                <TableColumn fx:id="rekapKelasKelasColumn" text="Kelas" prefWidth="220"/>
+                                                <TableColumn fx:id="rekapKelasJurusanColumn" text="Jurusan" prefWidth="160"/>
+                                                <TableColumn fx:id="rekapKelasTotalColumn" text="Total Siswa" prefWidth="120"/>
+                                            </columns>
+                                        </TableView>
+                                    </VBox>
+                                </content>
+                            </Tab>
+                            <Tab text="Per Jurusan" closable="false">
+                                <content>
+                                    <VBox spacing="10">
+                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                            <Button text="Reload Rekap Jurusan"
+                                                    onAction="#handleRekapJurusanRefresh"
+                                                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;"/>
+                                            <Button text="Export CSV (Per Jurusan)"
+                                                    onAction="#handleRekapJurusanExportCsv"
+                                                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-cursor: hand;"/>
+                                        </HBox>
+                                        <TableView fx:id="rekapJurusanTable" prefHeight="250">
+                                            <columns>
+                                                <TableColumn fx:id="rekapJurusanJurusanColumn" text="Jurusan" prefWidth="220"/>
+                                                <TableColumn fx:id="rekapJurusanTotalColumn" text="Total Siswa" prefWidth="140"/>
+                                            </columns>
+                                        </TableView>
+                                    </VBox>
+                                </content>
+                            </Tab>
+                        </tabs>
+                    </TabPane>
+                </VBox>
+
                 <!-- Info Panel -->
                 <HBox spacing="20" alignment="CENTER" 
                       style="-fx-background-color: #E3F2FD; -fx-padding: 15; -fx-background-radius: 5;">

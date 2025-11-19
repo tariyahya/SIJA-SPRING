@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.ApprovalIzinController"
+            prefWidth="1100" prefHeight="650">
+
+    <top>
+        <VBox spacing="8" style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+            <Label text="Perizinan Siswa" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <Label text="Pengajuan izin dan approval sederhana untuk Guru Piket"
+                   style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <BorderPane style="-fx-padding: 20;">
+            <top>
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 15 0;">
+                    <Button fx:id="tambahButton"
+                            text="Tambah Pengajuan Izin"
+                            onAction="#handleTambahIzin"
+                            style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-min-width: 180;"/>
+                    <Button fx:id="approveButton"
+                            text="Setujui"
+                            onAction="#handleApprove"
+                            disable="true"
+                            style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-min-width: 100;"/>
+                    <Button fx:id="rejectButton"
+                            text="Tolak"
+                            onAction="#handleReject"
+                            disable="true"
+                            style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-min-width: 100;"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button fx:id="refreshButton"
+                            text="Reload Pending"
+                            onAction="#handleRefresh"
+                            style="-fx-min-width: 130;"/>
+                    <Button fx:id="closeButton"
+                            text="Close"
+                            onAction="#handleClose"
+                            style="-fx-min-width: 80;"/>
+
+                    <ProgressIndicator fx:id="loadingIndicator"
+                                       prefWidth="28" prefHeight="28"
+                                       visible="false"/>
+                </HBox>
+            </top>
+
+            <center>
+                <TableView fx:id="izinTable"
+                           style="-fx-border-color: #ddd; -fx-border-width: 1;">
+                    <columns>
+                        <TableColumn fx:id="siswaColumn" text="Siswa" prefWidth="180"/>
+                        <TableColumn fx:id="kelasColumn" text="Kelas" prefWidth="110"/>
+                        <TableColumn fx:id="jurusanColumn" text="Jurusan" prefWidth="110"/>
+                        <TableColumn fx:id="jenisColumn" text="Jenis" prefWidth="100"/>
+                        <TableColumn fx:id="mulaiColumn" text="Mulai" prefWidth="110"/>
+                        <TableColumn fx:id="selesaiColumn" text="Selesai" prefWidth="110"/>
+                        <TableColumn fx:id="statusColumn" text="Status" prefWidth="110"/>
+                        <TableColumn fx:id="alasanColumn" text="Alasan" prefWidth="260"/>
+                    </columns>
+                </TableView>
+            </center>
+        </BorderPane>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_LEFT"
+              style="-fx-padding: 12 20; -fx-background-color: #f5f5f5;">
+            <Label fx:id="statusLabel" text="Ready"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
+

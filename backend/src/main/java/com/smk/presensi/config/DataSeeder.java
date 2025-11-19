@@ -71,32 +71,37 @@ public class DataSeeder implements CommandLineRunner {
     
     /**
      * Seed roles ke database.
-     * 
-     * Create 3 roles jika belum ada:
-     * - ROLE_ADMIN: Full access
-     * - ROLE_GURU: Read all, manage presensi
-     * - ROLE_SISWA: Read own data, submit presensi
+     *
+     * Pastikan semua role default tersedia:
+     * - ROLE_ADMIN, ROLE_GURU, ROLE_SISWA
+     * - ROLE_GURU_PIKET, ROLE_GURU_PEMBIMBING, ROLE_GURU_BK
+     * - ROLE_WAKAKURIKULUM, ROLE_WAKAHUBIN, ROLE_KAPROG
      */
     private void seedRoles() {
-        // Cek apakah roles sudah ada
-        if (roleRepository.count() > 0) {
-            logger.info("Roles already exist, skipping role seeding");
-            return;
-        }
-        
-        logger.info("Seeding roles...");
-        
-        // Create 3 roles
-        Role adminRole = new Role(RoleName.ROLE_ADMIN);
-        Role guruRole = new Role(RoleName.ROLE_GURU);
-        Role siswaRole = new Role(RoleName.ROLE_SISWA);
-        
-        // Save ke database
-        roleRepository.save(adminRole);
-        roleRepository.save(guruRole);
-        roleRepository.save(siswaRole);
-        
-        logger.info("Roles seeded: ROLE_ADMIN, ROLE_GURU, ROLE_SISWA");
+        logger.info("Seeding roles (ensuring default roles exist)...");
+
+        ensureRoleExists(RoleName.ROLE_ADMIN);
+        ensureRoleExists(RoleName.ROLE_GURU);
+        ensureRoleExists(RoleName.ROLE_SISWA);
+        ensureRoleExists(RoleName.ROLE_GURU_PIKET);
+        ensureRoleExists(RoleName.ROLE_GURU_PEMBIMBING);
+        ensureRoleExists(RoleName.ROLE_GURU_BK);
+        ensureRoleExists(RoleName.ROLE_WAKAKURIKULUM);
+        ensureRoleExists(RoleName.ROLE_WAKAHUBIN);
+        ensureRoleExists(RoleName.ROLE_KAPROG);
+
+        logger.info("Role seeding completed");
+    }
+
+    /**
+     * Helper untuk membuat role jika belum ada.
+     */
+    private void ensureRoleExists(RoleName roleName) {
+        roleRepository.findByName(roleName)
+                .orElseGet(() -> {
+                    logger.info("Seeding role: {}", roleName);
+                    return roleRepository.save(new Role(roleName));
+                });
     }
     
     /**

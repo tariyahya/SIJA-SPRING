@@ -1,0 +1,230 @@
+# PLAN KELENGKAPAN SISTEM PRESENSI SMK
+
+**Tanggal Pembuatan**: 18 November 2025  
+**Project**: SIJA Spring - Sistem Presensi SMK  
+**Target**: Sistem Presensi yang Komprehensif untuk SMK
+
+---
+
+## 📋 OVERVIEW
+
+Dokumen ini berisi rencana lengkap untuk menambahkan fitur-fitur penting yang masih kurang dalam sistem presensi SMK, dengan fokus khusus pada:
+1. **Perizinan dengan Role Guru Piket & Pembimbing PKL**
+2. **Lokasi Kantor untuk Unit DUDI (Dunia Usaha Dunia Industri)**
+3. **Manajemen PKL (Praktik Kerja Lapangan)**
+4. **Fitur-fitur pendukung lainnya**
+
+---
+
+## 🎯 FASE IMPLEMENTASI
+
+### **FASE 1: FOUNDATION** (2-3 Minggu)
+**Priority**: ⭐⭐⭐⭐⭐ CRITICAL
+
+#### 1.1 Manajemen Kelas & Jurusan
+```
+Status: ⚠️ Belum Ada
+Complexity: ⭐⭐ SEDANG
+Estimated Time: 3-4 hari
+
+Features:
+├─ CRUD Jurusan (AKL, TKR, TBO, SIJA)
+├─ CRUD Kelas (dengan wali kelas)
+├─ Assignment siswa ke kelas
+├─ Capacity management
+└─ Reports per kelas/jurusan
+
+Deliverables:
+├─ JurusanController.java (Backend)
+├─ KelasController.java (Backend)
+├─ Jurusan & Kelas entities
+├─ JurusanManagementController.java (Desktop)
+├─ KelasManagementController.java (Desktop)
+├─ jurusan-management.fxml
+├─ kelas-management.fxml
+└─ Database migration scripts
+
+Database Tables:
+├─ jurusan (id, kode, nama, durasi_tahun, ketua_jurusan_id)
+└─ kelas (id, nama, jurusan_id, tingkat, tahun_ajaran, wali_kelas_id, kapasitas)
+```
+
+#### 1.2 Role Management Enhancement
+```
+Status: ⚠️ Perlu Ekspansi
+Complexity: ⭐⭐⭐ TINGGI
+Estimated Time: 2-3 hari
+
+New Roles:
+├─ ROLE_GURU_PIKET (Guru yang bertugas piket hari itu)
+├─ ROLE_GURU_PEMBIMBING (Pembimbing PKL)
+├─ ROLE_GURU_BK (Bimbingan Konseling)
+├─ ROLE_WAKAKURIKULUM (Wakil Kepala Kurikulum)
+├─ ROLE_WAKAHUBIN (Wakil Kepala Hubungan Industri)
+└─ ROLE_KAPROG (Ketua Program Keahlian/Jurusan)
+
+Permission Matrix:
+┌──────────────────┬───────┬───────┬────────┬──────────┬──────────┐
+│ Action           │ Admin │ Piket │ Wali   │ Pembim.  │ BK       │
+│                  │       │       │ Kelas  │ PKL      │          │
+├──────────────────┼───────┼───────┼────────┼──────────┼──────────┤
+│ Input Presensi   │  ✅   │  ✅   │   ✅   │    ❌    │   ❌    │
+│ Approve Izin     │  ✅   │  ✅   │   ✅   │    ❌    │   ✅    │
+│ Manage PKL       │  ✅   │  ❌   │   ❌   │    ✅    │   ❌    │
+│ View All Data    │  ✅   │  ❌   │   ⚠️   │    ⚠️    │   ✅    │
+│ Generate Report  │  ✅   │  ⚠️   │   ✅   │    ✅    │   ✅    │
+│ Surat Peringatan │  ✅   │  ❌   │   ✅   │    ❌    │   ✅    │
+└──────────────────┴───────┴───────┴────────┴──────────┴──────────┘
+
+Deliverables:
+├─ Update Role enum dengan roles baru
+├─ Update SecurityConfig.java
+├─ Permission service layer
+├─ Role assignment UI
+└─ Documentation: Role & Permission Guide
+```
+
+---
+
+### **FASE 2: PERIZINAN & PKL** (3-4 Minggu)
+**Priority**: ⭐⭐⭐⭐⭐ CRITICAL
+
+#### 2.1 Modul Perizinan (Izin & Dispensasi)
+```
+Status: 🆕 NEW - HIGHLY RECOMMENDED
+Complexity: ⭐⭐⭐⭐ SANGAT TINGGI
+Estimated Time: 5-7 hari
+
+A. PENGAJUAN IZIN
+   ├─ Form pengajuan izin siswa
+   │   ├─ Jenis: SAKIT / IZIN / DISPENSASI
+   │   ├─ Tanggal & durasi
+   │   ├─ Alasan detail
+   │   ├─ Upload surat pendukung (PDF/Image)
+   │   ├─ Contact orang tua/wali
+   │   └─ Auto-save as draft
+   │
+   ├─ Jenis Izin Khusus:
+   │   ├─ Izin Sakit (dengan surat dokter)
+   │   ├─ Izin Urusan Keluarga
+   │   ├─ Dispensasi Lomba/Kompetisi
+   │   ├─ Dispensasi PKL (khusus siswa PKL)
+   │   └─ Dispensasi Kegiatan Sekolah
+   │
+   └─ Submission flow:
+       Siswa → Auto-notify → Guru Piket (hari itu) → Approval
+
+B. APPROVAL WORKFLOW
+   ├─ Dashboard Guru Piket
+   │   ├─ List pengajuan izin hari ini
+   │   ├─ Quick approve/reject buttons
+   │   ├─ View surat pendukung
+   │   ├─ Add notes/comments
+   │   ├─ Contact verification (telp ortu)
+   │   └─ Batch approval (multi-select)
+   │
+   ├─ Escalation Rules:
+   │   ├─ Izin > 3 hari → Wali Kelas approval
+   │   ├─ Izin > 7 hari → BK approval
+   │   ├─ Dispensasi PKL → Pembimbing PKL approval
+   │   └─ Dispensasi Lomba → Wakakurikulum approval
+   │
+   └─ Notification:
+       ├─ SMS ke orang tua (approved/rejected)
+       ├─ Email notification
+       ├─ In-app notification
+       └─ WhatsApp message (optional)
+
+C. TRACKING & MONITORING
+   ├─ Status tracking: PENDING / APPROVED / REJECTED / EXPIRED
+   ├─ History pengajuan per siswa
+   ├─ Alert: Siswa dengan banyak izin
+   ├─ Report: Izin per kelas/bulan
+   ├─ Verification: Detect suspicious patterns
+   └─ Integration dengan presensi (auto-mark)
+
+D. GURU PIKET FEATURES
+   ├─ Jadwal Piket Management
+   │   ├─ Assign guru piket per hari
+   │   ├─ Shift pagi/siang (jika ada)
+   │   ├─ Template jadwal bulanan
+   │   └─ Swap jadwal antar guru
+   │
+   ├─ Dashboard Piket Hari Ini
+   │   ├─ Summary presensi real-time
+   │   ├─ List siswa terlambat
+   │   ├─ List siswa izin (hari ini)
+   │   ├─ Quick action: Tandai siswa terlambat
+   │   ├─ Quick action: Input izin manual
+   │   └─ Export rekap harian
+   │
+   └─ Logbook Piket
+       ├─ Catatan kejadian hari itu
+       ├─ Tindakan yang diambil
+       ├─ Siswa bermasalah
+       └─ Handover ke piket berikutnya
+
+Deliverables:
+├─ Backend:
+│   ├─ IzinController.java (CRUD + approval)
+│   ├─ IzinService.java
+│   ├─ IzinRequest & IzinResponse DTOs
+│   ├─ GuruPiketController.java
+│   ├─ JadwalPiketController.java
+│   └─ FileUploadService.java (handle surat)
+│
+├─ Desktop:
+│   ├─ IzinManagementController.java
+│   ├─ ApprovalIzinController.java (Guru Piket)
+│   ├─ JadwalPiketController.java
+│   ├─ izin-form-dialog.fxml
+│   ├─ approval-izin.fxml
+│   └─ dashboard-piket.fxml
+│
+├─ Database:
+│   ├─ izin table (full schema below)
+│   ├─ jadwal_piket table
+│   └─ logbook_piket table
+│
+└─ Documentation:
+    ├─ User Guide: Perizinan
+    ├─ User Guide: Guru Piket
+    └─ API Documentation: Izin endpoints
+```
+
+#### 2.2 Modul PKL (Praktik Kerja Lapangan)
+```
+Status: 🆕 NEW - HIGHLY RECOMMENDED
+Complexity: ⭐⭐⭐⭐⭐ SANGAT TINGGI
+Estimated Time: 7-10 hari
+
+A. MANAJEMEN DUDI (Dunia Usaha Dunia Industri)
+   ├─ CRUD Perusahaan/Instansi DUDI
+   │   ├─ Nama perusahaan
+   │   ├─ Bidang usaha (IT, Otomotif, Keuangan, dll)
+   │   ├─ Alamat lengkap
+   │   ├─ Koordinat GPS (Lat/Long)
+   │   ├─ Radius validasi presensi (meter)
+   │   ├─ Contact person (nama, jabatan, HP, email)
+   │   ├─ Kuota siswa (max berapa siswa)
+   │   ├─ Periode kerjasama
+   │   ├─ MOU document upload
+   │   ├─ Rating & feedback
+   │   └─ Status: AKTIF / NONAKTIF / BLACKLIST
+   │
+   ├─ Mapping DUDI by Location
+   │   ├─ Map view (Google Maps integration)
+   │   ├─ Filter by distance from school
+   │   ├─ Filter by industry
+   │   └─ Available slots indicator
+   │
+   └─ DUDI Reports
+       ├─ List DUDI with current students
+       ├─ Capacity utilization
+       ├─ Performance rating
+       └─ Kerjasama renewal tracker
+
+B. PENEMPATAN SISWA PKL
+   ├─ Setup Periode PKL
+   │   ├─ Tahun ajaran
+   │   ├─ Tanggal mulai & selesai

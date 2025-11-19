@@ -75,7 +75,43 @@ public class Role {
          * Hanya bisa read own data, submit own presensi.
          * Tidak bisa lihat data siswa lain.
          */
-        ROLE_SISWA
+        ROLE_SISWA,
+
+        /**
+         * Guru Piket - bertugas memantau kehadiran harian
+         * dan melakukan approval/penolakan pengajuan izin.
+         */
+        ROLE_GURU_PIKET,
+
+        /**
+         * Guru Pembimbing PKL - membina siswa PKL dan
+         * memonitor presensi serta laporan PKL.
+         */
+        ROLE_GURU_PEMBIMBING,
+
+        /**
+         * Guru BK (Bimbingan Konseling) - mengelola
+         * kasus kedisiplinan dan surat peringatan.
+         */
+        ROLE_GURU_BK,
+
+        /**
+         * Wakil Kepala Kurikulum - akses laporan global,
+         * rekap, dan pengaturan kebijakan presensi.
+         */
+        ROLE_WAKAKURIKULUM,
+
+        /**
+         * Wakil Kepala Hubungan Industri - fokus pada
+         * pengelolaan PKL dan hubungan dengan DUDI.
+         */
+        ROLE_WAKAHUBIN,
+
+        /**
+         * Ketua Program Keahlian/Jurusan - melihat rekap
+         * kehadiran dan laporan untuk jurusan tertentu.
+         */
+        ROLE_KAPROG
     }
     
     // ==========================================

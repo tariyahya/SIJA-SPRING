@@ -63,6 +63,14 @@ public class Kelas {
     private Long waliKelasId;  // ID guru yang jadi wali kelas
 
     /**
+     * KAPASITAS - Batas maksimal jumlah siswa dalam kelas ini.
+     *
+     * Null atau 0 berarti tidak dibatasi (unlimited).
+     */
+    @Column(name = "kapasitas")
+    private Integer kapasitas;
+
+    /**
      * Constructor kosong - WAJIB untuk JPA
      * Jangan dihapus!
      */
@@ -113,5 +121,13 @@ public class Kelas {
     }
     public void setWaliKelasId(Long waliKelasId) { 
         this.waliKelasId = waliKelasId; 
+    }
+
+    public Integer getKapasitas() {
+        return kapasitas;
+    }
+
+    public void setKapasitas(Integer kapasitas) {
+        this.kapasitas = kapasitas;
     }
 }

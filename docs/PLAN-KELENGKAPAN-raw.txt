@@ -1,0 +1,285 @@
+﻿# PLAN KELENGKAPAN SISTEM PRESENSI SMK
+
+**Tanggal Pembuatan**: 18 November 2025  
+**Project**: SIJA Spring - Sistem Presensi SMK  
+**Target**: Sistem Presensi yang Komprehensif untuk SMK
+
+---
+
+## dY"< OVERVIEW
+
+Dokumen ini berisi rencana lengkap untuk menambahkan fitur-fitur penting yang masih kurang dalam sistem presensi SMK, dengan fokus khusus pada:
+1. **Perizinan dengan Role Guru Piket & Pembimbing PKL**
+2. **Lokasi Kantor untuk Unit DUDI (Dunia Usaha Dunia Industri)**
+3. **Manajemen PKL (Praktik Kerja Lapangan)**
+4. **Fitur-fitur pendukung lainnya**
+
+---
+
+## dYZ_ FASE IMPLEMENTASI
+
+### **FASE 1: FOUNDATION** (2-3 Minggu)
+**Priority**: �-?�-?�-?�-?�-? CRITICAL
+
+#### 1.1 Manajemen Kelas & Jurusan
+```
+Status: �s��,? Belum Ada
+Complexity: �-?�-? SEDANG
+Estimated Time: 3-4 hari
+
+Features:
+�"o�"? CRUD Jurusan (AKL, TKR, TBO, SIJA)
+�"o�"? CRUD Kelas (dengan wali kelas)
+�"o�"? Assignment siswa ke kelas
+�"o�"? Capacity management
+�""�"? Reports per kelas/jurusan
+
+Deliverables:
+�"o�"? JurusanController.java (Backend)
+�"o�"? KelasController.java (Backend)
+�"o�"? Jurusan & Kelas entities
+�"o�"? JurusanManagementController.java (Desktop)
+�"o�"? KelasManagementController.java (Desktop)
+�"o�"? jurusan-management.fxml
+�"o�"? kelas-management.fxml
+�""�"? Database migration scripts
+
+Database Tables:
+�"o�"? jurusan (id, kode, nama, durasi_tahun, ketua_jurusan_id)
+�""�"? kelas (id, nama, jurusan_id, tingkat, tahun_ajaran, wali_kelas_id, kapasitas)
+```
+
+#### 1.2 Role Management Enhancement
+```
+Status: �s��,? Perlu Ekspansi
+Complexity: �-?�-?�-? TINGGI
+Estimated Time: 2-3 hari
+
+New Roles:
+�"o�"? ROLE_GURU_PIKET (Guru yang bertugas piket hari itu)
+�"o�"? ROLE_GURU_PEMBIMBING (Pembimbing PKL)
+�"o�"? ROLE_GURU_BK (Bimbingan Konseling)
+�"o�"? ROLE_WAKAKURIKULUM (Wakil Kepala Kurikulum)
+�"o�"? ROLE_WAKAHUBIN (Wakil Kepala Hubungan Industri)
+�""�"? ROLE_KAPROG (Ketua Program Keahlian/Jurusan)
+
+Permission Matrix:
+�"O�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?
+�", Action           �", Admin �", Piket �", Wali   �", Pembim.  �", BK       �",
+�",                  �",       �",       �", Kelas  �", PKL      �",          �",
+�"o�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"��"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�?
+�", Input Presensi   �",  �o.   �",  �o.   �",   �o.   �",    �?O    �",   �?O    �",
+�", Approve Izin     �",  �o.   �",  �o.   �",   �o.   �",    �?O    �",   �o.    �",
+�", Manage PKL       �",  �o.   �",  �?O   �",   �?O   �",    �o.    �",   �?O    �",
+�", View All Data    �",  �o.   �",  �?O   �",   �s��,?   �",    �s��,?    �",   �o.    �",
+�", Generate Report  �",  �o.   �",  �s��,?   �",   �o.   �",    �o.    �",   �o.    �",
+�", Surat Peringatan �",  �o.   �",  �?O   �",   �o.   �",    �?O    �",   �o.    �",
+�""�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"'�"?�"?�"?�"?�"?�"?�"?�"'�"?�"?�"?�"?�"?�"?�"?�"'�"?�"?�"?�"?�"?�"?�"?�"?�"'�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"'�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"~
+
+Deliverables:
+�"o�"? Update Role enum dengan roles baru
+�"o�"? Update SecurityConfig.java
+�"o�"? Permission service layer
+�"o�"? Role assignment UI
+�""�"? Documentation: Role & Permission Guide
+```
+
+---
+
+### **FASE 2: PERIZINAN & PKL** (3-4 Minggu)
+**Priority**: �-?�-?�-?�-?�-? CRITICAL
+
+#### 2.1 Modul Perizinan (Izin & Dispensasi)
+```
+Status: dY+ NEW - HIGHLY RECOMMENDED
+Complexity: �-?�-?�-?�-? SANGAT TINGGI
+Estimated Time: 5-7 hari
+
+A. PENGAJUAN IZIN
+   �"o�"? Form pengajuan izin siswa
+   �",   �"o�"? Jenis: SAKIT / IZIN / DISPENSASI
+   �",   �"o�"? Tanggal & durasi
+   �",   �"o�"? Alasan detail
+   �",   �"o�"? Upload surat pendukung (PDF/Image)
+   �",   �"o�"? Contact orang tua/wali
+   �",   �""�"? Auto-save as draft
+   �",
+   �"o�"? Jenis Izin Khusus:
+   �",   �"o�"? Izin Sakit (dengan surat dokter)
+   �",   �"o�"? Izin Urusan Keluarga
+   �",   �"o�"? Dispensasi Lomba/Kompetisi
+   �",   �"o�"? Dispensasi PKL (khusus siswa PKL)
+   �",   �""�"? Dispensasi Kegiatan Sekolah
+   �",
+   �""�"? Submission flow:
+       Siswa �+' Auto-notify �+' Guru Piket (hari itu) �+' Approval
+
+B. APPROVAL WORKFLOW
+   �"o�"? Dashboard Guru Piket
+   �",   �"o�"? List pengajuan izin hari ini
+   �",   �"o�"? Quick approve/reject buttons
+   �",   �"o�"? View surat pendukung
+   �",   �"o�"? Add notes/comments
+   �",   �"o�"? Contact verification (telp ortu)
+   �",   �""�"? Batch approval (multi-select)
+   �",
+   �"o�"? Escalation Rules:
+   �",   �"o�"? Izin > 3 hari �+' Wali Kelas approval
+   �",   �"o�"? Izin > 7 hari �+' BK approval
+   �",   �"o�"? Dispensasi PKL �+' Pembimbing PKL approval
+   �",   �""�"? Dispensasi Lomba �+' Wakakurikulum approval
+   �",
+   �""�"? Notification:
+       �"o�"? SMS ke orang tua (approved/rejected)
+       �"o�"? Email notification
+       �"o�"? In-app notification
+       �""�"? WhatsApp message (optional)
+
+C. TRACKING & MONITORING
+   �"o�"? Status tracking: PENDING / APPROVED / REJECTED / EXPIRED
+   �"o�"? History pengajuan per siswa
+   �"o�"? Alert: Siswa dengan banyak izin
+   �"o�"? Report: Izin per kelas/bulan
+   �"o�"? Verification: Detect suspicious patterns
+   �""�"? Integration dengan presensi (auto-mark)
+
+D. GURU PIKET FEATURES
+   �"o�"? Jadwal Piket Management
+   �",   �"o�"? Assign guru piket per hari
+   �",   �"o�"? Shift pagi/siang (jika ada)
+   �",   �"o�"? Template jadwal bulanan
+   �",   �""�"? Swap jadwal antar guru
+   �",
+   �"o�"? Dashboard Piket Hari Ini
+   �",   �"o�"? Summary presensi real-time
+   �",   �"o�"? List siswa terlambat
+   �",   �"o�"? List siswa izin (hari ini)
+   �",   �"o�"? Quick action: Tandai siswa terlambat
+   �",   �"o�"? Quick action: Input izin manual
+   �",   �""�"? Export rekap harian
+   �",
+   �""�"? Logbook Piket
+       �"o�"? Catatan kejadian hari itu
+       �"o�"? Tindakan yang diambil
+       �"o�"? Siswa bermasalah
+       �""�"? Handover ke piket berikutnya
+
+Deliverables:
+�"o�"? Backend:
+�",   �"o�"? IzinController.java (CRUD + approval)
+�",   �"o�"? IzinService.java
+�",   �"o�"? IzinRequest & IzinResponse DTOs
+�",   �"o�"? GuruPiketController.java
+�",   �"o�"? JadwalPiketController.java
+�",   �""�"? FileUploadService.java (handle surat)
+�",
+�"o�"? Desktop:
+�",   �"o�"? IzinManagementController.java
+�",   �"o�"? ApprovalIzinController.java (Guru Piket)
+�",   �"o�"? JadwalPiketController.java
+�",   �"o�"? izin-form-dialog.fxml
+�",   �"o�"? approval-izin.fxml
+�",   �""�"? dashboard-piket.fxml
+�",
+�"o�"? Database:
+�",   �"o�"? izin table (full schema below)
+�",   �"o�"? jadwal_piket table
+�",   �""�"? logbook_piket table
+�",
+�""�"? Documentation:
+    �"o�"? User Guide: Perizinan
+    �"o�"? User Guide: Guru Piket
+    �""�"? API Documentation: Izin endpoints
+```
+
+#### 2.2 Modul PKL (Praktik Kerja Lapangan)
+```
+Status: dY+ NEW - HIGHLY RECOMMENDED
+Complexity: �-?�-?�-?�-?�-? SANGAT TINGGI
+Estimated Time: 7-10 hari
+
+```
+
+### **SHOULD HAVE** (Sangat Direkomendasikan)
+```
+�-? 6. Manajemen DUDI & Penempatan PKL
+�-? 7. Presensi PKL (GPS-based)
+�-? 8. Dashboard Pembimbing PKL
+�-? 9. Jadwal Pelajaran
+�-? 10. Surat Peringatan Otomatis
+```
+
+### **NICE TO HAVE** (Jika Ada Waktu)
+```
+dY'� 11. Jurnal PKL
+dY'� 12. Kunjungan Industri Tracking
+dY'� 13. Custom Report Builder
+dY'� 14. Advanced Analytics
+dY'� 15. Mobile App
+```
+
+---
+
+## dY"? NEXT STEPS
+
+### Langkah Selanjutnya:
+1. **Review Plan** �+' Diskusi dengan stakeholder (Kepala Sekolah, Wakakurikulum)
+2. **Prioritas Features** �+' Pilih fase mana yang paling urgent
+3. **Setup Team** �+' Tentukan siapa mengerjakan apa
+4. **Create Sprint Plan** �+' Breakdown ke sprint 2 minggu
+5. **Start Development** �+' Mulai dari FASE 1
+
+### Rekomendasi Saya:
+**Mulai dari FASE 2.1 (Perizinan) dan FASE 2.2 (PKL) karena:**
+- �-?�-?�-?�-?�-? Paling sering digunakan
+- Melibatkan role baru (Guru Piket, Pembimbing)
+- Foundation untuk fitur lainnya
+- High impact untuk daily operations
+
+---
+
+**Mau saya breakdown lebih detail untuk fase tertentu?** 
+Atau **mulai implementasi dari fitur mana dulu?** dYs?
+
+---
+
+## PROGRESS IMPLEMENTASI (LOG SINGKAT)
+
+### Backend
+- [x] Entity `Jurusan` (`jurusan` table) dan repository `JurusanRepository` sudah dibuat.
+- [x] DTO `JurusanRequest` & `JurusanResponse` serta `JurusanService` sudah tersedia.
+- [x] REST API `JurusanController` dengan endpoint:
+  - `GET /api/jurusan`
+  - `GET /api/jurusan/{id}`
+  - `POST /api/jurusan`
+  - `PUT /api/jurusan/{id}`
+  - `DELETE /api/jurusan/{id}`
+- [x] CRUD `Kelas` di backend:
+  - DTO `KelasRequest` & `KelasResponse`
+  - `KelasService` dengan validasi `existsByNama`
+  - Update `KelasRepository` (`findByNama`, `existsByNama`)
+  - `KelasController` dengan endpoint:
+    - `GET /api/kelas`
+    - `GET /api/kelas/{id}`
+    - `GET /api/kelas/jurusan/{jurusan}`
+    - `POST /api/kelas`
+    - `PUT /api/kelas/{id}`
+    - `DELETE /api/kelas/{id}`
+
+### Desktop App
+- [x] Model desktop untuk manajemen master:
+  - `desktop-app/src/main/java/com/smk/presensi/desktop/model/Jurusan.java`
+  - `desktop-app/src/main/java/com/smk/presensi/desktop/model/Kelas.java`
+- [x] Service untuk konsumsi API:
+  - `JurusanService` memanggil `/api/jurusan` (GET all/byId, POST, PUT, DELETE)
+  - `KelasService` memanggil `/api/kelas` (GET all/byId, GET by jurusan, POST, PUT, DELETE)
+- [x] View & controller desktop:
+  - `jurusan-management.fxml` + `JurusanManagementController.java` (CRUD jurusan)
+  - `kelas-management.fxml` + `KelasManagementController.java` (CRUD kelas + preview assignment siswa per kelas/jurusan)
+- [x] Build backend dan desktop-app sudah berhasil (`mvn -DskipTests package` pada masing-masing modul).
+
+### Next Recommended (Belum Dikerjakan)
+- [ ] Integrasi manajemen kelas/jurusan ke dashboard desktop (menu & navigasi).
+- [ ] Endpoint backend khusus assignment siswa → kelas (misalnya `POST /api/kelas/{id}/assign-siswa`) lalu wiring ke `KelasManagementController`.
+- [ ] Laporan / rekap siswa per kelas & jurusan di modul laporan/analytics.
+

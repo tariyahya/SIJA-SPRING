@@ -45,8 +45,15 @@
                 <ComboBox fx:id="roleComboBox" prefWidth="Infinity" promptText="Select role">
                     <items>
                         <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="ADMIN"/>
-                            <String fx:value="USER"/>
+                            <String fx:value="ROLE_ADMIN"/>
+                            <String fx:value="ROLE_GURU"/>
+                            <String fx:value="ROLE_SISWA"/>
+                            <String fx:value="ROLE_GURU_PIKET"/>
+                            <String fx:value="ROLE_GURU_PEMBIMBING"/>
+                            <String fx:value="ROLE_GURU_BK"/>
+                            <String fx:value="ROLE_WAKAKURIKULUM"/>
+                            <String fx:value="ROLE_WAKAHUBIN"/>
+                            <String fx:value="ROLE_KAPROG"/>
                         </FXCollections>
                     </items>
                 </ComboBox>
