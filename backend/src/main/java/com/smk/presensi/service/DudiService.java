@@ -38,6 +38,11 @@ public class DudiService {
         dudi.setContactPerson(request.contactPerson());
         dudi.setContactPhone(request.contactPhone());
         dudi.setKuotaSiswa(request.kuotaSiswa());
+        dudi.setLatitude(request.latitude());
+        dudi.setLongitude(request.longitude());
+        if (request.radiusValidasi() != null) {
+            dudi.setRadiusValidasi(request.radiusValidasi());
+        }
         dudi.setAktif(request.aktif() == null || request.aktif());
 
         Dudi saved = dudiRepository.save(dudi);
@@ -54,6 +59,11 @@ public class DudiService {
         dudi.setContactPerson(request.contactPerson());
         dudi.setContactPhone(request.contactPhone());
         dudi.setKuotaSiswa(request.kuotaSiswa());
+        dudi.setLatitude(request.latitude());
+        dudi.setLongitude(request.longitude());
+        if (request.radiusValidasi() != null) {
+            dudi.setRadiusValidasi(request.radiusValidasi());
+        }
         if (request.aktif() != null) {
             dudi.setAktif(request.aktif());
         }
@@ -78,6 +88,9 @@ public class DudiService {
                 dudi.getContactPerson(),
                 dudi.getContactPhone(),
                 dudi.getKuotaSiswa(),
+                dudi.getLatitude(),
+                dudi.getLongitude(),
+                dudi.getRadiusValidasi(),
                 dudi.isAktif()
         );
     }

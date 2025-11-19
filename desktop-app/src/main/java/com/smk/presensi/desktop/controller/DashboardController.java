@@ -654,14 +654,14 @@ public class DashboardController implements Initializable {
     private void handleAnalytics() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/fxml/analytics.fxml")
+                getClass().getResource("/fxml/analytics-report.fxml")
             );
             Parent root = loader.load();
             
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Analytics & Reports");
-            stage.setScene(new Scene(root, 1200, 800));
+            stage.setScene(new Scene(root, 1000, 700));
             stage.showAndWait();
             
         } catch (IOException e) {
@@ -671,24 +671,24 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * Handle Dashboard Piket dari menu View
+     * Handle Office Management dari menu
      */
     @FXML
-    private void handlePiketDashboard() {
+    private void handleOfficeManagement() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/fxml/dashboard-piket.fxml")
+                getClass().getResource("/fxml/office-management.fxml")
             );
             Parent root = loader.load();
-
+            
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Dashboard Guru Piket");
-            stage.setScene(new Scene(root, 1100, 650));
+            stage.setTitle("Office Location Management");
+            stage.setScene(new Scene(root));
             stage.showAndWait();
-
+            
         } catch (IOException e) {
-            showError("Error loading Dashboard Piket: " + e.getMessage());
+            showError("Error loading Office Management: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -714,6 +714,29 @@ public class DashboardController implements Initializable {
                 connectionStatusLabel.setText("🔴 Disconnected");
                 connectionStatusLabel.setStyle("-fx-text-fill: red;");
             }
+        }
+    }
+
+    /**
+     * Handle Import / Export dari menu
+     */
+    @FXML
+    private void handleImportExport() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/fxml/import-export.fxml")
+            );
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Import / Export Data");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+            
+        } catch (IOException e) {
+            showError("Error loading Import/Export: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

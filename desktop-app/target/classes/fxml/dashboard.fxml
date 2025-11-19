@@ -18,6 +18,7 @@
                 <Menu text="File">
                     <MenuItem text="Export PDF..." onAction="#handleExportPdf"/>
                     <MenuItem text="Export CSV..." onAction="#handleExportCsv"/>
+                    <MenuItem text="Import/Export Data..." onAction="#handleImportExport"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Logout" onAction="#handleLogout"/>
                 </Menu>
@@ -30,6 +31,7 @@
                     <MenuItem text="Jurusan Management" onAction="#handleJurusanManagement"/>
                     <MenuItem text="Perizinan Siswa" onAction="#handleIzinManagement"/>
                     <MenuItem text="DUDI &amp; PKL Management" onAction="#handleDudiManagement"/>
+                    <MenuItem text="Office Location" onAction="#handleOfficeManagement"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="User Management" onAction="#handleUserManagement"/>
                 </Menu>

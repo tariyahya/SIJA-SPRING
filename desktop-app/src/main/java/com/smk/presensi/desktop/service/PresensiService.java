@@ -98,14 +98,18 @@ public class PresensiService {
             Map<String, Object> responseMap = gson.fromJson(response.body(), type);
             
             Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
-            
+            if (data == null) {
+                throw new IOException("Invalid response: 'data' field is missing in /laporan/harian");
+            }
+
             DashboardStats stats = new DashboardStats();
-            stats.setTotalPresensi(((Double) data.get("totalPresensi")).intValue());
-            stats.setTotalHadir(((Double) data.get("totalHadir")).intValue());
-            stats.setTotalTerlambat(((Double) data.get("totalTerlambat")).intValue());
-            stats.setTotalAlpha(((Double) data.get("totalAlpha")).intValue());
-            stats.setPersentaseHadir((Double) data.get("persentaseHadir"));
-            
+
+            stats.setTotalPresensi(asInt(data.get("totalPresensi")));
+            stats.setTotalHadir(asInt(data.get("totalHadir")));
+            stats.setTotalTerlambat(asInt(data.get("totalTerlambat")));
+            stats.setTotalAlpha(asInt(data.get("totalAlfa")));
+            stats.setPersentaseHadir(asDouble(data.get("persentaseHadir")));
+
             return stats;
         }
 
@@ -197,6 +201,26 @@ public class PresensiService {
     public boolean deletePresensi(Long id) throws IOException, InterruptedException {
         HttpResponse<String> response = apiClient.delete("/admin/presensi/" + id);
         return response.statusCode() == 200 || response.statusCode() == 204;
+    }
+
+    /**
+     * Helper: safely convert Object number ke int (default 0 kalau null / bukan Number).
+     */
+    private int asInt(Object value) {
+        if (value instanceof Number number) {
+            return number.intValue();
+        }
+        return 0;
+    }
+
+    /**
+     * Helper: safely convert Object number ke double (default 0.0 kalau null / bukan Number).
+     */
+    private double asDouble(Object value) {
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        }
+        return 0.0;
     }
 
     private AdminPresensiPayload toAdminPayload(Presensi p) {

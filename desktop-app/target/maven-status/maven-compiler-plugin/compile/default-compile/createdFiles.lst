@@ -1,3 +1,4 @@
+com\smk\presensi\desktop\controller\ImportExportController.class
 com\smk\presensi\desktop\service\PenempatanPklService$1.class
 com\smk\presensi\desktop\service\LocalCacheService.class
 com\smk\presensi\desktop\service\SettingsManager.class
@@ -8,17 +9,22 @@ com\smk\presensi\desktop\controller\AnalyticsController$3.class
 com\smk\presensi\desktop\controller\DudiManagementController.class
 com\smk\presensi\desktop\model\User.class
 com\smk\presensi\desktop\model\Dudi.class
+com\smk\presensi\desktop\controller\AnalyticsReportController.class
 com\smk\presensi\desktop\service\JurusanService.class
 com\smk\presensi\desktop\service\KelasService$AssignRequest.class
+com\smk\presensi\desktop\service\LokasiKantorService$3.class
 com\smk\presensi\desktop\service\KelasService$2.class
 com\smk\presensi\desktop\controller\DashboardController.class
 com\smk\presensi\desktop\controller\ApprovalIzinController.class
 com\smk\presensi\desktop\service\UserService$3.class
+com\smk\presensi\desktop\controller\OfficeManagementController.class
 com\smk\presensi\desktop\service\CachedPresensiService.class
 com\smk\presensi\desktop\util\InAppNotification.class
 com\smk\presensi\desktop\service\PresensiService$3.class
 com\smk\presensi\desktop\service\UserService$2.class
 com\smk\presensi\desktop\controller\DashboardPiketController.class
+com\smk\presensi\desktop\controller\OfficeManagementController$1.class
+com\smk\presensi\desktop\service\LokasiKantorService$1.class
 com\smk\presensi\desktop\service\SiswaService$2.class
 com\smk\presensi\desktop\service\PresensiService$1.class
 com\smk\presensi\desktop\controller\UserManagementController.class
@@ -28,12 +34,14 @@ com\smk\presensi\desktop\service\PresensiService$AdminPresensiPayload.class
 com\smk\presensi\desktop\service\UserService$1.class
 com\smk\presensi\desktop\controller\GuruManagementController.class
 com\smk\presensi\desktop\model\DashboardStats.class
+com\smk\presensi\desktop\service\LokasiKantorService.class
 com\smk\presensi\desktop\service\LocalCacheService$CacheStats.class
 com\smk\presensi\desktop\service\UserService.class
 com\smk\presensi\desktop\util\ChartUtils.class
 com\smk\presensi\desktop\controller\UserFormDialog.class
 com\smk\presensi\desktop\service\JurusanService$1.class
 com\smk\presensi\desktop\controller\DashboardController$1.class
+com\smk\presensi\desktop\service\LokasiKantorService$2.class
 com\smk\presensi\desktop\service\DudiService.class
 com\smk\presensi\desktop\controller\JurusanManagementController$1.class
 com\smk\presensi\desktop\model\Presensi.class
@@ -54,6 +62,7 @@ com\smk\presensi\desktop\service\PresensiService$2.class
 com\smk\presensi\desktop\util\ChartUtils$DateFormat.class
 com\smk\presensi\desktop\service\LaporanSiswaService.class
 com\smk\presensi\desktop\viewmodel\LoginViewModel.class
+com\smk\presensi\desktop\service\LokasiKantorService$4.class
 com\smk\presensi\desktop\viewmodel\DashboardViewModel.class
 com\smk\presensi\desktop\service\ExportService.class
 com\smk\presensi\desktop\model\AppSettings.class
@@ -61,6 +70,7 @@ com\smk\presensi\desktop\service\PresensiService.class
 com\smk\presensi\desktop\model\Izin.class
 com\smk\presensi\desktop\controller\AnalyticsController$2.class
 com\smk\presensi\desktop\model\PenempatanPkl.class
+com\smk\presensi\desktop\service\SessionManager$1.class
 com\smk\presensi\desktop\AnalyticsTestApp.class
 com\smk\presensi\desktop\service\KelasService.class
 com\smk\presensi\desktop\controller\UserManagementController$1.class
@@ -81,6 +91,7 @@ com\smk\presensi\desktop\service\SessionManager.class
 com\smk\presensi\desktop\controller\JurusanManagementController.class
 com\smk\presensi\desktop\service\NotificationService.class
 com\smk\presensi\desktop\model\Kelas.class
+com\smk\presensi\desktop\model\LokasiKantor.class
 com\smk\presensi\desktop\service\GuruService.class
 com\smk\presensi\desktop\controller\DudiManagementController$1.class
 com\smk\presensi\desktop\model\Jurusan.class

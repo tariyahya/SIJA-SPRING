@@ -320,6 +320,9 @@ public class DudiManagementController implements Initializable {
         TextField contactPersonField = new TextField();
         TextField contactPhoneField = new TextField();
         TextField kuotaField = new TextField();
+        TextField latField = new TextField();
+        TextField longField = new TextField();
+        TextField radiusField = new TextField();
         CheckBox aktifCheck = new CheckBox("Aktif");
         aktifCheck.setSelected(true);
 
@@ -329,6 +332,9 @@ public class DudiManagementController implements Initializable {
         contactPersonField.setPromptText("Nama PIC");
         contactPhoneField.setPromptText("No. HP PIC");
         kuotaField.setPromptText("Kuota siswa (opsional)");
+        latField.setPromptText("Latitude (e.g. -7.12345)");
+        longField.setPromptText("Longitude (e.g. 112.12345)");
+        radiusField.setPromptText("Radius (meter), default 100");
 
         if (existing != null) {
             namaField.setText(existing.getNama());
@@ -339,6 +345,9 @@ public class DudiManagementController implements Initializable {
             if (existing.getKuotaSiswa() != null) {
                 kuotaField.setText(existing.getKuotaSiswa().toString());
             }
+            if (existing.getLatitude() != null) latField.setText(existing.getLatitude().toString());
+            if (existing.getLongitude() != null) longField.setText(existing.getLongitude().toString());
+            if (existing.getRadiusValidasi() != null) radiusField.setText(existing.getRadiusValidasi().toString());
             aktifCheck.setSelected(existing.getAktif() != null ? existing.getAktif() : true);
         }
 
@@ -357,7 +366,13 @@ public class DudiManagementController implements Initializable {
         grid.add(contactPhoneField, 1, 4);
         grid.add(new Label("Kuota Siswa:"), 0, 5);
         grid.add(kuotaField, 1, 5);
-        grid.add(aktifCheck, 1, 6);
+        grid.add(new Label("Latitude:"), 0, 6);
+        grid.add(latField, 1, 6);
+        grid.add(new Label("Longitude:"), 0, 7);
+        grid.add(longField, 1, 7);
+        grid.add(new Label("Radius (m):"), 0, 8);
+        grid.add(radiusField, 1, 8);
+        grid.add(aktifCheck, 1, 9);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -382,8 +397,18 @@ public class DudiManagementController implements Initializable {
                 try {
                     String kuotaText = kuotaField.getText() != null ? kuotaField.getText().trim() : "";
                     d.setKuotaSiswa(kuotaText.isEmpty() ? null : Integer.parseInt(kuotaText));
+                    
+                    String latText = latField.getText() != null ? latField.getText().trim() : "";
+                    if (!latText.isEmpty()) d.setLatitude(Double.parseDouble(latText));
+                    
+                    String longText = longField.getText() != null ? longField.getText().trim() : "";
+                    if (!longText.isEmpty()) d.setLongitude(Double.parseDouble(longText));
+                    
+                    String radText = radiusField.getText() != null ? radiusField.getText().trim() : "";
+                    if (!radText.isEmpty()) d.setRadiusValidasi(Integer.parseInt(radText));
+                    
                 } catch (NumberFormatException e) {
-                    InAppNotification.show("Kuota siswa harus berupa angka",
+                    InAppNotification.show("Format angka salah (Kuota/Lat/Long/Radius)",
                             dudiTable.getParent(),
                             InAppNotification.NotificationType.WARNING,
                             3);

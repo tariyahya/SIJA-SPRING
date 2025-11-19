@@ -100,10 +100,25 @@ public class ApiClient {
     }
 
     /**
+     * GET request for binary data (e.g. file download)
+     */
+    public HttpResponse<byte[]> getBinary(String endpoint) throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + endpoint))
+                .timeout(TIMEOUT)
+                .GET();
+
+        if (jwtToken != null) {
+            builder.header("Authorization", "Bearer " + jwtToken);
+        }
+
+        return httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofByteArray());
+    }
+
+    /**
      * POST request dengan JWT token
      */
-    public HttpResponse<String> post(String endpoint, String jsonBody) 
-            throws IOException, InterruptedException {
+    public HttpResponse<String> post(String endpoint, String jsonBody) throws IOException, InterruptedException {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + endpoint))
                 .header("Content-Type", "application/json")

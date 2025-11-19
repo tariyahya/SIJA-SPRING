@@ -53,6 +53,7 @@
                                 <ToggleGroup fx:id="exportFormatGroup"/>
                             </toggleGroup>
                         </RadioButton>
+                        <RadioButton text="Excel (XLSX)" fx:id="excelFormatRadio" toggleGroup="$exportFormatGroup"/>
                         <RadioButton text="CSV" fx:id="csvFormatRadio" toggleGroup="$exportFormatGroup"/>
                     </HBox>
                     

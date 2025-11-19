@@ -31,7 +31,7 @@ public class UserService {
      * Get all users
      */
     public List<User> getAllUsers() throws IOException, InterruptedException {
-        // Backend base URL already includes /api, so endpoint di sini cukup /users
+        // Backend base URL sudah /api, jadi endpoint cukup /users
         HttpResponse<String> response = apiClient.get("/users");
 
         if (response.statusCode() != 200) {

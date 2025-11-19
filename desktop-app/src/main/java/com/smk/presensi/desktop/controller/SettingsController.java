@@ -26,6 +26,7 @@ public class SettingsController implements Initializable {
 
     // Export Settings
     @FXML private RadioButton pdfFormatRadio;
+    @FXML private RadioButton excelFormatRadio;
     @FXML private RadioButton csvFormatRadio;
     @FXML private TextField exportDirField;
     @FXML private CheckBox autoOpenExportCheck;
@@ -118,6 +119,8 @@ public class SettingsController implements Initializable {
         // Set export format radio buttons
         if ("PDF".equals(settings.getDefaultExportFormat())) {
             if (pdfFormatRadio != null) pdfFormatRadio.setSelected(true);
+        } else if ("EXCEL".equals(settings.getDefaultExportFormat())) {
+            if (excelFormatRadio != null) excelFormatRadio.setSelected(true);
         } else {
             if (csvFormatRadio != null) csvFormatRadio.setSelected(true);
         }
@@ -155,7 +158,12 @@ public class SettingsController implements Initializable {
         settings.setEnableWebSocket(enableWebSocketCheck.isSelected());
         settings.setAutoReconnect(autoReconnectCheck.isSelected());
         settings.setShowNotifications(showNotificationsCheck.isSelected());
-        settings.setDefaultExportFormat(pdfFormatRadio.isSelected() ? "PDF" : "CSV");
+        
+        String format = "CSV";
+        if (pdfFormatRadio.isSelected()) format = "PDF";
+        else if (excelFormatRadio.isSelected()) format = "EXCEL";
+        
+        settings.setDefaultExportFormat(format);
         settings.setDefaultExportPath(exportDirField.getText());
         
         // Save using SettingsManager

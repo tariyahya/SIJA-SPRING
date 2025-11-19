@@ -11,6 +11,9 @@ public class Dudi {
     private String contactPerson;
     private String contactPhone;
     private Integer kuotaSiswa;
+    private Double latitude;
+    private Double longitude;
+    private Integer radiusValidasi;
     private Boolean aktif;
 
     public Long getId() {
@@ -67,6 +70,30 @@ public class Dudi {
 
     public void setKuotaSiswa(Integer kuotaSiswa) {
         this.kuotaSiswa = kuotaSiswa;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Integer getRadiusValidasi() {
+        return radiusValidasi;
+    }
+
+    public void setRadiusValidasi(Integer radiusValidasi) {
+        this.radiusValidasi = radiusValidasi;
     }
 
     public Boolean getAktif() {

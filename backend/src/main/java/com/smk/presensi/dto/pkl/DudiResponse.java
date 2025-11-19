@@ -11,6 +11,9 @@ public record DudiResponse(
         String contactPerson,
         String contactPhone,
         Integer kuotaSiswa,
+        Double latitude,
+        Double longitude,
+        Integer radiusValidasi,
         Boolean aktif
 ) {
 }

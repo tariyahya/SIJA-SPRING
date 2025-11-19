@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.OfficeManagementController"
+            prefWidth="900" prefHeight="600">
+
+    <top>
+        <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+            <Label text="Office Location Management" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+            <Label text="Manage school locations for Geolocation validation" style="-fx-font-size: 12px; -fx-text-fill: #666;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <BorderPane style="-fx-padding: 20;">
+            <top>
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 0 0 15 0;">
+                    <Button fx:id="addButton" text="Add Location" onAction="#handleAdd" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                    <Button fx:id="editButton" text="Edit" onAction="#handleEdit" disable="true"/>
+                    <Button fx:id="deleteButton" text="Delete" onAction="#handleDelete" disable="true" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+                    <Button fx:id="activateButton" text="Set Active" onAction="#handleActivate" disable="true" style="-fx-background-color: #007bff; -fx-text-fill: white;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <ProgressIndicator fx:id="loadingIndicator" visible="false" prefWidth="20" prefHeight="20"/>
+                </HBox>
+            </top>
+            <center>
+                <TableView fx:id="table">
+                    <columns>
+                        <TableColumn fx:id="namaColumn" text="Name" prefWidth="200"/>
+                        <TableColumn fx:id="latColumn" text="Latitude" prefWidth="100"/>
+                        <TableColumn fx:id="longColumn" text="Longitude" prefWidth="100"/>
+                        <TableColumn fx:id="radiusColumn" text="Radius (m)" prefWidth="100"/>
+                        <TableColumn fx:id="activeColumn" text="Status" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>
