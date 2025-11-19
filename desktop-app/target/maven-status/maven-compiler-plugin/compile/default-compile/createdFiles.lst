@@ -99,5 +99,7 @@ com\smk\presensi\desktop\controller\LoginController.class
 com\smk\presensi\desktop\service\LaporanSiswaService$1.class
 com\smk\presensi\desktop\controller\ExportDateRangeDialog.class
 com\smk\presensi\desktop\service\IzinService.class
+com\smk\presensi\desktop\service\UserService$4.class
 com\smk\presensi\desktop\service\GuruService$1.class
+com\smk\presensi\desktop\service\ApiClient$1.class
 com\smk\presensi\desktop\util\ChartUtils$LegendPosition.class
