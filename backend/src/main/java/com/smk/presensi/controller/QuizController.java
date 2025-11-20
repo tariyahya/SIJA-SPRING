@@ -26,6 +26,11 @@ public class QuizController {
         return ResponseEntity.created(URI.create("/api/quiz/sessions/" + s.getId())).body(s);
     }
 
+    @GetMapping("/sessions")
+    public java.util.List<QuizSession> listSessions() {
+        return quizService.findAll();
+    }
+
     @PostMapping("/sessions/{id}/questions")
     public ResponseEntity<QuizQuestion> addQuestion(@PathVariable("id") Long sessionId, @RequestBody CreateQuizQuestionRequest req) {
         QuizQuestion q = quizService.addQuestion(sessionId, req);

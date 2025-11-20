@@ -1,0 +1,12 @@
+# CATATAN: Icon Launcher Belum Ada
+
+Saat ini aplikasi tidak menggunakan icon launcher karena file icon (`ic_launcher.png`) belum dibuat.
+
+Jika ingin menambahkan icon:
+1. Buka Android Studio
+2. Klik kanan pada folder `res` > New > Image Asset
+3. Pilih launcher icon type
+4. Upload gambar icon Anda atau gunakan clipart
+5. Generate semua ukuran icon secara otomatis
+
+Aplikasi tetap bisa berjalan tanpa icon, hanya akan menggunakan icon default Android.

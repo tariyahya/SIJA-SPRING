@@ -2,6 +2,9 @@ package com.smk.presensi.desktop.controller;
 
 import com.smk.presensi.desktop.model.Presensi;
 import com.smk.presensi.desktop.service.ApiClient;
+import com.smk.presensi.desktop.model.Kelas;
+import com.smk.presensi.desktop.service.CachedPresensiService;
+import com.smk.presensi.desktop.service.KelasService;
 import com.smk.presensi.desktop.service.PresensiService;
 import com.smk.presensi.desktop.service.UserService;
 import com.smk.presensi.desktop.util.InAppNotification;
@@ -17,6 +20,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -59,6 +65,7 @@ public class PresensiManagementController implements Initializable {
     @FXML private Button searchButton;
     @FXML private Button resetButton;
     @FXML private Button addButton;
+    @FXML private Button kelasButton;
     @FXML private Button refreshButton;
     @FXML private Button editButton;
     @FXML private Button deleteButton;
@@ -71,14 +78,19 @@ public class PresensiManagementController implements Initializable {
     @FXML private CheckBox mockDataCheckbox;
     
     private PresensiService presensiService;
+    private CachedPresensiService cachedService;
+    private KelasService kelasService;
     private ObservableList<Presensi> presensiList;
     private ObservableList<Presensi> filteredList;
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Initialize service with singleton ApiClient (shares JWT token)
         ApiClient apiClient = ApiClient.getInstance();
         presensiService = new PresensiService(apiClient);
+        cachedService = new CachedPresensiService(presensiService);
+        kelasService = new KelasService(apiClient);
         
         presensiList = FXCollections.observableArrayList();
         filteredList = FXCollections.observableArrayList();
@@ -137,6 +149,7 @@ public class PresensiManagementController implements Initializable {
         searchButton.setOnAction(e -> handleSearch());
         resetButton.setOnAction(e -> handleReset());
         addButton.setOnAction(e -> handleAdd());
+        kelasButton.setOnAction(e -> handleKelasAttendance());
         refreshButton.setOnAction(e -> loadData());
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
@@ -157,7 +170,8 @@ public class PresensiManagementController implements Initializable {
                     data = presensiService.getMockData();
                 } else {
                     LocalDate today = LocalDate.now();
-                    data = presensiService.getLaporanHarian(today);
+                    // Use cached service for offline support
+                    data = cachedService.getPresensiByDateRange(today, today);
                 }
                 
                 Platform.runLater(() -> {
@@ -214,6 +228,76 @@ public class PresensiManagementController implements Initializable {
         filteredList.setAll(presensiList);
         updateInfoLabel();
     }
+
+    @FXML
+    private void handleKelasAttendance() {
+        try {
+            List<Kelas> kelasList = kelasService.getAllKelas();
+            if (kelasList.isEmpty()) {
+                kelasList = createFallbackKelas();
+            }
+            if (kelasList.isEmpty()) {
+                InAppNotification.show("Data kelas kosong, tidak bisa buka absensi kelas",
+                        presensiTable.getParent(),
+                        InAppNotification.NotificationType.WARNING, 5);
+                return;
+            }
+
+            Dialog<KelasSelection> dialog = new Dialog<>();
+            dialog.setTitle("Absensi Manual Per Kelas");
+            dialog.setHeaderText("Pilih kelas dan jadwal pelajaran");
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+            ComboBox<Kelas> kelasCombo = new ComboBox<>(FXCollections.observableArrayList(kelasList));
+            kelasCombo.setPrefWidth(220);
+            kelasCombo.setPromptText("Pilih kelas");
+            if (!kelasList.isEmpty()) {
+                kelasCombo.getSelectionModel().selectFirst();
+            }
+
+            TextField mapelField = new TextField();
+            mapelField.setPromptText("Contoh: Matematika / RPL");
+            DatePicker tanggalPicker = new DatePicker(LocalDate.now());
+            TextField jamMulaiField = new TextField();
+            jamMulaiField.setPromptText("07:00");
+            TextField jamSelesaiField = new TextField();
+            jamSelesaiField.setPromptText("08:30");
+
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.addRow(0, new Label("Kelas"), kelasCombo);
+            grid.addRow(1, new Label("Mapel"), mapelField);
+            grid.addRow(2, new Label("Tanggal"), tanggalPicker);
+            grid.addRow(3, new Label("Jam Mulai"), jamMulaiField);
+            grid.addRow(4, new Label("Jam Selesai"), jamSelesaiField);
+
+            dialog.getDialogPane().setContent(grid);
+
+            dialog.setResultConverter(btn -> {
+                if (btn == ButtonType.OK) {
+                    Kelas selected = kelasCombo.getValue();
+                    if (selected == null) return null;
+                    return new KelasSelection(
+                            selected,
+                            tanggalPicker.getValue() != null ? tanggalPicker.getValue() : LocalDate.now(),
+                            mapelField.getText(),
+                            jamMulaiField.getText(),
+                            jamSelesaiField.getText()
+                    );
+                }
+                return null;
+            });
+
+            Optional<KelasSelection> result = dialog.showAndWait();
+            result.ifPresent(this::openEditKehadiranDialog);
+        } catch (Exception e) {
+            e.printStackTrace();
+            InAppNotification.show("Gagal membuka dialog absensi kelas: " + e.getMessage(),
+                    presensiTable.getParent(),
+                    InAppNotification.NotificationType.ERROR, 5);
+        }
+    }
     
     @FXML
     private void handleAdd() {
@@ -249,8 +333,6 @@ public class PresensiManagementController implements Initializable {
             dialog.getDialogPane().setContent(form);
             dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
             dialog.setResultConverter(buttonType -> {
                 if (buttonType == ButtonType.OK) {
                     Presensi p = new Presensi();
@@ -281,7 +363,8 @@ public class PresensiManagementController implements Initializable {
                 setLoading(true);
                 new Thread(() -> {
                     try {
-                        Presensi created = presensiService.createPresensi(p);
+                        // Use cached service for offline support
+                        Presensi created = cachedService.createPresensi(p);
                         Platform.runLater(() -> {
                             setLoading(false);
                             if (created != null) {
@@ -312,7 +395,60 @@ public class PresensiManagementController implements Initializable {
                     InAppNotification.NotificationType.ERROR, 5);
         }
     }
-    
+
+    private void openEditKehadiranDialog(KelasSelection selection) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/edit-kehadiran-dialog.fxml"));
+            Parent root = loader.load();
+            EditKehadiranController controller = loader.getController();
+
+            LocalTime jamMulai = parseTimeSafe(selection.jamMulai());
+            LocalTime jamSelesai = parseTimeSafe(selection.jamSelesai());
+
+            controller.initData(selection.kelas().getNama(),
+                    selection.tanggal(),
+                    selection.mapel(),
+                    jamMulai,
+                    jamSelesai);
+
+            Stage stage = new Stage();
+            stage.setTitle("Absensi Kelas - " + selection.kelas().getNama());
+            stage.initOwner(presensiTable.getScene().getWindow());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            loadData(); // refresh table after bulk submit
+        } catch (Exception e) {
+            e.printStackTrace();
+            InAppNotification.show("Gagal membuka form absensi kelas: " + e.getMessage(),
+                    presensiTable.getParent(),
+                    InAppNotification.NotificationType.ERROR, 5);
+        }
+    }
+
+    private LocalTime parseTimeSafe(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return LocalTime.parse(value, timeFormatter);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private List<Kelas> createFallbackKelas() {
+        return List.of(fallbackKelas(1L, "XII SIJA 1"),
+                fallbackKelas(2L, "XII SIJA 2"),
+                fallbackKelas(3L, "XI RPL 1"));
+    }
+
+    private Kelas fallbackKelas(Long id, String nama) {
+        Kelas kelas = new Kelas();
+        kelas.setId(id);
+        kelas.setNama(nama);
+        return kelas;
+    }
+
     @FXML
     private void handleEdit() {
         Presensi selected = presensiTable.getSelectionModel().getSelectedItem();
@@ -555,4 +691,6 @@ public class PresensiManagementController implements Initializable {
                          (filteredList.size() != presensiList.size() ? 
                           " (dari " + presensiList.size() + ")" : ""));
     }
+
+    private record KelasSelection(Kelas kelas, LocalDate tanggal, String mapel, String jamMulai, String jamSelesai) {}
 }

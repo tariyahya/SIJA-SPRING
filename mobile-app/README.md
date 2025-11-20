@@ -32,4 +32,15 @@ mobile-app/
 - [ ] Error API ditampilkan jelas agar siswa mudah debugging.
 - [ ] Setiap tahap memiliki README mini menjelaskan tujuan & tugas siswa.
 
-Tambahkan screenshot, wireframe, dan flow khusus mobile pada folder `docs/` untuk memudahkan siswa memahami UI/UX yang diinginkan.
+## Implementasi Saat Ini (Generated)
+
+Aplikasi dasar telah dibuat dengan fitur:
+- **Login**: Menggunakan endpoint `/api/auth/login`.
+- **Dashboard**: Menampilkan nama user.
+- **Checkin**: Mengirim data lokasi (dummy) ke `/api/presensi/checkin`.
+- **History**: Menampilkan list presensi dari `/api/presensi/histori`.
+
+### Cara Menjalankan
+1. Buka folder `mobile-app` di Android Studio.
+2. Sync Gradle.
+3. Jalankan di Emulator (pastikan backend running di port 8080).

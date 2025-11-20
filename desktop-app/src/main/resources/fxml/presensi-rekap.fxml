@@ -1,18 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="Under Construction" textFill="#666666">
-        <font>
-            <Font name="System Bold" size="24.0" />
-        </font>
-    </Label>
-    <Label text="This module is not yet implemented." textFill="#999999">
-        <font>
-            <Font size="16.0" />
-        </font>
-    </Label>
-</VBox>
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.PresensiRekapPlaceholderController"
+            styleClass="root"
+            stylesheets="@../css/dashboard.css">
+
+    <top>
+        <VBox>
+            <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                <Label text="Rekap Presensi (Placeholder)" styleClass="title">
+                    <font><Font name="System Bold" size="20"/></font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="infoLabel" text="Ready" styleClass="user-label"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label text="Periode:"/>
+                <DatePicker fx:id="startDatePicker"/>
+                <Label text="s/d"/>
+                <DatePicker fx:id="endDatePicker"/>
+                <Button fx:id="filterButton" text="Terapkan" styleClass="btn-primary"/>
+                <Button fx:id="resetButton" text="Reset" styleClass="btn-secondary"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <TableView fx:id="rekapTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="tanggalColumn" text="Tanggal" prefWidth="110"/>
+                    <TableColumn fx:id="kelasColumn" text="Kelas" prefWidth="130"/>
+                    <TableColumn fx:id="hadirColumn" text="Hadir" prefWidth="70"/>
+                    <TableColumn fx:id="izinColumn" text="Izin" prefWidth="70"/>
+                    <TableColumn fx:id="sakitColumn" text="Sakit" prefWidth="70"/>
+                    <TableColumn fx:id="alfaColumn" text="Alfa" prefWidth="70"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

@@ -103,6 +103,11 @@ public class LoginController implements Initializable {
      * Navigate ke Dashboard setelah login sukses
      */
     private void navigateToDashboard() {
+        // Pastikan control sudah punya Scene (bisa null saat initialize dipanggil sebelum Stage terlihat)
+        if (loginButton.getScene() == null) {
+            javafx.application.Platform.runLater(this::navigateToDashboard);
+            return;
+        }
         try {
             // Load dashboard FXML
             FXMLLoader loader = new FXMLLoader(
@@ -115,8 +120,12 @@ public class LoginController implements Initializable {
             dashboardController.setSessionManager(sessionManager);
 
             // Get current stage
+            if (loginButton.getScene() == null || loginButton.getScene().getWindow() == null) {
+                return;
+            }
+            
             Stage stage = (Stage) loginButton.getScene().getWindow();
-
+            
             // Set new scene
             Scene scene = new Scene(root);
             stage.setScene(scene);

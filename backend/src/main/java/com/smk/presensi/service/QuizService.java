@@ -82,4 +82,8 @@ public class QuizService {
     public Optional<QuizSession> findById(Long id) {
         return sessionRepo.findById(id);
     }
+
+    public java.util.List<QuizSession> findAll() {
+        return sessionRepo.findAll();
+    }
 }

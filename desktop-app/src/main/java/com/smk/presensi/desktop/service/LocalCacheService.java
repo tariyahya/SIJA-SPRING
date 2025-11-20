@@ -146,6 +146,35 @@ public class LocalCacheService {
     }
 
     /**
+     * Save offline presensi (synced = 0)
+     * Used when creating presensi while offline
+     */
+    public void saveOfflinePresensi(Presensi p) {
+        String sql = """
+            INSERT INTO presensi_cache 
+            (user_id, username, tipe, tanggal, jam_masuk, jam_pulang, status, method, keterangan, synced, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, datetime('now'))
+        """;
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setLong(1, p.getUserId());
+            pstmt.setString(2, p.getUsername());
+            pstmt.setString(3, p.getTipe());
+            pstmt.setString(4, p.getTanggal().toString());
+            pstmt.setString(5, p.getJamMasuk() != null ? p.getJamMasuk().toString() : null);
+            pstmt.setString(6, p.getJamPulang() != null ? p.getJamPulang().toString() : null);
+            pstmt.setString(7, p.getStatus());
+            pstmt.setString(8, p.getMethod());
+            pstmt.setString(9, p.getKeterangan());
+            
+            pstmt.executeUpdate();
+            System.out.println("Saved offline presensi for user: " + p.getUsername());
+        } catch (SQLException e) {
+            System.err.println("Failed to save offline presensi: " + e.getMessage());
+        }
+    }
+
+    /**
      * Get cached presensi by date range
      */
     public List<Presensi> getCachedPresensi(LocalDate startDate, LocalDate endDate) {
@@ -238,6 +267,78 @@ public class LocalCacheService {
         }
 
         return result;
+    }
+
+    /**
+     * Get all unsynced presensi records
+     */
+    public List<Presensi> getUnsyncedPresensi() {
+        List<Presensi> result = new ArrayList<>();
+        String sql = "SELECT * FROM presensi_cache WHERE synced = 0";
+
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Presensi p = new Presensi();
+                // Note: ID might be null or local ID, handled by backend on sync
+                p.setId(rs.getLong("id")); 
+                p.setUserId(rs.getLong("user_id"));
+                p.setUsername(rs.getString("username"));
+                p.setTipe(rs.getString("tipe"));
+                p.setTanggal(java.time.LocalDate.parse(rs.getString("tanggal")));
+                
+                String jamMasuk = rs.getString("jam_masuk");
+                if (jamMasuk != null) {
+                    p.setJamMasuk(java.time.LocalTime.parse(jamMasuk));
+                }
+                
+                String jamPulang = rs.getString("jam_pulang");
+                if (jamPulang != null) {
+                    p.setJamPulang(java.time.LocalTime.parse(jamPulang));
+                }
+                
+                p.setStatus(rs.getString("status"));
+                p.setMethod(rs.getString("method"));
+                p.setKeterangan(rs.getString("keterangan"));
+
+                result.add(p);
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to get unsynced presensi: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Mark records as synced after successful upload
+     */
+    public void markAsSynced(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return;
+
+        String sql = "UPDATE presensi_cache SET synced = 1, updated_at = datetime('now') WHERE id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            connection.setAutoCommit(false);
+            
+            for (Long id : ids) {
+                pstmt.setLong(1, id);
+                pstmt.addBatch();
+            }
+            
+            pstmt.executeBatch();
+            connection.commit();
+            connection.setAutoCommit(true);
+            System.out.println("Marked " + ids.size() + " records as synced");
+        } catch (SQLException e) {
+            System.err.println("Failed to mark as synced: " + e.getMessage());
+            try {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     /**

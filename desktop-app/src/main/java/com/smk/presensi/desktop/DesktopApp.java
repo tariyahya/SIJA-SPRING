@@ -1,5 +1,7 @@
 package com.smk.presensi.desktop;
 
+import com.smk.presensi.desktop.service.SyncService;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,6 +22,9 @@ public class DesktopApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Start background sync service
+        SyncService.getInstance().startBackgroundSync();
+
         try {
             // Load Login Screen first
             FXMLLoader loader = new FXMLLoader(
@@ -48,7 +53,7 @@ public class DesktopApp extends Application {
     @Override
     public void stop() {
         // Cleanup resources when app closes
-        System.out.println("Application closing...");
+        SyncService.getInstance().stop();
     }
 
     public static void main(String[] args) {

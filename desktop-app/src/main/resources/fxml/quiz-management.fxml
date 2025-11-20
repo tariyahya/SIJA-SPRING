@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.QuizManagementController"
+            styleClass="root"
+            stylesheets="@../css/dashboard.css">
+
+    <top>
+        <VBox>
+            <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+
+                <Label text="Manajemen Quiz Interaktif" styleClass="title">
+                    <font>
+                        <Font name="System Bold" size="20"/>
+                    </font>
+                </Label>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label fx:id="statusLabel" text="Ready" styleClass="user-label"/>
+                <ProgressIndicator fx:id="loadingIndicator" prefWidth="30" prefHeight="30" visible="false"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <SplitPane orientation="VERTICAL" dividerPositions="0.45">
+                <!-- Bagian atas: daftar sesi -->
+                <items>
+                    <VBox spacing="8">
+                        <TitledPane text="Daftar Sesi Quiz" expanded="true">
+                            <content>
+                                <VBox spacing="8">
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <Label text="Filter Mapel:"/>
+                                        <TextField fx:id="mapelFilterField" promptText="Ketik nama mapel"/>
+                                        <Label text="Status:"/>
+                                        <ComboBox fx:id="statusFilterCombo" prefWidth="120"/>
+                                        <Button fx:id="filterButton" text="Terapkan" styleClass="btn-primary"/>
+                                        <Button fx:id="refreshButton" text="Refresh" styleClass="btn-secondary"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="infoLabel" text="0 sesi"/>
+                                    </HBox>
+
+                                    <TableView fx:id="sessionTable" VBox.vgrow="ALWAYS">
+                                        <columns>
+                                            <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+                                            <TableColumn fx:id="judulColumn" text="Judul" prefWidth="200"/>
+                                            <TableColumn fx:id="guruColumn" text="Guru" prefWidth="150"/>
+                                            <TableColumn fx:id="kelasColumn" text="Kelas" prefWidth="120"/>
+                                            <TableColumn fx:id="mapelColumn" text="Mapel" prefWidth="120"/>
+                                            <TableColumn fx:id="tanggalColumn" text="Tanggal" prefWidth="100"/>
+                                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="80"/>
+                                            <TableColumn fx:id="tokenColumn" text="Token" prefWidth="90"/>
+                                        </columns>
+                                    </TableView>
+
+                                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                                        <Button fx:id="newSessionButton" text="Sesi Baru" styleClass="btn-success"/>
+                                        <Button fx:id="generateTokenButton" text="Generate Token/QR" styleClass="btn-primary" disable="true"/>
+                                        <Button fx:id="viewTokenButton" text="Lihat Token/QR" styleClass="btn-secondary" disable="true"/>
+                                    </HBox>
+                                </VBox>
+                            </content>
+                        </TitledPane>
+                    </VBox>
+
+                    <!-- Bagian bawah: detail & soal -->
+                    <VBox spacing="8">
+                        <TitledPane text="Detail Sesi &amp; Bank Soal" expanded="true">
+                            <content>
+                                <VBox spacing="8">
+                                    <GridPane hgap="10" vgap="6">
+                                        <padding>
+                                            <Insets top="8" right="10" bottom="8" left="10"/>
+                                        </padding>
+
+                                        <Label text="Judul:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="detailJudulField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                        <Label text="Mapel:" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                                        <TextField fx:id="detailMapelField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                                        <Label text="Tanggal:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="detailTanggalField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                        <Label text="Kelas:" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                                        <TextField fx:id="detailKelasField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                                        <Label text="Token:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                        <TextField fx:id="detailTokenField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                        <Label text="QR URL:" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                                        <TextField fx:id="detailQrField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+                                    </GridPane>
+
+                                    <SplitPane dividerPositions="0.6">
+                                        <items>
+                                            <!-- Tabel soal -->
+                                            <VBox spacing="6">
+                                                <Label text="Daftar Soal"/>
+                                                <TableView fx:id="questionTable" VBox.vgrow="ALWAYS">
+                                                    <columns>
+                                                        <TableColumn fx:id="soalColumn" text="Soal" prefWidth="260"/>
+                                                        <TableColumn fx:id="kunciColumn" text="Jawaban Benar" prefWidth="100"/>
+                                                        <TableColumn fx:id="bobotColumn" text="Bobot" prefWidth="60"/>
+                                                    </columns>
+                                                </TableView>
+                                            </VBox>
+
+                                            <!-- Form tambah soal -->
+                                            <VBox spacing="6">
+                                                <Label text="Tambah Soal"/>
+                                                <TextArea fx:id="soalArea" promptText="Tulis teks soal di sini" prefRowCount="3"/>
+                                                <GridPane hgap="6" vgap="4">
+                                                    <Label text="Opsi A:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                                    <TextField fx:id="opsiAField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                                    <Label text="Opsi B:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                                    <TextField fx:id="opsiBField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                                    <Label text="Opsi C:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                                    <TextField fx:id="opsiCField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                                    <Label text="Opsi D:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                                    <TextField fx:id="opsiDField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                                    <Label text="Jawaban:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                                    <ComboBox fx:id="jawabanCombo" prefWidth="80" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                                    <Label text="Bobot:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                                    <TextField fx:id="bobotField" promptText="1" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                                                </GridPane>
+
+                                                <HBox spacing="8" alignment="CENTER_RIGHT">
+                                                    <Region HBox.hgrow="ALWAYS"/>
+                                                    <Button fx:id="downloadTemplateButton" text="Unduh Template Excel" styleClass="btn-secondary"/>
+                                                    <Button fx:id="importQuestionsButton" text="Import Excel" styleClass="btn-primary" disable="true"/>
+                                                    <Button fx:id="addQuestionButton" text="Tambah Soal" styleClass="btn-primary" disable="true"/>
+                                                </HBox>
+                                            </VBox>
+                                        </items>
+                                    </SplitPane>
+                                </VBox>
+                            </content>
+                        </TitledPane>
+                    </VBox>
+                </items>
+            </SplitPane>
+        </VBox>
+    </center>
+</BorderPane>

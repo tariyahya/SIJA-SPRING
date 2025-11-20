@@ -1,0 +1,14 @@
+CARA MENJALANKAN APLIKASI MOBILE
+
+Karena Gradle tidak terinstall secara global di komputer ini (sehingga perintah 'gradle' tidak dikenali), Anda tidak bisa menjalankan aplikasi lewat terminal (PowerShell/CMD) secara langsung.
+
+Silakan ikuti langkah ini:
+
+1. Buka aplikasi "Android Studio".
+2. Pastikan project "mobile-app" sudah terbuka.
+3. Tunggu proses "Gradle Sync" di pojok kanan bawah selesai (sampai loading bar hilang).
+   - Jika Android Studio meminta untuk update Gradle wrapper, pilih "Yes" atau "Update". Ini akan membuatkan file 'gradlew' untuk Anda.
+4. Klik tombol "Run" (Ikon Segitiga Hijau ▶) di toolbar atas.
+5. Pilih Emulator (contoh: Pixel 3a) atau HP fisik Anda.
+
+Aplikasi akan otomatis di-build, di-install, dan dijalankan di emulator.

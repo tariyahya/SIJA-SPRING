@@ -1,18 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="Under Construction" textFill="#666666">
-        <font>
-            <Font name="System Bold" size="24.0" />
-        </font>
-    </Label>
-    <Label text="This module is not yet implemented." textFill="#999999">
-        <font>
-            <Font size="16.0" />
-        </font>
-    </Label>
-</VBox>
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.PeminjamanPlaceholderController"
+            styleClass="root"
+            stylesheets="@../css/dashboard.css">
+    <top>
+        <VBox>
+            <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+                <Label text="Peminjaman Sarpras (Placeholder)" styleClass="title">
+                    <font><Font name="System Bold" size="20"/></font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="infoLabel" text="Ready" styleClass="user-label"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="10">
+            <padding><Insets top="10" right="20" bottom="20" left="20"/></padding>
+            <TableView fx:id="pinjamTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="barangColumn" text="Barang" prefWidth="150"/>
+                    <TableColumn fx:id="peminjamColumn" text="Peminjam" prefWidth="150"/>
+                    <TableColumn fx:id="pinjamDateColumn" text="Tgl Pinjam" prefWidth="100"/>
+                    <TableColumn fx:id="kembaliDateColumn" text="Tgl Kembali" prefWidth="100"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.smk.presensi.mobile.app-merged_res-28:/xml_network_security_config.xml.flat",
+        "source": "com.smk.presensi.mobile.app-main-30:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.smk.presensi.mobile.app-merged_res-28:/layout_activity_login.xml.flat",
+        "source": "com.smk.presensi.mobile.app-main-30:/layout/activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\sija_003\\.gradle\\daemon\\8.4\\com.smk.presensi.mobile.app-merged_res-28:\\layout_activity_dashboard.xml.flat",
+        "source": "C:\\Users\\sija_003\\.gradle\\daemon\\8.4\\com.smk.presensi.mobile.app-main-30:\\layout\\activity_dashboard.xml"
+    },
+    {
+        "merged": "com.smk.presensi.mobile.app-merged_res-28:/layout_activity_dashboard.xml.flat",
+        "source": "com.smk.presensi.mobile.app-main-30:/layout/activity_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\sija_003\\.gradle\\daemon\\8.4\\com.smk.presensi.mobile.app-merged_res-28:\\layout_activity_login.xml.flat",
+        "source": "C:\\Users\\sija_003\\.gradle\\daemon\\8.4\\com.smk.presensi.mobile.app-main-30:\\layout\\activity_login.xml"
+    }
+]

@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="Under Construction" textFill="#666666">
-        <font>
-            <Font name="System Bold" size="24.0" />
-        </font>
-    </Label>
-    <Label text="This module is not yet implemented." textFill="#999999">
-        <font>
-            <Font size="16.0" />
-        </font>
-    </Label>
-</VBox>
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.smk.presensi.desktop.controller.JadwalManagementPlaceholderController"
+            styleClass="root"
+            stylesheets="@../css/dashboard.css">
+
+    <top>
+        <VBox>
+            <HBox styleClass="top-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                <Label text="Jadwal Mengajar" styleClass="title">
+                    <font><Font name="System Bold" size="20"/></font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="infoLabel" text="Ready" styleClass="user-label"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="20" bottom="20" left="20"/>
+            </padding>
+            <TableView fx:id="jadwalTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="hariColumn" text="Hari" prefWidth="90"/>
+                    <TableColumn fx:id="mapelColumn" text="Mapel" prefWidth="180"/>
+                    <TableColumn fx:id="guruColumn" text="Guru" prefWidth="180"/>
+                    <TableColumn fx:id="kelasColumn" text="Kelas" prefWidth="120"/>
+                    <TableColumn fx:id="jamColumn" text="Jam" prefWidth="140"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

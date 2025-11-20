@@ -3,11 +3,12 @@ package com.smk.presensi.desktop.util;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.Parent;
 import javafx.util.Duration;
 
 /**
@@ -20,6 +21,30 @@ public class InAppNotification {
      */
     public static void show(String message, Parent root) {
         show(message, root, NotificationType.INFO, 3);
+    }
+
+    /**
+     * Convenience success toast without custom root fallback (uses simple Alert when root null).
+     */
+    public static void showSuccess(String title, String message) {
+        if (title == null) title = "Berhasil";
+        showSimpleAlert(Alert.AlertType.INFORMATION, title, message);
+    }
+
+    /**
+     * Convenience error toast without custom root fallback (uses simple Alert when root null).
+     */
+    public static void showError(String title, String message) {
+        if (title == null) title = "Error";
+        showSimpleAlert(Alert.AlertType.ERROR, title, message);
+    }
+
+    private static void showSimpleAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.show();
     }
 
     /**

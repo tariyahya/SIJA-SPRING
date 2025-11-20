@@ -26,6 +26,9 @@ public class UlanganHarianService {
         this.apiClient = apiClient;
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(java.time.LocalDate.class,
+                        (com.google.gson.JsonDeserializer<LocalDate>) (json, type, context) ->
+                                LocalDate.parse(json.getAsString()))
                 .create();
     }
 
@@ -125,4 +128,3 @@ public class UlanganHarianService {
         }
     }
 }
-

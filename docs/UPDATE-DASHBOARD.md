@@ -160,7 +160,16 @@ Catatan implementasi per 20 Nov 2025 (backend):
 - **Presensi Guru di Kelas & Auto Jurnal Guru** sudah berjalan end-to-end: `PresensiGuruController` (desktop) menyimpan presensi guru dan langsung memanggil `JournalService` yang terhubung ke `GuruJurnalController` di backend.
 - **Penilaian UH (Ulangan Harian)** sudah memiliki entity, service, dan controller (`UlanganHarian`, `UlanganHarianService`, `UlanganHarianController` pada endpoint `/api/akademik/uh`).
 - **Quiz Interaktif** sudah memiliki API dasar melalui `QuizController` dan `QuizService` (`/api/quiz`) yang mendukung pembuatan sesi, penambahan soal, dan generate token + QR URL.
-Sisa pekerjaan adalah membangun UI desktop yang nyaman untuk guru (form input, import bank soal dari Excel, serta tampilan QR/token dan rekapan nilai), yang tetap dimasukkan ke backlog sprint berikutnya beserta estimasi effort dan dependensi tambahan.
+Sisa pekerjaan adalah menyempurnakan rekapan nilai peserta di desktop dan integrasi import bank soal berskala besar, yang tetap dimasukkan ke backlog sprint berikutnya beserta estimasi effort dan dependensi tambahan.
+
+#### 5.4.2 Implementasi Desktop: Manajemen Quiz (20 Nov 2025)
+
+- Layar baru `quiz-management.fxml` + `QuizManagementController` di desktop-app:
+  - Membuat sesi quiz (pilih Guru, Kelas, judul, mapel, materi, tanggal).
+  - Generate token & QR URL langsung dari desktop (memanggil `/api/quiz/sessions/{id}/token`). Token/QR dapat ditampilkan di dialog info untuk dibagikan ke peserta.
+  - Menambah soal secara manual (opsi A-D, jawaban benar, bobot) ke sesi terpilih.
+  - Import bank soal dari Excel (`.xlsx`): pengguna memilih file, dibaca di desktop, lalu tiap baris dikirim sebagai soal ke backend. Format kolom template: `Soal`, `Opsi A`, `Opsi B`, `Opsi C`, `Opsi D`, `Jawaban Benar (A/B/C/D)`, `Bobot`.
+  - Tombol “Unduh Template Excel” membuat file contoh `template_quiz.xlsx` secara lokal agar guru mudah menyiapkan bank soal.
 
 #### 5.4.1 API Quiz Interaktif (Backend Ready – 20 Nov 2025)
 

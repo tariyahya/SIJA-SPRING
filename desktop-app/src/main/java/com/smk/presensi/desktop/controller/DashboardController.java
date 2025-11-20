@@ -141,6 +141,7 @@ public class DashboardController implements Initializable {
     @FXML public void handleMapelManagement() { loadView("/fxml/mapel-management.fxml"); }
     @FXML public void handleJadwalManagement() { loadView("/fxml/jadwal-management.fxml"); }
     @FXML public void handleUlanganHarian() { loadView("/fxml/ulangan-harian.fxml"); }
+    @FXML public void handleQuizManagement() { loadView("/fxml/quiz-management.fxml"); }
 
     // Presensi
     @FXML public void handlePresensiManagement() { loadView("/fxml/presensi-management.fxml"); }

@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" 
+<BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.smk.presensi.desktop.controller.PresensiManagementController"
             styleClass="root"
@@ -17,44 +17,45 @@
                 <padding>
                     <Insets top="15" right="20" bottom="15" left="20"/>
                 </padding>
-                
-                <Label text="📋 Manajemen Presensi" styleClass="title">
+
+                <Label text="Manajemen Presensi" styleClass="title">
                     <font>
                         <Font name="System Bold" size="20"/>
                     </font>
                 </Label>
-                
+
                 <Region HBox.hgrow="ALWAYS"/>
-                
+
                 <Label fx:id="statusLabel" text="Ready" styleClass="user-label"/>
                 <ProgressIndicator fx:id="loadingIndicator" prefWidth="30" prefHeight="30" visible="false"/>
             </HBox>
-            
+
             <!-- Search and Action Bar -->
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="search-bar">
                 <padding>
                     <Insets top="10" right="20" bottom="10" left="20"/>
                 </padding>
-                
+
                 <DatePicker fx:id="startDatePicker" promptText="Tanggal Mulai" prefWidth="150"/>
-                
+
                 <DatePicker fx:id="endDatePicker" promptText="Tanggal Akhir" prefWidth="150"/>
-                
+
                 <ComboBox fx:id="tipeFilter" promptText="Filter Tipe" prefWidth="120"/>
-                
+
                 <ComboBox fx:id="statusFilter" promptText="Filter Status" prefWidth="150"/>
-                
-                <TextField fx:id="searchField" promptText="🔍 Cari Username..." prefWidth="200"/>
-                
+
+                <TextField fx:id="searchField" promptText="Cari Username..." prefWidth="200"/>
+
                 <Button fx:id="searchButton" text="Cari" styleClass="btn-primary"/>
-                
+
                 <Button fx:id="resetButton" text="Reset" styleClass="btn-secondary"/>
-                
+
                 <Region HBox.hgrow="ALWAYS"/>
-                
-                <Button fx:id="addButton" text="➕ Tambah Presensi" styleClass="btn-success"/>
-                
-                <Button fx:id="refreshButton" text="⟳ Refresh" styleClass="btn-primary"/>
+
+                <Button fx:id="addButton" text="Tambah Presensi" styleClass="btn-success"/>
+                <Button fx:id="kelasButton" text="Absensi Kelas" styleClass="btn-primary"/>
+
+                <Button fx:id="refreshButton" text="Refresh" styleClass="btn-primary"/>
             </HBox>
         </VBox>
     </top>
@@ -64,14 +65,14 @@
             <padding>
                 <Insets top="10" right="20" bottom="20" left="20"/>
             </padding>
-            
+
             <!-- Info Label -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label fx:id="infoLabel" text="Total: 0 presensi"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <CheckBox fx:id="mockDataCheckbox" text="Mock Data" selected="false"/>
             </HBox>
-            
+
             <!-- Table -->
             <TableView fx:id="presensiTable" VBox.vgrow="ALWAYS">
                 <columns>
@@ -90,11 +91,11 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
-            
+
             <!-- Action Buttons -->
             <HBox spacing="10" alignment="CENTER_RIGHT">
-                <Button fx:id="editButton" text="✏️ Edit" styleClass="btn-warning" disable="true"/>
-                <Button fx:id="deleteButton" text="🗑️ Delete" styleClass="btn-danger" disable="true"/>
+                <Button fx:id="editButton" text="Edit" styleClass="btn-warning" disable="true"/>
+                <Button fx:id="deleteButton" text="Delete" styleClass="btn-danger" disable="true"/>
                 <Button fx:id="closeButton" text="Close" styleClass="btn-secondary"/>
             </HBox>
         </VBox>

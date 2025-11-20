@@ -71,6 +71,7 @@
                                             <Button maxWidth="Infinity" onAction="#handleMapelManagement" styleClass="submenu-button" text="Mata Pelajaran" />
                                             <Button maxWidth="Infinity" onAction="#handleJadwalManagement" styleClass="submenu-button" text="Jadwal Mengajar" />
                                             <Button maxWidth="Infinity" onAction="#handleUlanganHarian" styleClass="submenu-button" text="Penilaian UH" />
+                                            <Button maxWidth="Infinity" onAction="#handleQuizManagement" styleClass="submenu-button" text="Manajemen Quiz" />
                                         </VBox>
                                     </content>
                                 </TitledPane>

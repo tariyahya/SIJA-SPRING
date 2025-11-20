@@ -114,6 +114,36 @@ public class CachedPresensiService {
     }
 
     /**
+     * Create presensi with offline support
+     * Try: API -> Local Cache (offline)
+     */
+    public Presensi createPresensi(Presensi presensi) throws Exception {
+        try {
+            // Try API first
+            Presensi created = presensiService.createPresensi(presensi);
+            
+            // If success, cache it (synced=1)
+            new Thread(() -> localCache.cachePresensi(List.of(created))).start();
+            
+            // Invalidate memory cache
+            clearMemoryCache();
+            
+            return created;
+        } catch (Exception e) {
+            System.err.println("⚠ API failed, saving offline: " + e.getMessage());
+            
+            // Save offline (synced=0)
+            localCache.saveOfflinePresensi(presensi);
+            
+            // Invalidate memory cache
+            clearMemoryCache();
+            
+            // Return the object (it won't have a real ID yet)
+            return presensi;
+        }
+    }
+
+    /**
      * Cache entry with TTL
      */
     private static class CacheEntry<T> {
