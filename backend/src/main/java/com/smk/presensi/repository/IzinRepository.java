@@ -18,5 +18,9 @@ public interface IzinRepository extends JpaRepository<Izin, Long> {
             LocalDate start,
             LocalDate end
     );
+
+    List<Izin> findBySiswa_Id(Long siswaId);
+
+    List<Izin> findBySiswa_IdAndStatus(Long siswaId, IzinStatus status);
 }
 

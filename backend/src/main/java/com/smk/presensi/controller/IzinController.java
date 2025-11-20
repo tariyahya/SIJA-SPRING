@@ -57,6 +57,29 @@ public class IzinController {
     }
 
     /**
+     * Daftar izin milik user yang login.
+     */
+    @GetMapping("/my")
+    @PreAuthorize("isAuthenticated()")
+    public List<IzinResponse> getMine() {
+        return izinService.getMine();
+    }
+
+    /**
+     * Pencarian izin dengan filter siswaId/status.
+     *
+     * Access: ADMIN, GURU_PIKET, GURU_BK, WAKAKURIKULUM
+     */
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN','GURU_PIKET','GURU_BK','WAKAKURIKULUM')")
+    public List<IzinResponse> search(
+            @RequestParam(required = false) Long siswaId,
+            @RequestParam(required = false) String status
+    ) {
+        return izinService.search(siswaId, status);
+    }
+
+    /**
      * Daftar semua izin (opsional, untuk admin).
      *
      * Access: ADMIN

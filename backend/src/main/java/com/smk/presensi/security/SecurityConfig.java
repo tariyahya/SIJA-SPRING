@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -138,8 +139,9 @@ public class SecurityConfig {
                 // 4. Authorization rules: Tentukan endpoint mana yang perlu auth
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints (tidak perlu authentication)
-                        // Auth endpoints: login, register
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        // Auth endpoints: login (public), register khusus admin
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").hasRole("ADMIN")
                         
                         // H2 Console (untuk development)
                         .requestMatchers("/h2-console/**").permitAll()

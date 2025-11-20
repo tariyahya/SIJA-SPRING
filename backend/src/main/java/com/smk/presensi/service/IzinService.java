@@ -94,6 +94,51 @@ public class IzinService {
     }
 
     /**
+     * Daftar izin milik user yang login (berdasarkan relasi Siswa �?' User).
+     */
+    public List<IzinResponse> getMine() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new RuntimeException("Konteks user tidak ditemukan");
+        }
+        User currentUser = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User " + authentication.getName() + " tidak ditemukan"));
+
+        Siswa siswa = siswaRepository.findByUser(currentUser)
+                .orElseThrow(() -> new RuntimeException("User " + authentication.getName() + " tidak terhubung dengan data siswa"));
+
+        return izinRepository.findBySiswa_Id(siswa.getId())
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Cari izin berdasar siswaId dan/atau status.
+     */
+    public List<IzinResponse> search(Long siswaId, String status) {
+        IzinStatus filterStatus = null;
+        if (status != null && !status.isBlank()) {
+            filterStatus = parseStatus(status);
+        }
+
+        List<Izin> izinList;
+        if (siswaId != null && filterStatus != null) {
+            izinList = izinRepository.findBySiswa_IdAndStatus(siswaId, filterStatus);
+        } else if (siswaId != null) {
+            izinList = izinRepository.findBySiswa_Id(siswaId);
+        } else if (filterStatus != null) {
+            izinList = izinRepository.findByStatus(filterStatus);
+        } else {
+            izinList = izinRepository.findAll();
+        }
+
+        return izinList.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Approval / reject izin oleh Guru Piket / Admin.
      */
     public IzinResponse approve(Long id, IzinApprovalRequest request) {
